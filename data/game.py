@@ -1,9 +1,15 @@
+from constants import FRAMES_PER_SECOND
+
 class Game:
-    def __init()__:
+    """
+    Main class of the game, handles highest level functions
+    """
+    def __init__(self):
         self.running = True
 
-    def main():
-        while not self.done:
-            lag += game.clock.tick(self.fps)
-            self.event_loop()
-            self.draw(lag/TIME_PER_UPDATE)
+    def main(self):
+        while self.running:
+            pass
+            # lag += game.clock.tick(FRAMES_PER_SECOND)
+            # self.event_loop()
+            # self.draw(lag/TIME_PER_UPDATE)

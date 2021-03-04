@@ -1,5 +1,5 @@
 # python aux files
-__pycache__/
+__pycache__
 *.pyc
 
 # vim aux files
