@@ -19,6 +19,7 @@ class Game:
         self.running = True
         self.events = None
 
+        self.clock = pygame.time.Clock()
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Verge of tomorrow')
 
@@ -35,7 +36,7 @@ class Game:
         Runs main loop, where state and time is defined
         """
         while self.running:
-            pygame.time.Clock().tick(FRAMES_PER_SECOND)
+            self.clock.tick(FRAMES_PER_SECOND)
 
             self.handle_input()
             self.state_machine.update(self.events, self.window)
