@@ -5,8 +5,8 @@ go to either about screen or play screen
 
 import pygame
 
-from ..utils import is_in_rect
 from .base.state import State
+from ..utils import is_in_rect
 from ..constants import WHITE, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT
 
 class Select(State):
@@ -47,5 +47,7 @@ class Select(State):
         if pygame.mouse.get_pressed()[0]:
             if is_in_rect(self.about_rect, pygame.mouse.get_pos()):
                 self.next = 'ABOUT'
+                self.clear_window = True
             elif is_in_rect(self.play_rect, pygame.mouse.get_pos()):
                 self.next = 'PLAY'
+                self.clear_window = True

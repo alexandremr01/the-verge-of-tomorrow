@@ -7,6 +7,8 @@ import pygame
 from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FRAMES_PER_SECOND
 from .screens.title import Title
 from .screens.select import Select
+from .screens.play import Play
+from .screens.about import About
 from .screens.base.state_machine import StateMachine
 
 class Game:
@@ -22,7 +24,9 @@ class Game:
 
         state_dict = {
             'TITLE': Title(),
-            'SELECT': Select()
+            'SELECT': Select(),
+            'PLAY': Play(),
+            'ABOUT': About()
         }
         self.state_machine = StateMachine(state_dict, 'TITLE')
 
