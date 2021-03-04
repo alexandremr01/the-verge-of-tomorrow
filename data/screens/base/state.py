@@ -9,3 +9,23 @@ class State:
     a given possible screen mode in the game, which are managed
     by the state machine class
     """
+    def __init__(self):
+        self.next = None
+
+    def update(self):
+        """
+        Updates the elements of this state through time,
+        should be overloaded in children
+        """
+
+    def draw(self, surface):
+        """
+        Draws this state on surface, should be overloaded
+        """
+
+    def handle_input(self, events, keys):
+        """
+        Updates its elements based on a given input by user,
+        in the form of pygame events and keys, should be
+        overloaded
+        """

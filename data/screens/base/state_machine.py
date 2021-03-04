@@ -12,19 +12,26 @@ class StateMachine:
         self.current_state = initial_state
         self.previous_state = None
 
-    def update(self, event):
+    def update(self, events, keys):
         """
         Gives information to current state, make decision based on it
-        and then draw the final state decided
+        and then updates state if the current state decided to do so
         """
-        self.current_state.handle_event(event)
+        self.current_state.handle_input(events, keys)
         self.update_state()
-        self.current_state.draw()
 
     def update_state(self):
         """
         Updates to the new state defined by the current state class
         """
+        self.current_state.update()
+
         if self.current_state.next is not None:
             self.previous_state = self.current_state
             self.current_state = self.states_dict[self.previous_state.next]
+
+    def draw_current(self, surface):
+        """
+        Draws the current state on surface
+        """
+        self.current_state.draw(surface)
