@@ -42,3 +42,4 @@ class Title(State):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 self.next = 'SELECT'
+                self.clear_window = True

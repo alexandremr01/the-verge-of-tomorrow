@@ -11,6 +11,7 @@ class State:
     """
     def __init__(self):
         self.next = None
+        self.clear_window = False
 
     def update(self):
         """

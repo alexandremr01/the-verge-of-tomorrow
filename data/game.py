@@ -6,6 +6,7 @@ import pygame
 
 from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FRAMES_PER_SECOND
 from .screens.title import Title
+from .screens.select import Select
 from .screens.base.state_machine import StateMachine
 
 class Game:
@@ -19,7 +20,10 @@ class Game:
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Verge of tomorrow')
 
-        state_dict = {'TITLE'   : Title()}
+        state_dict = {
+            'TITLE': Title(),
+            'SELECT': Select()
+        }
         self.state_machine = StateMachine(state_dict, 'TITLE')
 
     def main(self):
