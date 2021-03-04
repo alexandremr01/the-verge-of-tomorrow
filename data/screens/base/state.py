@@ -15,7 +15,8 @@ class State:
     def update(self):
         """
         Updates the elements of this state through time,
-        should be overloaded in children
+        should be overloaded in children, unless if it is
+        a static image
         """
 
     def draw(self, surface):
@@ -23,7 +24,7 @@ class State:
         Draws this state on surface, should be overloaded
         """
 
-    def handle_input(self, events, keys):
+    def handle_input(self, events):
         """
         Updates its elements based on a given input by user,
         in the form of pygame events and keys, should be

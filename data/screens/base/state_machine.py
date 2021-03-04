@@ -5,20 +5,24 @@ like selection, title and scores
 
 class StateMachine:
     """
-    State machine that handles screen change in game
+    State machine that handles screen change in game,
+    constructed with a dictionary describing the states
+    to manage and its initial_state
     """
     def __init__(self, states_dict, initial_state):
         self.states_dict = states_dict
-        self.current_state = initial_state
+        self.current_state = self.states_dict[initial_state]
         self.previous_state = None
 
-    def update(self, events, keys):
+    def update(self, events, surface):
         """
         Gives information to current state, make decision based on it
-        and then updates state if the current state decided to do so
+        and then updates state if the current state decided to do so,
+        drawing it afterwards
         """
-        self.current_state.handle_input(events, keys)
+        self.current_state.handle_input(events)
         self.update_state()
+        self.current_state.draw(surface)
 
     def update_state(self):
         """
@@ -29,9 +33,3 @@ class StateMachine:
         if self.current_state.next is not None:
             self.previous_state = self.current_state
             self.current_state = self.states_dict[self.previous_state.next]
-
-    def draw_current(self, surface):
-        """
-        Draws the current state on surface
-        """
-        self.current_state.draw(surface)
