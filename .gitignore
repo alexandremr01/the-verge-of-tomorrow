@@ -1,4 +1,20 @@
+# python aux files
 __pycache__/
+*.pyc
 
+# vim aux files
+*.swp
 
+# eclipse aux files
+.project
+.settings
+
+# pycharm aux files
+.idea
+
+# vs code aux files
+.vscode/
+
+# Apple macOS aux file
 .DS_Store
+
