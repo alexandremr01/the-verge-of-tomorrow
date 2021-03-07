@@ -6,6 +6,7 @@ programmed to stalk and hurt him
 import numpy as np
 from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
+from ...constants import CONTACT_DISTANCE, FRAMES_PER_SECOND
 
 class Enemy(Entity):
     """
@@ -16,14 +17,32 @@ class Enemy(Entity):
         self.health = DEFAULT_ENEMY_HEALTH
         self.velocity = DEFAULT_ENEMY_VELOCITY
 
-    def ai_move(self, target):
+        self.previous_pos = None
+        self.curr_pos = position
+
+    def estimate_velocity(self):
+        """
+        Obtains an estimate of enemy velocity
+        by finite differences
+        """
+        velocity = (np.array(self.curr_pos) - np.array(self.previous_pos))*FRAMES_PER_SECOND
+
+        return np.linalg.norm(velocity)
+
+    def ai_move(self, target): # TODO: it only goes in the direction of target, should be smarter
         """
         Function responsible for making the enemy go towards
         the player
         param target: where it should go, supposedly the player position
         type target: numpy array
         """
-        curr = np.array(self.get_position())
-        diff = target - curr
+        diff = target - self.curr_pos
+
+        if np.linalg.norm(diff) < CONTACT_DISTANCE:
+            self.previous_pos = self.curr_pos
+            return
         diff = diff/np.linalg.norm(diff)
         self.move(diff[0]*self.velocity, diff[1]*self.velocity)
+
+        self.previous_pos = self.curr_pos
+        self.curr_pos = self.get_position()

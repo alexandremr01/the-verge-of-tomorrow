@@ -3,8 +3,8 @@ Main screen, where the game actually occurs
 """
 
 from .base.state import State
-from ..map import RandomMap
-from ..setup import graphics_dict
+from ..test_maps import WaveMap
+from ..constants import BLACK
 
 class Play(State):
     """
@@ -14,15 +14,19 @@ class Play(State):
     def __init__(self):
         super().__init__()
 
-        self.map = RandomMap(graphics_dict["test_spritesheet"])
+        self.map = WaveMap()
 
     def update(self):
-        pass
+        """
+        Updates the game
+        """
+        self.map.update()
 
     def draw(self, surface):
         """
         Draws the game
         """
+        surface.fill(BLACK)
         self.map.draw(surface)
 
     def handle_input(self, events):
