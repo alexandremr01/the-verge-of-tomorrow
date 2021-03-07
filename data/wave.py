@@ -5,6 +5,7 @@ them.
 """
 
 from .constants import ENEMIES_INCREMENT_PER_WAVE
+from .components.enemies.zombie import Zombie
 
 class Wave:
     """
@@ -21,7 +22,7 @@ class Wave:
 
         self.wave_over = True
 
-    def new_wave(self):
+    def new_wave(self): # TODO: night/day dynamics
         """
         Creates a new wave, resetting its params.
         The number of players increases by 5 as each
@@ -62,8 +63,16 @@ class Wave:
 
         self.num_enemies_to_spawn += 1
 
-    def generate_enemy(self):
-        pass
+    def generate_enemy(self, pos):
+        """
+        Creates an enemy located on pos
+        """
+        if self.num_enemies_to_spawn == 0:
+            print('Error: create enemy requested, but exceeds number of spawns of this wave')
+            return None
+
+        self.num_enemies_to_spawn -= 1
+        return Zombie(pos) # TODO: use procedure to choose between enemies depending on wave
 
     def spawns_left(self):
         """

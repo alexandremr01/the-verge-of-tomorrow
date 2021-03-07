@@ -3,8 +3,8 @@ Main screen, where the game actually occurs
 """
 
 from .base.state import State
-from ..components.base.sprite import SpriteSheet
 from ..map import RandomMap
+from ..setup import graphics_dict
 
 class Play(State):
     """
@@ -14,9 +14,7 @@ class Play(State):
     def __init__(self):
         super().__init__()
 
-        sprite_sheet_loc = '../survival-game/resources/graphics/spritesheet-example.png'
-        self.spritesheet = SpriteSheet(sprite_sheet_loc, 16, 128, 160)
-        self.map = RandomMap(self.spritesheet)
+        self.map = RandomMap(graphics_dict["test_spritesheet"])
 
     def update(self):
         pass

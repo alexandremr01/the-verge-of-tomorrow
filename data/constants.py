@@ -3,7 +3,6 @@ This module contains constant variables used throughout all
 code
 """
 
-
 # Screen
 FRAMES_PER_SECOND = 60
 SCREEN_WIDTH = 800
@@ -25,3 +24,12 @@ MAX_OBJECT_COUNT = 100
 
 # Waves
 ENEMIES_INCREMENT_PER_WAVE = 5
+
+# Enemies
+DEFAULT_ENEMY_VELOCITY = 0.1
+DEFAULT_ENEMY_HEALTH = 100
+ZOMBIE_VELOCITY = 0.1
+ZOMBIE_HEALTH = 110
+
+# Directories
+BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'

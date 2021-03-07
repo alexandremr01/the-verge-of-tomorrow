@@ -84,8 +84,7 @@ class SpriteSheet:
         if scale is not None:
             sprite = pygame.transform.scale(self.sprites[index], scale)
             return sprite
-        else:
-            return self.sprites[index]
+        return self.sprites[index]
 
     def get_resolution(self):
         """
