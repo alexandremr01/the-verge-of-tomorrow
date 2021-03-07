@@ -4,7 +4,7 @@ Class supposed to contain entities that will be rendered at game state
 
 import numpy as np
 from .constants import *
-from .components.sprite import Sprite
+from .components.base.sprite import Sprite
 
 class Chunk:
     def __init__(self, position=(-1, -1)):

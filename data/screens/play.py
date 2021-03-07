@@ -3,7 +3,7 @@ Main screen, where the game actually occurs
 """
 
 from .base.state import State
-from ..components.sprite import SpriteSheet
+from ..components.base.sprite import SpriteSheet
 from ..map import RandomMap
 
 class Play(State):

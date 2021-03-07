@@ -10,10 +10,10 @@ class Sprite(pygame.sprite.Sprite):
     """
     def __init__(self, initial_center, spritesheet):
         """
-        param spritesheet : Sprite's graphics
-        type spritesheet : pygame.Surface
-        param initial_center : sprite's initial center position
-        type initial_center : two-dimensional tuple
+        param spritesheet: Sprite's graphics
+        type spritesheet: pygame.Surface
+        param initial_center: sprite's initial center position
+        type initial_center: two-dimensional tuple
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface(spritesheet.get_rect().size).convert_alpha()
@@ -22,37 +22,55 @@ class Sprite(pygame.sprite.Sprite):
                                                initial_center[1] - self.image.get_rect().height / 2)
 
     def get_image(self):
+        """
+        Returns its pygame surface
+        """
         return self.image
 
     def get_position(self):
+        """
+        Returns its top left corner position
+        """
         return (self.rect.left, self.rect.top)
 
     def get_center(self):
+        """
+        Returns its center position
+        """
         return self.rect.center
 
     def get_width(self):
+        """
+        Returns width
+        """
         return self.rect.width
 
     def get_height(self):
+        """
+        Returns height
+        """
         return self.rect.height
 
-    def update(self, dx, dy):
-        self.rect.move_ip(dx, dy)
-       
+    def update(self, d_x, d_y):
+        """
+        Moves its image d_x units left and d_y units down
+        """
+        self.rect.move_ip(d_x, d_y)
+
 class SpriteSheet:
     """
     A collection of game's graphics
     """
     def __init__(self, path, resolution, width, height):
         """
-        param path : path to the spritsheet
-        type path : string
-        param resolution : spritesheet's resolution
-        type resolution : int
-        param width:
+        param path: path to the spritsheet
+        type path: string
+        param resolution: spritesheet's resolution
+        type resolution: int
+        param width: width
         type width: int
-        param width:
-        type width: int
+        param height: height
+        type height: int
         """
         self.sprites = []
         self.resolution = resolution
@@ -73,7 +91,7 @@ class SpriteSheet:
 
     def get_image(self, index, scale=None):
         """
-        Returns the sprite at index 
+        Returns the sprite at index
         """
         if scale is not None:
             sprite = pygame.transform.scale(self.sprites[index], scale)
