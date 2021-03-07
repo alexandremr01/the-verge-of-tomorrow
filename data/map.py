@@ -3,8 +3,10 @@ Class supposed to contain entities that will be rendered at game state
 """
 
 import numpy as np
-from .constants import *
+from .constants import SCREEN_HEIGHT, SCREEN_WIDTH
+from .constants import MAP_WIDTH, MAP_HEIGHT, CHUNK_SIZE, MAX_OBJECT_COUNT
 from .components.base.sprite import Sprite
+from .wave import Wave
 
 class Chunk:
     def __init__(self, position=(-1, -1)):
@@ -20,6 +22,9 @@ class Map:
     def __init__(self, spawn_parameters, width=MAP_WIDTH, height=MAP_HEIGHT, chunk_size=CHUNK_SIZE):
         self.width = width
         self.height = height
+        self.wave = Wave()
+        self.wave.new_wave()
+
         self.chunk_size = CHUNK_SIZE
         self.gridmap = np.array([[Chunk(np.array([row, column]) * CHUNK_SIZE)
                                   for row in range(MAP_HEIGHT / CHUNK_SIZE)]
@@ -29,7 +34,6 @@ class Map:
         self.spawn_distance = spawn_parameters["spawn_distance"]
         self.despawn_distance = spawn_parameters["despawn_distance"]
         self.entities = []
-        self.entity_count = 0
 
     def spawn_entities(self):
         """
@@ -42,8 +46,7 @@ class Map:
         # index = 0
         # for entity in self.entities:
         #   if entity.health == 0:
-        #       entity.killed()
-        #       self.entity_count -= 1
+        #       self.wave.notify_kill()
         #       r_entity.append(index)
         #   index += 1
         # self.entitites = np.delete(self.entities, r_entity)
@@ -53,19 +56,16 @@ class Map:
         # live_entities = []
         # for entity in self.entities:
         #   if entity.health == 0:
-        #       entity.killed()     # Alerts wave parameters that enemy has been killed
-        #       self.entity_count -= 1
+        #       self.wave.notify_kill()
         #   elif distance(entity.position, player.position) > self.despawn_distance:
-        #       entity.despawn()    # Alerts wave parameters that enemy has been despawned
-        #       self.entity_count -= 1
+        #       self.wave.notify_despawn()
         #   else:
         #       live_entities.append(entity)
         # self.entities = live_entities
 
         # IF WAVE NOT CLEARED SPAWNS NEW ENTITY
-        # if 0 < wave.entities_left() != self.entity_count:
-        #   new_entity = wave.gen_new_entity(gen_random_spawn_pos(spawn_dist))
-        #   self.entities.append(new_entity)
+        # if self.wave.spawns_left():
+        #   self.entities.append(self.wave.generate_enemy())
         pass
 
     def spawn_objects(self):
@@ -135,6 +135,9 @@ class Map:
         spawns new entities and objects,
         despawns out of range ones.
         """
+        if self.wave.finished():
+            self.wave.new_wave()
+
         self.update_positions()
         self.spawn_entities()
         self.spawn_objects()
