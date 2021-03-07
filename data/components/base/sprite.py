@@ -8,16 +8,16 @@ class Sprite(pygame.sprite.Sprite):
     """
     Base class for game's sprite
     """
-    def __init__(self, initial_center, spritesheet):
+    def __init__(self, initial_center, sprite_graphic):
         """
-        param spritesheet: Sprite's graphics
-        type spritesheet: pygame.Surface
+        param sprite_graphic: Sprite's graphics
+        type sprite_graphic: pygame.Surface
         param initial_center: sprite's initial center position
         type initial_center: two-dimensional tuple
         """
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface(spritesheet.get_rect().size).convert_alpha()
-        self.image.blit(spritesheet, (0, 0), spritesheet.get_rect())
+        self.image = pygame.Surface(sprite_graphic.get_rect().size).convert_alpha()
+        self.image.blit(sprite_graphic, (0, 0), sprite_graphic.get_rect())
         self.rect = self.image.get_rect().move(initial_center[0] - self.image.get_rect().width / 2,
                                                initial_center[1] - self.image.get_rect().height / 2)
 
@@ -33,12 +33,6 @@ class Sprite(pygame.sprite.Sprite):
         """
         return (self.rect.left, self.rect.top)
 
-    def get_center(self):
-        """
-        Returns its center position
-        """
-        return self.rect.center
-
     def get_width(self):
         """
         Returns width
@@ -50,12 +44,6 @@ class Sprite(pygame.sprite.Sprite):
         Returns height
         """
         return self.rect.height
-
-    def update(self, d_x, d_y):
-        """
-        Moves its image d_x units left and d_y units down
-        """
-        self.rect.move_ip(d_x, d_y)
 
 class SpriteSheet:
     """

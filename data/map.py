@@ -166,7 +166,7 @@ class RandomMap:
             for j in range(num_columns):
                 sprite = Sprite(((i * spritesheet.resolution + (spritesheet.resolution // 2)),
                                   (j * spritesheet.resolution + (spritesheet.resolution // 2))),
-                                 spritesheet.get_image(tile_num[i][j]))
+                                 spritesheet.get_image(tile_num[i][j], (4, 5)))
                 self.map.append(sprite)
 
     def draw(self, surface):
