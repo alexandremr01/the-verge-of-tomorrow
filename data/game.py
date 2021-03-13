@@ -10,7 +10,7 @@ from .screens.select import Select
 from .screens.play import Play
 from .screens.about import About
 from .screens.base.state_machine import StateMachine
-from .setup import load_graphics
+from .setup import load_graphics, graphics_dict
 
 class Game:
     """
@@ -22,13 +22,13 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption('Verge of tomorrow')
+        pygame.display.set_caption('The Verge of Tomorrow')
         load_graphics()
 
         state_dict = {
             'TITLE': Title(),
             'SELECT': Select(),
-            'PLAY': Play(),
+            'PLAY': Play(graphics_dict),
             'ABOUT': About()
         }
         self.state_machine = StateMachine(state_dict, 'TITLE')

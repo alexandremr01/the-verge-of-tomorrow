@@ -65,8 +65,8 @@ class SpriteSheet:
         spritesheet = pygame.image.load(path).convert_alpha()
         row = 0
         column = 0
-        while row < width / resolution[0]:
-            while column < height / resolution[1]:
+        while row < height / resolution[1]:
+            while column < width / resolution[0]:
                 left_edge = resolution[0] * column
                 top_edge = resolution[1] * row
                 rect = pygame.Rect(left_edge, top_edge, resolution[0], resolution[1])
