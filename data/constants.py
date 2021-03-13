@@ -2,6 +2,7 @@
 This module contains constant variables used throughout all
 code
 """
+from math import sqrt
 
 # Screen
 FRAMES_PER_SECOND = 60
@@ -19,18 +20,26 @@ BLACK = (0, 0, 0)
 # Map
 MAP_WIDTH = 1600
 MAP_HEIGHT = 1600
+MAP_DIAGONAL = sqrt(MAP_WIDTH*MAP_WIDTH + MAP_HEIGHT*MAP_HEIGHT)
 CHUNK_SIZE = 32
+BLOCK_SIZE = 8
 MAX_OBJECT_COUNT = 100
 
 # Waves
 ENEMIES_INCREMENT_PER_WAVE = 5
 
 # Enemies
+SPAWN_DISTANCE = 0.2 * MAP_DIAGONAL / 2
+DESPAWN_DISTANCE = 0.8 * MAP_DIAGONAL / 2
 DEFAULT_ENEMY_VELOCITY = 2
 DEFAULT_ENEMY_HEALTH = 100
 ZOMBIE_VELOCITY = 3
 ZOMBIE_HEALTH = 110
 CONTACT_DISTANCE = 1
+
+# Player
+PLAYER_INITIAL_HEALTH = 10
+PLAYER_INITIAL_VELOCITY = 5
 
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
