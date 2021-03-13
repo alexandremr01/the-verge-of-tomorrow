@@ -25,7 +25,7 @@ class State:
         Draws this state on surface, should be overloaded
         """
 
-    def handle_input(self, events):
+    def handle_input(self, events, keys):
         """
         Updates its elements based on a given input by user,
         in the form of pygame events and keys, should be

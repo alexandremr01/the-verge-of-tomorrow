@@ -16,13 +16,13 @@ class StateMachine:
         self.current_state = self.states_dict[initial_state]
         self.previous_state = None
 
-    def update(self, events, surface):
+    def update(self, events, keys, surface):
         """
         Gives information to current state, make decision based on it
         and then updates state if the current state decided to do so,
         drawing it afterwards
         """
-        self.current_state.handle_input(events)
+        self.current_state.handle_input(events, keys)
         self.update_state(surface)
         self.current_state.draw(surface)
 

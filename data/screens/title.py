@@ -35,7 +35,7 @@ class Title(State):
         surface.blit(self.title_surface, self.title_rect)
         surface.blit(self.helper_surface, self.helper_rect)
 
-    def handle_input(self, events):
+    def handle_input(self, events, keys):
         """
         On any key press, sets next state to be select
         """

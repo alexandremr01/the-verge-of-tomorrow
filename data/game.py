@@ -19,6 +19,7 @@ class Game:
     def __init__(self):
         self.running = True
         self.events = None
+        self.keys = None
 
         self.clock = pygame.time.Clock()
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -41,7 +42,8 @@ class Game:
             self.clock.tick(FRAMES_PER_SECOND)
 
             self.handle_input()
-            self.state_machine.update(self.events, self.window)
+            self.keys = pygame.key.get_pressed()
+            self.state_machine.update(self.events, self.keys, self.window)
             pygame.display.update()
 
     def handle_input(self):

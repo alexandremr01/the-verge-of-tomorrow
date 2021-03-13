@@ -39,7 +39,7 @@ class Select(State):
         pygame.draw.rect(surface, ORANGE, self.play_rect)
         surface.blit(self.play_surface, self.play_rect)
 
-    def handle_input(self, events):
+    def handle_input(self, events, keys):
         """
         If about box is clicked, goes to about screen,
         else if play box is clicked, initiates game

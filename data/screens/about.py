@@ -35,7 +35,7 @@ class About(State):
         pygame.draw.rect(surface, ORANGE, self.back_surface.get_rect())
         surface.blit(self.back_surface, self.back_surface.get_rect())
 
-    def handle_input(self, events):
+    def handle_input(self, events, keys):
         """
         If the back button is pressed, it returns to select screen
         """
