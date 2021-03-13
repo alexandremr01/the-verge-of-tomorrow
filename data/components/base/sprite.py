@@ -54,7 +54,7 @@ class SpriteSheet:
         param path: path to the spritsheet
         type path: string
         param resolution: spritesheet's resolution
-        type resolution: int
+        type resolution: two-dimensional tuple of ints
         param width: width
         type width: int
         param height: height
@@ -65,11 +65,11 @@ class SpriteSheet:
         spritesheet = pygame.image.load(path).convert_alpha()
         row = 0
         column = 0
-        while row < width / resolution:
-            while column < height / resolution:
-                left_edge = resolution * column
-                top_edge = resolution * row
-                rect = pygame.Rect(left_edge, top_edge, resolution, resolution)
+        while row < width / resolution[0]:
+            while column < height / resolution[1]:
+                left_edge = resolution[0] * column
+                top_edge = resolution[1] * row
+                rect = pygame.Rect(left_edge, top_edge, resolution[0], resolution[1])
                 image = pygame.Surface(rect.size).convert_alpha()
                 image.blit(spritesheet, (0, 0), rect)
                 self.sprites.append(image)
