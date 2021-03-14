@@ -3,6 +3,7 @@ Class supposed to contain enemies that will be rendered at game state
 """
 import pygame
 import numpy as np
+
 from .components import player
 from .utils import distance
 from .constants import MAP_WIDTH, MAP_HEIGHT, CHUNK_SIZE, BLOCK_SIZE, MAX_OBJECT_COUNT, SPAWN_DISTANCE, \
@@ -52,7 +53,7 @@ class Map:
                                     for row in range(MAP_HEIGHT // CHUNK_SIZE)]
                                    for column in range(MAP_WIDTH // CHUNK_SIZE)])
         self.player_chunk_position = np.array([0, 0])
-        self.player = Player(graphics['player'])
+        self.player = Player(graphics)
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.object_count = 0
         self.spawn_distance = SPAWN_DISTANCE
