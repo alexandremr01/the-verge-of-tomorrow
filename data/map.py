@@ -120,6 +120,7 @@ class Map:
             self.chunkgrid = self.chunkgrid[:, 1:]
             new_chunks = np.array([[Chunk()] for row in range(MAP_HEIGHT // CHUNK_SIZE)])
             self.chunkgrid = np.concatenate((self.chunkgrid, new_chunks), axis=1)
+            self.reset_map_position()
         if self.player_chunk_position[0] < - CHUNK_SIZE:
             self.player.move(CHUNK_SIZE, 0)
             self.player_chunk_position[0] = self.player_chunk_position[0] + CHUNK_SIZE
@@ -128,6 +129,7 @@ class Map:
             self.chunkgrid = self.chunkgrid[:, :MAP_WIDTH // CHUNK_SIZE - 1]
             new_chunks = np.array([[Chunk()] for row in range(MAP_HEIGHT // CHUNK_SIZE)])
             self.chunkgrid = np.concatenate((new_chunks, self.chunkgrid), axis=1)
+            self.reset_map_position()
         if self.player_chunk_position[1] > CHUNK_SIZE:
             self.player.move(0, -CHUNK_SIZE)
             self.player_chunk_position[1] = self.player_chunk_position[1] - CHUNK_SIZE
@@ -136,6 +138,7 @@ class Map:
             self.chunkgrid = self.chunkgrid[1:, :]
             new_chunks = np.array([[Chunk() for column in range(MAP_WIDTH // CHUNK_SIZE)]])
             self.chunkgrid = np.concatenate((new_chunks, self.chunkgrid), axis=0)
+            self.reset_map_position()
         if self.player_chunk_position[1] < - CHUNK_SIZE:
             self.player.move(0, CHUNK_SIZE)
             self.player_chunk_position[1] = self.player_chunk_position[1] + CHUNK_SIZE
@@ -144,7 +147,7 @@ class Map:
             self.chunkgrid = self.chunkgrid[:MAP_HEIGHT // CHUNK_SIZE - 1, :]
             new_chunks = np.array([[Chunk() for column in range(MAP_WIDTH // CHUNK_SIZE)]])
             self.chunkgrid = np.concatenate((self.chunkgrid, new_chunks), axis=0)
-        self.reset_map_position()
+            self.reset_map_position()
 
     def reset_map_position(self):
         for chunk_row in range(MAP_HEIGHT // CHUNK_SIZE):
