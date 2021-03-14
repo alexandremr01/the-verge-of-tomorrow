@@ -13,7 +13,7 @@ from pygame.locals import *
 
 
 class Block:
-    def __init__(self, position):
+    def __init__(self, position=(-1, -1)):
         self.position = position
         self.rect = pygame.Rect(position[0], position[1], BLOCK_SIZE, BLOCK_SIZE)
         self.terrain = None
@@ -28,7 +28,7 @@ class Block:
 
 
 class Chunk:
-    def __init__(self, position):
+    def __init__(self, position=(-1, -1)):
         self.position = position
         self.rect = pygame.Rect(position[0], position[1], CHUNK_SIZE, CHUNK_SIZE)
         self.blockgrid = np.array([[Block(np.array([row, column]) * BLOCK_SIZE + position)
@@ -106,7 +106,7 @@ class Map:
         self.player_chunk_position = self.player_chunk_position + walk_vector
         # for enemy in self.enemies:
         #     enemy.position = enemy.position + enemy.ai_move()
-        # self.update_chunkgrid()
+        self.update_chunkgrid()
 
     def update_chunkgrid(self):
         """
@@ -115,33 +115,33 @@ class Map:
         if self.player_chunk_position[0] > CHUNK_SIZE:
             self.player.move(-CHUNK_SIZE, 0)
             self.player_chunk_position[0] = self.player_chunk_position[0] - CHUNK_SIZE
-            for chunk in self.chunkgrid[:][0]:
+            for chunk in self.chunkgrid[:, 0]:
                 self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[:][1:]
+            self.chunkgrid = self.chunkgrid[:, 1:]
             new_chunks = np.array([[Chunk()] for row in range(MAP_HEIGHT // CHUNK_SIZE)])
             self.chunkgrid = np.concatenate((self.chunkgrid, new_chunks), axis=1)
         if self.player_chunk_position[0] < - CHUNK_SIZE:
             self.player.move(CHUNK_SIZE, 0)
             self.player_chunk_position[0] = self.player_chunk_position[0] + CHUNK_SIZE
-            for chunk in self.chunkgrid[:][MAP_WIDTH // CHUNK_SIZE]:
+            for chunk in self.chunkgrid[:, MAP_WIDTH // CHUNK_SIZE - 1]:
                 self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[:][:MAP_WIDTH // CHUNK_SIZE]
+            self.chunkgrid = self.chunkgrid[:, :MAP_WIDTH // CHUNK_SIZE - 1]
             new_chunks = np.array([[Chunk()] for row in range(MAP_HEIGHT // CHUNK_SIZE)])
             self.chunkgrid = np.concatenate((new_chunks, self.chunkgrid), axis=1)
         if self.player_chunk_position[1] > CHUNK_SIZE:
             self.player.move(0, -CHUNK_SIZE)
             self.player_chunk_position[1] = self.player_chunk_position[1] - CHUNK_SIZE
-            for chunk in self.chunkgrid[0][:]:
+            for chunk in self.chunkgrid[0, :]:
                 self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[1:][:]
+            self.chunkgrid = self.chunkgrid[1:, :]
             new_chunks = np.array([[Chunk() for column in range(MAP_WIDTH // CHUNK_SIZE)]])
             self.chunkgrid = np.concatenate((new_chunks, self.chunkgrid), axis=0)
         if self.player_chunk_position[1] < - CHUNK_SIZE:
             self.player.move(0, CHUNK_SIZE)
             self.player_chunk_position[1] = self.player_chunk_position[1] + CHUNK_SIZE
-            for chunk in self.chunkgrid[MAP_HEIGHT // CHUNK_SIZE][:]:
+            for chunk in self.chunkgrid[MAP_HEIGHT // CHUNK_SIZE - 1, :]:
                 self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[:MAP_HEIGHT // CHUNK_SIZE][:]
+            self.chunkgrid = self.chunkgrid[:MAP_HEIGHT // CHUNK_SIZE - 1, :]
             new_chunks = np.array([[Chunk() for column in range(MAP_WIDTH // CHUNK_SIZE)]])
             self.chunkgrid = np.concatenate((self.chunkgrid, new_chunks), axis=0)
         self.reset_map_position()

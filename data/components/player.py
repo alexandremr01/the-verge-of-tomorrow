@@ -13,7 +13,7 @@ class Player(Entity):
     def __init__(self, graphics):
         super().__init__(np.array([MAP_WIDTH, MAP_HEIGHT])/2, graphics.get_image(0))
         self.health = 10
-        self.velocity = 500
+        self.velocity = 5
         self.states = []
         for i in range(graphics.get_size()):
             self.states.append(graphics.get_image(i))
