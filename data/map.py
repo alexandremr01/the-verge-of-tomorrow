@@ -3,6 +3,8 @@ Class supposed to contain enemies that will be rendered at game state
 """
 import pygame
 import numpy as np
+import random
+from math import cos, sin
 
 from .components import player
 from .utils import distance
@@ -56,8 +58,6 @@ class Map:
         self.player = Player(graphics)
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.object_count = 0
-        self.spawn_distance = SPAWN_DISTANCE
-        self.despawn_distance = DESPAWN_DISTANCE
         self.enemies = []
 
     def spawn_enemies(self):
@@ -70,13 +70,15 @@ class Map:
         for enemy in self.enemies:
             if enemy.health == 0:
                 self.wave.notify_kill()
-            elif distance(enemy.get_position(), self.player.get_position()) > self.despawn_distance:
+            elif distance(enemy.get_position(), self.player.get_position()) > DESPAWN_DISTANCE:
                 self.wave.notify_despawn()
             else:
                 live_enemies.append(enemy)
         self.enemies = live_enemies
         if self.wave.spawns_left():
-            self.enemies.append(self.wave.generate_enemy((800, 800)))  # ARRUMAR
+            theta = np.random.rand()
+            spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
+            self.enemies.append(self.wave.generate_enemy(self.player.get_position() + spawn_vector))
 
     def spawn_objects(self):
         """
@@ -115,6 +117,8 @@ class Map:
         """
         if self.player_chunk_position[0] > CHUNK_SIZE:
             self.player.move(-CHUNK_SIZE, 0)
+            for enemy in self.enemies:
+                enemy.move(-CHUNK_SIZE, 0)
             self.player_chunk_position[0] = self.player_chunk_position[0] - CHUNK_SIZE
             for chunk in self.chunkgrid[:, 0]:
                 self.object_count -= chunk.object_count
@@ -124,6 +128,8 @@ class Map:
             self.reset_map_position()
         if self.player_chunk_position[0] < - CHUNK_SIZE:
             self.player.move(CHUNK_SIZE, 0)
+            for enemy in self.enemies:
+                enemy.move(CHUNK_SIZE, 0)
             self.player_chunk_position[0] = self.player_chunk_position[0] + CHUNK_SIZE
             for chunk in self.chunkgrid[:, MAP_WIDTH // CHUNK_SIZE - 1]:
                 self.object_count -= chunk.object_count
@@ -133,6 +139,8 @@ class Map:
             self.reset_map_position()
         if self.player_chunk_position[1] > CHUNK_SIZE:
             self.player.move(0, -CHUNK_SIZE)
+            for enemy in self.enemies:
+                enemy.move(0, -CHUNK_SIZE)
             self.player_chunk_position[1] = self.player_chunk_position[1] - CHUNK_SIZE
             for chunk in self.chunkgrid[0, :]:
                 self.object_count -= chunk.object_count
@@ -142,6 +150,8 @@ class Map:
             self.reset_map_position()
         if self.player_chunk_position[1] < - CHUNK_SIZE:
             self.player.move(0, CHUNK_SIZE)
+            for enemy in self.enemies:
+                enemy.move(0, CHUNK_SIZE)
             self.player_chunk_position[1] = self.player_chunk_position[1] + CHUNK_SIZE
             for chunk in self.chunkgrid[MAP_HEIGHT // CHUNK_SIZE - 1, :]:
                 self.object_count -= chunk.object_count
