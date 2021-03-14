@@ -14,4 +14,4 @@ def is_in_rect(rect, pos):
     return False
 
 def distance(first_pos, second_pos):
-    return np.sqrt(np.sum(np.power(second_pos - first_pos, 2)))
+    return np.sqrt(np.sum(np.power(np.array(second_pos) - np.array(first_pos), 2)))
