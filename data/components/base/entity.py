@@ -13,6 +13,10 @@ class Entity:
         self.sprite = Sprite(position, sprite_graphic)
 
     def update_sprite(self, sprite_graphic):
+        """
+        Changes current sprite of entity to the
+        new sprite_graphic
+        """
         self.sprite = Sprite(self.get_position(), sprite_graphic)
 
     def get_position(self):
@@ -21,22 +25,15 @@ class Entity:
         """
         return self.sprite.rect.center
 
-    def set_center_position(self, x, y):
-        """
-        Moves its image to position (x, y)
-        """
-        self.sprite.rect.update(x - self.sprite.rect.width/2, y - self.sprite.rect.height/2
-                                , self.sprite.rect.width, self.sprite.rect.height)
-
     def move(self, d_x, d_y):
         """
         Moves its image d_x units left and d_y units down
         """
         self.sprite.rect.move_ip(d_x, d_y)
 
-    def draw(self, surface, screen_pos):
+    def draw(self, screen):
         """
         Draws this entity in its current position,
         on surface, a pygame Surface
         """
-        surface.blit(self.sprite.get_image(), self.sprite.get_position() - screen_pos)
+        screen.blit(self.sprite.get_image(), self.sprite.get_position())

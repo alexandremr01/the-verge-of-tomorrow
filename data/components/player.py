@@ -1,7 +1,13 @@
+"""
+Module containing player related abstractions.
+The player being controlled by the user.
+"""
+
 import pygame
 import numpy as np
 
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, MAP_WIDTH, MAP_HEIGHT, FRAMES_PER_SECOND
+from ..setup import graphics_dict
 from .base.entity import Entity
 from .base.sprite import Sprite
 from pygame.locals import *
@@ -34,36 +40,32 @@ class Hud():
         if health is not None:
             self.heart[health:] = [False] * len(self.heart[health:])
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws the heads-up display
         """
         for i in range(len(self.heart)):
             if self.heart[i] == True:
-                surface.blit(self.heart_sprites[0], self.heart_positions[i])
+                screen.blit_rel(self.heart_sprites[0], self.heart_positions[i])
             else:
-                surface.blit(self.heart_sprites[1], self.heart_positions[i])
-        surface.blit(self.weapon_sprites[self.current_weapon], self.weapon_position)
+                screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
+        screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
 
 class Player(Entity):
     """
     Main character class
     """
-    def __init__(self, graphics):
-        """
-        param graphics : collection of all game's graphics
-        type graphics : dict of SpriteSheet
-        """
-        super().__init__(np.array([MAP_WIDTH, MAP_HEIGHT])/2, graphics['player'].get_image(0))
+    def __init__(self):
+        super().__init__(np.array([MAP_WIDTH, MAP_HEIGHT])/2, graphics_dict['player'].get_image(0))
         self.health = 5
         self.velocity = 5
-        self.hud = Hud(self.health, graphics['items'])
+        self.hud = Hud(self.health, graphics_dict['items'])
         self.states = []
-        for i in range(graphics['player'].get_size()):
-            self.states.append(graphics['player'].get_image(i))
+        for i in range(graphics_dict['player'].get_size()):
+            self.states.append(graphics_dict['player'].get_image(i))
         self.weapon = self.states[0]
         self.current_state = self.states[0]
-    
+
     def set_weapon(self, key):
         """
         Sets a weapon for the player
@@ -95,9 +97,9 @@ class Player(Entity):
             self.update_sprite(self.current_state)
         self.hud.update(key)
 
-    def draw(self, surface, screen_pos):
+    def draw(self, screen):
         """
         Draws the player's animation
         """
-        super().draw(surface, screen_pos)
-        self.hud.draw(surface)
+        super().draw(screen)
+        self.hud.draw(screen)

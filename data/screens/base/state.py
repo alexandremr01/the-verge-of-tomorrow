@@ -20,7 +20,7 @@ class State:
         a static image
         """
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws this state on surface, should be overloaded
         """

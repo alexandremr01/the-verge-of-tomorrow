@@ -10,7 +10,8 @@ from .screens.select import Select
 from .screens.play import Play
 from .screens.about import About
 from .screens.base.state_machine import StateMachine
-from .setup import load_graphics, graphics_dict
+from .screens.base.screen_surface import ScreenSurface
+from .setup import load_graphics
 
 class Game:
     """
@@ -23,13 +24,14 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = ScreenSurface(self.window.get_rect())
         pygame.display.set_caption('The Verge of Tomorrow')
         load_graphics()
 
         state_dict = {
             'TITLE': Title(),
             'SELECT': Select(),
-            'PLAY': Play(graphics_dict),
+            'PLAY': Play(),
             'ABOUT': About()
         }
         self.state_machine = StateMachine(state_dict, 'TITLE')
@@ -43,7 +45,9 @@ class Game:
 
             self.handle_input()
             self.keys = pygame.key.get_pressed()
-            self.state_machine.update(self.events, self.keys, self.window)
+            self.state_machine.update(self.events, self.keys, self.screen)
+
+            self.window.blit(self.screen, (0, 0))
             pygame.display.update()
 
     def handle_input(self):

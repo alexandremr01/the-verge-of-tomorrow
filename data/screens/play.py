@@ -2,13 +2,9 @@
 Main screen, where the game actually occurs
 """
 
-import pygame
-
 from .base.state import State
-from ..components.player import Player
 from ..map import Map
-from ..test_maps import WaveMap
-from ..constants import BLACK, FRAMES_PER_SECOND
+from ..constants import BLACK
 
 
 class Play(State):
@@ -16,28 +12,25 @@ class Play(State):
     Screen of the game where the user needs to
     survive as much as possible
     """
-    def __init__(self, graphics):
+    def __init__(self):
         super().__init__()
-        self.map = Map(graphics)
-        self.time = pygame.time.get_ticks()
-        
+        self.map = Map()
+
     def update(self):
         """
         Updates the game
         """
         self.map.update()
-        self.time = pygame.time.get_ticks()
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws the game
         """
-        surface.fill(BLACK)
-        self.map.draw(surface)
+        screen.fill(BLACK)
+        self.map.draw(screen)
 
     def handle_input(self, events, keys):
         """
         Responds to inputs given through keyboard
         """
         self.map.handle_input(events)
-

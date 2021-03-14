@@ -16,17 +16,17 @@ class StateMachine:
         self.current_state = self.states_dict[initial_state]
         self.previous_state = None
 
-    def update(self, events, keys, surface):
+    def update(self, events, keys, screen):
         """
         Gives information to current state, make decision based on it
         and then updates state if the current state decided to do so,
         drawing it afterwards
         """
         self.current_state.handle_input(events, keys)
-        self.update_state(surface)
-        self.current_state.draw(surface)
+        self.update_state(screen)
+        self.current_state.draw(screen)
 
-    def update_state(self, surface):
+    def update_state(self, screen):
         """
         Updates to the new state defined by the current state class,
         clearing the window if it is set to do so by the current state
@@ -38,6 +38,6 @@ class StateMachine:
             self.current_state = self.states_dict[self.previous_state.next]
 
             if self.previous_state.clear_window is True:
-                surface.fill(BLACK)
+                screen.fill(BLACK)
             self.previous_state.next = None
             self.previous_state.clear_window = False

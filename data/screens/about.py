@@ -26,14 +26,14 @@ class About(State):
     def update(self):
         pass
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws the about text
         """
-        surface.blit(self.about_surface, self.about_rect)
+        screen.blit_rel(self.about_surface, self.about_rect)
 
-        pygame.draw.rect(surface, ORANGE, self.back_surface.get_rect())
-        surface.blit(self.back_surface, self.back_surface.get_rect())
+        pygame.draw.rect(screen, ORANGE, self.back_surface.get_rect())
+        screen.blit_rel(self.back_surface, self.back_surface.get_rect())
 
     def handle_input(self, events, keys):
         """

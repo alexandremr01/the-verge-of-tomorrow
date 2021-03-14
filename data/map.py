@@ -3,7 +3,6 @@ Class supposed to contain enemies that will be rendered at game state
 """
 import pygame
 import numpy as np
-import random
 from math import cos, sin
 
 from .components import player
@@ -47,7 +46,7 @@ class Chunk:
 
 
 class Map:
-    def __init__(self, graphics):
+    def __init__(self):
         self.time = pygame.time.get_ticks()
         self.wave = Wave()
         self.wave.new_wave()
@@ -55,7 +54,7 @@ class Map:
                                     for row in range(MAP_HEIGHT // CHUNK_SIZE)]
                                    for column in range(MAP_WIDTH // CHUNK_SIZE)])
         self.player_chunk_position = np.array([0, 0])
-        self.player = Player(graphics)
+        self.player = Player()
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.object_count = 0
         self.enemies = []
@@ -192,20 +191,17 @@ class Map:
         self.spawn_objects()
         self.spawn_enemies()
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws onto the screen enemies and objects in sight.
         """
-        screen_pos = np.array(self.player.get_position()) - np.array([SCREEN_WIDTH, SCREEN_HEIGHT])/2
-        screen_rect = pygame.Rect(screen_pos[0], screen_pos[1], SCREEN_WIDTH, SCREEN_HEIGHT)
-        self.player.draw(surface, screen_pos)
+        screen.center_on_player(self.player.get_position())
+        self.player.draw(screen)
         # for chunk in self.chunkgrid:
         #     if screen_rect.colliderect(chunk.rect):
         #         for block in chunk.blockgrid:
         #             if screen_rect.colliderect(block.rect):
-        #                 block.object.draw(surface)
+        #                 block.object.draw(screen)
         for enemy in self.enemies:
-            if screen_rect.colliderect(enemy.sprite.rect):
-                enemy.draw(surface, screen_pos)
-
-
+            if screen.screen_rect.colliderect(enemy.sprite.rect):
+                enemy.draw(screen)

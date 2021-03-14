@@ -28,12 +28,12 @@ class Title(State):
     def update(self):
         pass
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws title of the game and helper text
         """
-        surface.blit(self.title_surface, self.title_rect)
-        surface.blit(self.helper_surface, self.helper_rect)
+        screen.blit_rel(self.title_surface, self.title_rect)
+        screen.blit_rel(self.helper_surface, self.helper_rect)
 
     def handle_input(self, events, keys):
         """

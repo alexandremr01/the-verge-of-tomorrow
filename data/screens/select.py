@@ -29,15 +29,15 @@ class Select(State):
     def update(self):
         pass
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws the options the game provides for the player to select
         """
-        pygame.draw.rect(surface, ORANGE, self.about_rect)
-        surface.blit(self.about_surface, self.about_rect)
+        pygame.draw.rect(screen, ORANGE, self.about_rect)
+        screen.blit_rel(self.about_surface, self.about_rect)
 
-        pygame.draw.rect(surface, ORANGE, self.play_rect)
-        surface.blit(self.play_surface, self.play_rect)
+        pygame.draw.rect(screen, ORANGE, self.play_rect)
+        screen.blit_rel(self.play_surface, self.play_rect)
 
     def handle_input(self, events, keys):
         """
