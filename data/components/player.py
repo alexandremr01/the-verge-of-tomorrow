@@ -5,12 +5,11 @@ The player being controlled by the user.
 
 import pygame
 import numpy as np
+from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, MAP_WIDTH, MAP_HEIGHT, FRAMES_PER_SECOND
+from ..constants import MAP_WIDTH, MAP_HEIGHT
 from ..setup import graphics_dict
 from .base.entity import Entity
-from .base.sprite import Sprite
-from pygame.locals import *
 
 
 class Hud():

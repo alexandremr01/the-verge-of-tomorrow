@@ -1,18 +1,17 @@
 """
 Class supposed to contain enemies that will be rendered at game state
 """
+
+from math import cos, sin
 import pygame
 import numpy as np
-from math import cos, sin
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP
 
-from .components import player
 from .utils import distance
-from .constants import MAP_WIDTH, MAP_HEIGHT, CHUNK_SIZE, BLOCK_SIZE, MAX_OBJECT_COUNT, SPAWN_DISTANCE, \
-    DESPAWN_DISTANCE, SCREEN_WIDTH, SCREEN_HEIGHT
+from .constants import MAP_WIDTH, MAP_HEIGHT, CHUNK_SIZE, BLOCK_SIZE
+from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE
 from .wave import Wave
 from .components.player import Player
-from pygame.locals import *
-
 
 class Block:
     def __init__(self, position=(-1, -1)):
@@ -106,8 +105,9 @@ class Map:
             walk_vector[1] -= self.player.velocity
         self.player.move(walk_vector[0], walk_vector[1])
         self.player_chunk_position = self.player_chunk_position + walk_vector
-        # for enemy in self.enemies:
-        #     enemy.position = enemy.position + enemy.ai_move()
+        for enemy in self.enemies:
+            if not enemy.sprite.rect.colliderect(self.player.sprite.rect):
+                enemy.ai_move(self.player.get_position())
         self.update_chunkgrid()
 
     def update_chunkgrid(self):
@@ -197,11 +197,13 @@ class Map:
         """
         screen.center_on_player(self.player.get_position())
         self.player.draw(screen)
+
+        for enemy in self.enemies:
+            if screen.screen_rect.colliderect(enemy.sprite.rect):
+                enemy.draw(screen)
+
         # for chunk in self.chunkgrid:
         #     if screen_rect.colliderect(chunk.rect):
         #         for block in chunk.blockgrid:
         #             if screen_rect.colliderect(block.rect):
         #                 block.object.draw(screen)
-        for enemy in self.enemies:
-            if screen.screen_rect.colliderect(enemy.sprite.rect):
-                enemy.draw(screen)

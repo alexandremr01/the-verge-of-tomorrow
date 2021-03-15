@@ -6,7 +6,7 @@ programmed to stalk and hurt him
 import numpy as np
 from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
-from ...constants import CONTACT_DISTANCE, FRAMES_PER_SECOND
+from ...constants import FRAMES_PER_SECOND
 
 class Enemy(Entity):
     """
@@ -25,8 +25,10 @@ class Enemy(Entity):
         Obtains an estimate of enemy velocity
         by finite differences
         """
-        velocity = (np.array(self.curr_pos) - np.array(self.previous_pos))*FRAMES_PER_SECOND
+        if self.previous_pos is None:
+            return self.velocity
 
+        velocity = (np.array(self.curr_pos) - np.array(self.previous_pos))*FRAMES_PER_SECOND
         return np.linalg.norm(velocity)
 
     def ai_move(self, target): # TODO: it only goes in the direction of target, should be smarter
@@ -36,13 +38,17 @@ class Enemy(Entity):
         param target: where it should go, supposedly the player position
         type target: numpy array
         """
-        diff = target - self.curr_pos
+        diff = target - self.get_position()
 
-        if np.linalg.norm(diff) < CONTACT_DISTANCE:
-            self.previous_pos = self.curr_pos
-            return
         diff = diff/np.linalg.norm(diff)
         self.move(diff[0]*self.velocity, diff[1]*self.velocity)
 
+    def draw(self, screen):
+        """
+        Draws zombie on screen, updating
+        params to estimate its velocity
+        """
         self.previous_pos = self.curr_pos
         self.curr_pos = self.get_position()
+
+        super().draw(screen)

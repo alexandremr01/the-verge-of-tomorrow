@@ -30,12 +30,12 @@ class SpritesMap:
                                  spritesheet.get_image(tile_num[i][j], (4, 5)))
                 self.map.append(sprite)
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws its collection of sprites
         """
         for tile in self.map:
-            surface.blit(tile.get_image(), tile.get_position())
+            screen.blit(tile.get_image(), tile.get_position())
 
 class WaveMap:
     """
@@ -69,9 +69,9 @@ class WaveMap:
         for enemy in alive:
             self.enemies.append(enemy)
 
-    def draw(self, surface):
+    def draw(self, screen):
         """
         Draws enemies
         """
         for enemy in self.enemies:
-            enemy.draw(surface)
+            enemy.draw(screen)
