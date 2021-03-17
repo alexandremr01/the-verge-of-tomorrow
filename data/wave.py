@@ -8,7 +8,7 @@ from math import sin, cos
 import numpy as np
 
 from .utils import distance
-from .constants import ENEMIES_INCREMENT_PER_WAVE
+from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE
 from .components.enemies.zombie import Zombie
 
@@ -17,13 +17,14 @@ class Wave:
     Keeps track of enemies, responsible
     for creation as well
     """
-    def __init__(self):
+    def __init__(self, time):
         self.current_wave = 0
 
         self.current_wave_num_enemies = 0
         self.num_enemies_killed = 0
         self.num_enemies_to_spawn = 0
         self.total_enemies_killed = 0
+        self.spawn_timer = time
 
         self.enemies = []
         self.wave_over = True
@@ -51,7 +52,7 @@ class Wave:
         spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
         new_enemy_pos = player_position + spawn_vector
 
-        self.enemies.append(Zombie(new_enemy_pos))
+        self.enemies.append(Zombie(new_enemy_pos)) # TODO: use more enemies
         self.num_enemies_to_spawn -= 1
 
     def update_alive_enemies(self, player_position):
@@ -70,7 +71,7 @@ class Wave:
                 live_enemies.append(enemy)
         self.enemies = live_enemies
 
-    def update_enemies(self, player):
+    def update_enemies(self, player, time):
         """
         Updates enemies' states, spawning or despawning
         them if it is the case
@@ -80,8 +81,9 @@ class Wave:
                 enemy.ai_move(player.get_position())
 
         self.update_alive_enemies(player.get_position())
-        if self.num_enemies_to_spawn > 0:
+        if time - self.spawn_timer > TIME_TO_SPAWN and self.num_enemies_to_spawn > 0:
             self.generate_enemy(player.get_position())
+            self.spawn_timer = time
 
         if self.num_enemies_killed == self.current_wave_num_enemies:
             self.wave_over = True

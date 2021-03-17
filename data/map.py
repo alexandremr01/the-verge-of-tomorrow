@@ -44,7 +44,7 @@ class Chunk:
 class Map:
     def __init__(self):
         self.time = pygame.time.get_ticks()
-        self.wave = Wave()
+        self.wave = Wave(self.time)
         self.chunkgrid = np.array([[Chunk(np.array([row, column]) * CHUNK_SIZE)
                                     for row in range(MAP_HEIGHT // CHUNK_SIZE)]
                                    for column in range(MAP_WIDTH // CHUNK_SIZE)])
@@ -160,7 +160,7 @@ class Map:
         if self.wave.finished():
             self.wave.new_wave()
         self.update_positions()
-        self.wave.update_enemies(self.player)
+        self.wave.update_enemies(self.player, self.time)
         self.spawn_objects()
 
     def draw(self, screen):
