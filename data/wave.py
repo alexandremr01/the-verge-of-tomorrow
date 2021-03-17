@@ -4,7 +4,12 @@ the enemies of the game, as well as creating
 them.
 """
 
+from math import sin, cos
+import numpy as np
+
+from .utils import distance
 from .constants import ENEMIES_INCREMENT_PER_WAVE
+from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE
 from .components.enemies.zombie import Zombie
 
 class Wave:
@@ -20,7 +25,10 @@ class Wave:
         self.num_enemies_to_spawn = 0
         self.total_enemies_killed = 0
 
+        self.enemies = []
         self.wave_over = True
+
+        self.new_wave()
 
     def new_wave(self): # TODO: night/day dynamics
         """
@@ -35,51 +43,48 @@ class Wave:
         self.current_wave_num_enemies = self.current_wave*ENEMIES_INCREMENT_PER_WAVE
         self.num_enemies_to_spawn = self.current_wave_num_enemies
 
-    def notify_kill(self):
-        """
-        This function is called when an enemy is
-        killed
-        """
-        if self.wave_over:
-            print('Error: wave is finished and kill was notified')
-            return
-
-        self.num_enemies_killed += 1
-        self.total_enemies_killed += 1
-
-        if self.num_enemies_killed == self.current_wave_num_enemies:
-            self.wave_over = True
-
-    def notify_despawn(self):
-        """
-        This function is called when an enemy is
-        despawned and has to be recreated
-        """
-        if self.num_enemies_to_spawn + 1 > self.current_wave_num_enemies:
-            print('Error: there are more enemies to spawn than it should be')
-            return
-        if self.wave_over:
-            print('Error: wave is finished and there was despawn')
-
-        self.num_enemies_to_spawn += 1
-
-    def generate_enemy(self, pos):
+    def generate_enemy(self, player_position):
         """
         Creates an enemy located on pos
         """
-        if self.num_enemies_to_spawn == 0:
-            print('Error: create enemy requested, but exceeds number of spawns of this wave')
-            return None
+        theta = np.random.rand()
+        spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
+        new_enemy_pos = player_position + spawn_vector
 
+        self.enemies.append(Zombie(new_enemy_pos))
         self.num_enemies_to_spawn -= 1
-        return Zombie(pos) # TODO: use procedure to choose between enemies depending on wave
 
-    def spawns_left(self):
+    def update_alive_enemies(self, player_position):
         """
-        Query to whether there still are enemies
-        left to spawn
+        Checks each enemy's health and distance to
+        player to see if it continues alive or not
         """
-        return self.num_enemies_to_spawn > 0
+        live_enemies = []
+        for enemy in self.enemies:
+            if enemy.health == 0:
+                self.num_enemies_killed += 1
+                self.total_enemies_killed += 1
+            elif distance(enemy.get_position(), player_position) > DESPAWN_DISTANCE:
+                self.num_enemies_to_spawn += 1
+            else:
+                live_enemies.append(enemy)
+        self.enemies = live_enemies
+
+    def update_enemies(self, player):
+        """
+        Updates enemies' states, spawning or despawning
+        them if it is the case
+        """
+        for enemy in self.enemies:
+            if not enemy.sprite.rect.colliderect(player.sprite.rect):
+                enemy.ai_move(player.get_position())
+
+        self.update_alive_enemies(player.get_position())
+        if self.num_enemies_to_spawn > 0:
+            self.generate_enemy(player.get_position())
+
+        if self.num_enemies_killed == self.current_wave_num_enemies:
+            self.wave_over = True
 
     def finished(self):
         """
