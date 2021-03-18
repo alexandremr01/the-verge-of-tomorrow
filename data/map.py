@@ -22,7 +22,7 @@ class Map:
 
         self.terrain_tiles = []
         self.object_tiles = []
-        # self.map_surface = pygame.Surface()
+        self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
         self.chunks = {(0, 0): Chunk(np.array([0, 0]), self.gen_seed())}
         self.loaded_chunks = [(0, 0)]
         self.newly_loaded_chunks = [(0, 0)]
@@ -39,7 +39,9 @@ class Map:
         :rtype: numpy array
         """
         player_position = self.player.get_position()
-        return np.floor(np.abs(player_position) / (CHUNK_ARRAY/2)) * np.sign(player_position)
+        if CHUNK_RECT.collidepoint(player_position):
+            return np.array([0, 0])
+        return (np.floor((np.abs(player_position) + CHUNK_ARRAY/2) / CHUNK_SIZE) * np.sign(player_position)).astype(int)
 
     def get_chunk_quadrant(self):
         """
@@ -49,7 +51,7 @@ class Map:
         :return: vector indicating which quadrant the player is on\
         :rtype: numpy array
         """
-        dif = self.player.get_position() - (-CHUNK_ARRAY/2 + CHUNK_SIZE * self.chunk_position)
+        dif = self.player.get_position() - CHUNK_SIZE * self.get_chunk_position()
         quadrant = np.array([0, 0, 0, 0])
         quadrant[0] = TOP_RECT.collidepoint(dif)
         if not quadrant[0]:
@@ -57,7 +59,7 @@ class Map:
         quadrant[2] = LEFT_RECT.collidepoint(dif)
         if not quadrant[2]:
             quadrant[3] = RIGHT_RECT.collidepoint(dif)
-        return np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])
+        return (np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])).astype(int)
 
     def gen_seed(self):
         return 0
@@ -71,12 +73,14 @@ class Map:
         :param chunk_quadrant: vector indicating which quadrant the player is on
         :type chunk_quadrant: numpy array
         """
-        seed = self.gen_seed()
         chunk_position_pos = tuple(chunk_position + chunk_quadrant)
-        if self.chunks.get(chunk_position_pos) is None:
-            self.chunks[chunk_position_pos] = Chunk(np.array(chunk_position_pos), seed)
-        else:
+        if self.chunks.get(chunk_position_pos) is not None:
+            if self.chunks[chunk_position_pos].tilegrid is not None:
+                return
             self.chunks[chunk_position_pos].render()
+        else:
+            seed = self.gen_seed()
+            self.chunks[chunk_position_pos] = Chunk(np.array(chunk_position_pos), seed)
         self.newly_loaded_chunks.append(chunk_position_pos)
         self.loaded_chunks.append(chunk_position_pos)
 
@@ -111,7 +115,7 @@ class Map:
         chunk_position = self.get_chunk_position()
         if np.all(chunk_position == self.chunk_position):
             chunk_quadrant = self.get_chunk_quadrant()
-            if np.all(chunk_quadrant != self.chunk_quadrant):
+            if np.any(chunk_quadrant != self.chunk_quadrant):
                 self.chunk_quadrant = chunk_quadrant
                 if np.linalg.norm(chunk_quadrant) != 0:
                     self.gen_chunk(chunk_position, chunk_quadrant)
@@ -157,6 +161,7 @@ class Map:
             self.wave.new_wave()
         self.update_positions()
         self.update_chunks()
+        print(self.get_chunk_quadrant(), self.loaded_chunks)
         self.wave.update_enemies(self.player, self.time)
 
     def draw(self, screen):

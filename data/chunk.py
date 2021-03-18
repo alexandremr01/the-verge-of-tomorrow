@@ -10,8 +10,7 @@ class Chunk:
         self.tilegrid = self.render()
 
     def render(self):
-        # Using seed renders the tilegrid
-        pass
+        return [1]
 
     def draw(self):
         pass
