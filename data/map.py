@@ -6,64 +6,121 @@ import pygame
 import numpy as np
 from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP
 
-from .constants import MAP_WIDTH, MAP_HEIGHT, CHUNK_SIZE, BLOCK_SIZE
+from .constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
 from .wave import Wave
 from .components.player import Player
-
-class Block:
-    def __init__(self, position=(-1, -1)):
-        self.position = position
-        self.rect = pygame.Rect(position[0], position[1], BLOCK_SIZE, BLOCK_SIZE)
-        self.terrain = None
-        self.object = None
-
-    def update_position(self, position):
-        self.position = position
-        self.rect = pygame.Rect(position[0], position[1], BLOCK_SIZE, BLOCK_SIZE)
-
-    def is_occupied(self):
-        return not (self.object is None)
-
-
-class Chunk:
-    def __init__(self, position=(-1, -1)):
-        self.position = position
-        self.rect = pygame.Rect(position[0], position[1], CHUNK_SIZE, CHUNK_SIZE)
-        self.blockgrid = np.array([[Block(np.array([row, column]) * BLOCK_SIZE + position)
-                                    for row in range(CHUNK_SIZE // BLOCK_SIZE)]
-                                   for column in range(CHUNK_SIZE // BLOCK_SIZE)])
-        self.object_count = 0
-        self.enemy_count = 0
-        self.terrain_type = None  # TODO: Create different terrain types
-
-    def update_position(self, position):
-        self.position = position
-        self.rect = pygame.Rect(position[0], position[1], CHUNK_SIZE, CHUNK_SIZE)
+from .chunk import Chunk
+from .tile import Tile
 
 
 class Map:
     def __init__(self):
         self.time = pygame.time.get_ticks()
-        self.wave = Wave(self.time)
-        self.chunkgrid = np.array([[Chunk(np.array([row, column]) * CHUNK_SIZE)
-                                    for row in range(MAP_HEIGHT // CHUNK_SIZE)]
-                                   for column in range(MAP_WIDTH // CHUNK_SIZE)])
-        self.player_chunk_position = np.array([0, 0])
         self.player = Player()
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
-        self.object_count = 0
+        self.wave = Wave(self.time)
 
-    def spawn_objects(self):
+        self.terrain_tiles = []
+        self.object_tiles = []
+        # self.map_surface = pygame.Surface()
+        self.chunks = {(0, 0): Chunk(np.array([0, 0]), self.gen_seed())}
+        self.loaded_chunks = [(0, 0)]
+        self.newly_loaded_chunks = [(0, 0)]
+        self.unloaded_chunks = False
+        self.chunk_position = self.get_chunk_position()
+        self.chunk_quadrant = self.get_chunk_quadrant()
+
+    def get_chunk_position(self):
         """
-        Computes number of objects in game,
-        spawns new objects and
-        despawns objects that are out of range.
+        Returns the current chunk position on the grid e.g. the primary chunk position is (0, 0)
+        its right neighbor is (1, 0) and its bottom neighbor is (0, 1).
+
+        :return: current chunk position on the grid.
+        :rtype: numpy array
         """
-        # self.update_chunkgrid()
-        # if self.object_count < MAX_OBJECT_COUNT:
-        #   self.chunkgrid[get_spawn_position()].object = gen_random_object()
-        #   self.object_count += 1
-        pass
+        player_position = self.player.get_position()
+        return np.floor(np.abs(player_position) / (CHUNK_ARRAY/2)) * np.sign(player_position)
+
+    def get_chunk_quadrant(self):
+        """
+        Returns vector indicating the quadrant the player is standing on i.e. top, botttom, left, right
+        or two of them at a time.
+
+        :return: vector indicating which quadrant the player is on\
+        :rtype: numpy array
+        """
+        dif = self.player.get_position() - (-CHUNK_ARRAY/2 + CHUNK_SIZE * self.chunk_position)
+        quadrant = np.array([0, 0, 0, 0])
+        quadrant[0] = TOP_RECT.collidepoint(dif)
+        if not quadrant[0]:
+            quadrant[1] = BOTTOM_RECT.collidepoint(dif)
+        quadrant[2] = LEFT_RECT.collidepoint(dif)
+        if not quadrant[2]:
+            quadrant[3] = RIGHT_RECT.collidepoint(dif)
+        return np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])
+
+    def gen_seed(self):
+        return 0
+
+    def gen_chunk(self, chunk_position, chunk_quadrant):
+        """
+        Generates and renders chunk given by chunk_position + chun_quadrant
+
+        :param chunk_position: position of the chunk the player is on
+        :type chunk_position: numpy array
+        :param chunk_quadrant: vector indicating which quadrant the player is on
+        :type chunk_quadrant: numpy array
+        """
+        seed = self.gen_seed()
+        chunk_position_pos = tuple(chunk_position + chunk_quadrant)
+        if self.chunks.get(chunk_position_pos) is None:
+            self.chunks[chunk_position_pos] = Chunk(np.array(chunk_position_pos), seed)
+        else:
+            self.chunks[chunk_position_pos].render()
+        self.newly_loaded_chunks.append(chunk_position_pos)
+        self.loaded_chunks.append(chunk_position_pos)
+
+    def unload_chunks(self, old_chunk_position, new_chunk_position):
+        """
+        Unloads the chunks which are neighbors to old_chunk_position but aren't to the new_chunk_position.
+
+        :param old_chunk_position: position of the chunk the player was on
+        :type old_chunk_position: numpy array
+        :param new_chunk_position: position of the chunk the player was on
+        :type new_chunk_position: numpy array
+        """
+        unload_vector = old_chunk_position - new_chunk_position
+        unload_vectors = []
+        if np.linalg.norm(unload_vector) > 1:
+            x = np.array([unload_vector[0], 0])
+            y = np.array([0, unload_vector[1]])
+            unload_vectors = [unload_vector, x, y, x - y, y - x]
+        else:
+            flip = np.flip(unload_vector)
+            unload_vectors = [unload_vector, unload_vector + flip, unload_vector - flip]
+        for vector in unload_vectors:
+            unload_position = tuple(old_chunk_position + vector)
+            if self.chunks.get(unload_position) is not None:
+                self.chunks[unload_position].tilegrid = None
+                self.loaded_chunks.remove(unload_position)
+
+    def update_chunks(self):
+        """
+        Updates the chunks by creating new ones, rendering already created ones and unloading distant ones.
+        """
+        chunk_position = self.get_chunk_position()
+        if np.all(chunk_position == self.chunk_position):
+            chunk_quadrant = self.get_chunk_quadrant()
+            if np.all(chunk_quadrant != self.chunk_quadrant):
+                self.chunk_quadrant = chunk_quadrant
+                if np.linalg.norm(chunk_quadrant) != 0:
+                    self.gen_chunk(chunk_position, chunk_quadrant)
+                    if np.linalg.norm(chunk_quadrant) > 1:
+                        self.gen_chunk(chunk_position, np.array([chunk_quadrant[0], 0]))
+                        self.gen_chunk(chunk_position, np.array([0, chunk_quadrant[1]]))
+        else:
+            self.unload_chunks(self.chunk_position, chunk_position)
+            self.chunk_position = chunk_position
 
     def update_positions(self):
         """
@@ -79,67 +136,6 @@ class Map:
         if self.is_moving[K_w]:
             walk_vector[1] -= self.player.velocity
         self.player.move(walk_vector[0], walk_vector[1])
-        self.player_chunk_position = self.player_chunk_position + walk_vector
-        self.update_chunkgrid()
-
-    def update_chunkgrid(self):
-        """
-        Slices chunkgrid and adds new row or column depending on player movement.
-        """
-        if self.player_chunk_position[0] > CHUNK_SIZE:
-            self.player.move(-CHUNK_SIZE, 0)
-            for enemy in self.wave.enemies:
-                enemy.move(-CHUNK_SIZE, 0)
-            self.player_chunk_position[0] = self.player_chunk_position[0] - CHUNK_SIZE
-            for chunk in self.chunkgrid[:, 0]:
-                self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[:, 1:]
-            new_chunks = np.array([[Chunk()] for row in range(MAP_HEIGHT // CHUNK_SIZE)])
-            self.chunkgrid = np.concatenate((self.chunkgrid, new_chunks), axis=1)
-            self.reset_map_position()
-        if self.player_chunk_position[0] < - CHUNK_SIZE:
-            self.player.move(CHUNK_SIZE, 0)
-            for enemy in self.wave.enemies:
-                enemy.move(CHUNK_SIZE, 0)
-            self.player_chunk_position[0] = self.player_chunk_position[0] + CHUNK_SIZE
-            for chunk in self.chunkgrid[:, MAP_WIDTH // CHUNK_SIZE - 1]:
-                self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[:, :MAP_WIDTH // CHUNK_SIZE - 1]
-            new_chunks = np.array([[Chunk()] for row in range(MAP_HEIGHT // CHUNK_SIZE)])
-            self.chunkgrid = np.concatenate((new_chunks, self.chunkgrid), axis=1)
-            self.reset_map_position()
-        if self.player_chunk_position[1] > CHUNK_SIZE:
-            self.player.move(0, -CHUNK_SIZE)
-            for enemy in self.wave.enemies:
-                enemy.move(0, -CHUNK_SIZE)
-            self.player_chunk_position[1] = self.player_chunk_position[1] - CHUNK_SIZE
-            for chunk in self.chunkgrid[0, :]:
-                self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[1:, :]
-            new_chunks = np.array([[Chunk() for column in range(MAP_WIDTH // CHUNK_SIZE)]])
-            self.chunkgrid = np.concatenate((new_chunks, self.chunkgrid), axis=0)
-            self.reset_map_position()
-        if self.player_chunk_position[1] < - CHUNK_SIZE:
-            self.player.move(0, CHUNK_SIZE)
-            for enemy in self.wave.enemies:
-                enemy.move(0, CHUNK_SIZE)
-            self.player_chunk_position[1] = self.player_chunk_position[1] + CHUNK_SIZE
-            for chunk in self.chunkgrid[MAP_HEIGHT // CHUNK_SIZE - 1, :]:
-                self.object_count -= chunk.object_count
-            self.chunkgrid = self.chunkgrid[:MAP_HEIGHT // CHUNK_SIZE - 1, :]
-            new_chunks = np.array([[Chunk() for column in range(MAP_WIDTH // CHUNK_SIZE)]])
-            self.chunkgrid = np.concatenate((self.chunkgrid, new_chunks), axis=0)
-            self.reset_map_position()
-
-    def reset_map_position(self):
-        for chunk_row in range(MAP_HEIGHT // CHUNK_SIZE):
-            for chunk_column in range(MAP_WIDTH // CHUNK_SIZE):
-                self.chunkgrid[chunk_row][chunk_column].update_position(
-                    np.array([chunk_row, chunk_column]) * CHUNK_SIZE)
-                for block_row in range(CHUNK_SIZE // BLOCK_SIZE):
-                    for block_column in range(CHUNK_SIZE // BLOCK_SIZE):
-                        self.chunkgrid[chunk_row][chunk_column].blockgrid[block_row][block_column].update_position(
-                            np.array([block_row, block_column]) * BLOCK_SIZE)
 
     def handle_input(self, events):
         for event in events:
@@ -160,8 +156,8 @@ class Map:
         if self.wave.finished():
             self.wave.new_wave()
         self.update_positions()
+        self.update_chunks()
         self.wave.update_enemies(self.player, self.time)
-        self.spawn_objects()
 
     def draw(self, screen):
         """
@@ -174,8 +170,10 @@ class Map:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
 
-        # for chunk in self.chunkgrid:
-        #     if screen_rect.colliderect(chunk.rect):
-        #         for block in chunk.blockgrid:
-        #             if screen_rect.colliderect(block.rect):
-        #                 block.object.draw(screen)
+        # if self.unloaded_chunks:
+        #     # Redraw every loaded chunk
+        # elif len(self.newly_loaded_chunks) is not 0:
+        #     # Draw newly loaded chunks
+        #     self.newly_loaded_chunks = []
+
+
