@@ -105,8 +105,9 @@ class Map:
         for vector in unload_vectors:
             unload_position = tuple(old_chunk_position + vector)
             if self.chunks.get(unload_position) is not None:
-                self.chunks[unload_position].tilegrid = None
-                self.loaded_chunks.remove(unload_position)
+                if self.chunks[unload_position].tilegrid is not None:
+                    self.chunks[unload_position].tilegrid = None
+                    self.loaded_chunks.remove(unload_position)
 
     def update_chunks(self):
         """
@@ -160,8 +161,8 @@ class Map:
         if self.wave.finished():
             self.wave.new_wave()
         self.update_positions()
+        print(self.player.get_position(), self.get_chunk_position(), self.get_chunk_quadrant(), self.loaded_chunks)
         self.update_chunks()
-        print(self.get_chunk_quadrant(), self.loaded_chunks)
         self.wave.update_enemies(self.player, self.time)
 
     def draw(self, screen):

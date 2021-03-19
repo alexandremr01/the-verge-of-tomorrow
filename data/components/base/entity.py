@@ -30,7 +30,7 @@ class Entity:
 
     def move(self, d_x, d_y):
         """
-        Moves its image d_x units left and d_y units down
+        Moves its image d_x units right and d_y units down
         """
         self.sprite.rect.move_ip(d_x, d_y)
         self.position = np.array(self.sprite.rect.center)

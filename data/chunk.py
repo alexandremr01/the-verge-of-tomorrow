@@ -7,10 +7,11 @@ class Chunk:
         self.coordinates = coordinates
         self.rect = pygame.Rect(coordinates[0], coordinates[1], CHUNK_SIZE, CHUNK_SIZE)
         self.seed = seed
-        self.tilegrid = self.render()
+        self.tilegrid = None
+        self.render()
 
     def render(self):
-        return [1]
+        self.tilegrid = [0, 1]
 
     def draw(self):
         pass
