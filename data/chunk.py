@@ -13,5 +13,5 @@ class Chunk:
     def render(self):
         self.tilegrid = [0, 1]
 
-    def draw(self):
+    def draw(self, surface, position):
         pass

@@ -18,9 +18,11 @@ def distance(first_pos, second_pos):
     return np.sqrt(np.sum(np.power(np.array(second_pos) - np.array(first_pos), 2)))
 
 
-def get_grid_positions(center_position, initial_vector, step=0):
+def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1):
     vectors = [np.array([1, 0]), np.array([1, 1]), np.array([0, 1]), np.array([-1, 1]),
                np.array([-1, 0]), np.array([-1, -1]), np.array([0, -1]), np.array([1, -1])]
+    if step == -1:
+        return [center_position] + [center_position + vector for vector in vectors]
     initial = 0
     for i in range(8):
         if np.all(vectors[i] == initial_vector):

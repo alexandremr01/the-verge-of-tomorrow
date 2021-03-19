@@ -1,7 +1,3 @@
-"""
-Class supposed to contain enemies that will be rendered at game state
-"""
-
 import pygame
 import numpy as np
 from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP
@@ -15,6 +11,9 @@ from .utils import get_grid_positions
 
 
 class Map:
+    """
+    Class responsible for holding, managing and drawing map objects.
+    """
     def __init__(self):
         self.time = pygame.time.get_ticks()
         self.player = Player()
@@ -33,10 +32,10 @@ class Map:
 
     def get_chunk_position(self):
         """
-        Returns the current chunk position on the grid e.g. the primary chunk position is (0, 0)
-        its right neighbor is (1, 0) and its bottom neighbor is (0, 1).
+        Returns the current chunk position on the grid e.g. the primary chunk position is [0, 0]
+        its right neighbor is [1, 0] and its bottom neighbor is [0, 1].
 
-        :return: current chunk position on the grid.
+        :return: current chunk position on the grid
         :rtype: numpy array
         """
         player_position = self.player.get_position()
@@ -49,7 +48,7 @@ class Map:
         Returns vector indicating the quadrant the player is standing on i.e. top, botttom, left, right
         or two of them at a time.
 
-        :return: vector indicating which quadrant the player is on\
+        :return: vector indicating which quadrant the player is on
         :rtype: numpy array
         """
         dif = self.player.get_position() - CHUNK_SIZE * self.get_chunk_position()
@@ -63,9 +62,18 @@ class Map:
         return (np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])).astype(int)
 
     def gen_seed(self):
+        """
+        DONT KNOW YET
+        """
         return 0
 
     def gen_chunks(self, chunk_positions):
+        """
+        Generates or renders chunks at chunk_positions if not yet loaded.
+
+        :param chunk_positions: the positions at which to generate chunks
+        :type chunk_positions: array of tuples
+        """
         for chunk_position in chunk_positions:
             if self.chunks.get(chunk_position) is not None:
                 if self.chunks[chunk_position].tilegrid is not None:
@@ -79,7 +87,10 @@ class Map:
 
     def unload_chunks(self, chunk_positions):
         """
-        Unloads the chunks which are neighbors to old_chunk_position but aren't to the new_chunk_position.
+        Unloads chunks at chunk_positions if already generated and rendered.
+
+        :param chunk_positions: the positions to unload chunks
+        :type chunk_positions: array of tuples
         """
         for unload_position in chunk_positions:
             if self.chunks.get(unload_position) is not None:
@@ -90,7 +101,9 @@ class Map:
 
     def update_chunks(self):
         """
-        Updates the chunks by creating new ones, rendering already created ones and unloading distant ones.
+        Updates chunks by creating new ones, rendering already created ones and unloading distant ones.
+        A chunk is created/rendered when the player moves to a new quadrant which is not [0, 0].
+        A chunk is unloaded when the player moves to a new chunk.
         """
         self.unloaded_chunks = False
         chunk_position = self.get_chunk_position()
@@ -109,7 +122,7 @@ class Map:
 
     def update_positions(self):
         """
-        Updates positions of enemies and objects relative to the player.
+        Updates positions of player and enemies.
         """
         walk_vector = np.array([0, 0])
         if self.is_moving[K_a]:
@@ -123,6 +136,9 @@ class Map:
         self.player.move(walk_vector[0], walk_vector[1])
 
     def handle_input(self, events):
+        """
+        Handles input from keyboard and mouse.
+        """
         for event in events:
             if event.type == KEYDOWN:
                 self.is_moving[event.key] = True
@@ -133,9 +149,7 @@ class Map:
 
     def update(self):
         """
-        Updates positions of enemies and objects relative to the player,
-        spawns new enemies and objects,
-        despawns out of range ones.
+        Updates map object.
         """
         self.time = pygame.time.get_ticks()
         if self.wave.finished():
@@ -146,7 +160,7 @@ class Map:
 
     def draw(self, screen):
         """
-        Draws onto the screen enemies and objects in sight.
+        Draws on the screen the player, enemies and objects in sight.
         """
         screen.center_on_player(self.player.get_position())
         self.player.draw(screen)
@@ -155,14 +169,17 @@ class Map:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
 
-        # if self.unloaded_chunks:
-        #     self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
-
-
-        # if self.unloaded_chunks:
-        #     # Redraw every loaded chunk
-        # elif len(self.newly_loaded_chunks) is not 0:
-        #     # Draw newly loaded chunks
-        #     self.newly_loaded_chunks = []
+        if self.unloaded_chunks:
+            self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
+            for position in get_grid_positions(self.get_chunk_position()):
+                if tuple(position) in self.loaded_chunks:
+                    self.chunks[tuple(position)].draw(self.map_surface, CHUNK_ARRAY + position * CHUNK_SIZE)
+        elif self.newly_loaded_chunks is not []:
+            for position in get_grid_positions(self.get_chunk_position()):
+                if tuple(position) in self.newly_loaded_chunks:
+                    self.chunks[tuple(position)].draw(self.map_surface, CHUNK_ARRAY + position * CHUNK_SIZE)
+            self.newly_loaded_chunks = []
+        # Player position in surface is given by
+        # CHUNK_ARRAY * 3/2 + self.player.get_position() - self.get_chunk_position() * CHUNK_SIZE
 
 
