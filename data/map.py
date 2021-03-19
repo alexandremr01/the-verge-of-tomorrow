@@ -11,6 +11,7 @@ from .wave import Wave
 from .components.player import Player
 from .chunk import Chunk
 from .tile import Tile
+from .utils import get_grid_positions
 
 
 class Map:
@@ -26,7 +27,7 @@ class Map:
         self.chunks = {(0, 0): Chunk(np.array([0, 0]), self.gen_seed())}
         self.loaded_chunks = [(0, 0)]
         self.newly_loaded_chunks = [(0, 0)]
-        self.unloaded_chunks = False
+        self.unloaded_chunks = True
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
 
@@ -64,67 +65,46 @@ class Map:
     def gen_seed(self):
         return 0
 
-    def gen_chunk(self, chunk_position, chunk_quadrant):
-        """
-        Generates and renders chunk given by chunk_position + chun_quadrant
+    def gen_chunks(self, chunk_positions):
+        for chunk_position in chunk_positions:
+            if self.chunks.get(chunk_position) is not None:
+                if self.chunks[chunk_position].tilegrid is not None:
+                    continue
+                self.chunks[chunk_position].render()
+            else:
+                seed = self.gen_seed()
+                self.chunks[chunk_position] = Chunk(np.array(chunk_position), seed)
+            self.newly_loaded_chunks.append(chunk_position)
+            self.loaded_chunks.append(chunk_position)
 
-        :param chunk_position: position of the chunk the player is on
-        :type chunk_position: numpy array
-        :param chunk_quadrant: vector indicating which quadrant the player is on
-        :type chunk_quadrant: numpy array
-        """
-        chunk_position_pos = tuple(chunk_position + chunk_quadrant)
-        if self.chunks.get(chunk_position_pos) is not None:
-            if self.chunks[chunk_position_pos].tilegrid is not None:
-                return
-            self.chunks[chunk_position_pos].render()
-        else:
-            seed = self.gen_seed()
-            self.chunks[chunk_position_pos] = Chunk(np.array(chunk_position_pos), seed)
-        self.newly_loaded_chunks.append(chunk_position_pos)
-        self.loaded_chunks.append(chunk_position_pos)
-
-    def unload_chunks(self, old_chunk_position, new_chunk_position):
+    def unload_chunks(self, chunk_positions):
         """
         Unloads the chunks which are neighbors to old_chunk_position but aren't to the new_chunk_position.
-
-        :param old_chunk_position: position of the chunk the player was on
-        :type old_chunk_position: numpy array
-        :param new_chunk_position: position of the chunk the player was on
-        :type new_chunk_position: numpy array
         """
-        unload_vector = old_chunk_position - new_chunk_position
-        unload_vectors = []
-        if np.linalg.norm(unload_vector) > 1:
-            x = np.array([unload_vector[0], 0])
-            y = np.array([0, unload_vector[1]])
-            unload_vectors = [unload_vector, x, y, x - y, y - x]
-        else:
-            flip = np.flip(unload_vector)
-            unload_vectors = [unload_vector, unload_vector + flip, unload_vector - flip]
-        for vector in unload_vectors:
-            unload_position = tuple(old_chunk_position + vector)
+        for unload_position in chunk_positions:
             if self.chunks.get(unload_position) is not None:
                 if self.chunks[unload_position].tilegrid is not None:
                     self.chunks[unload_position].tilegrid = None
+                    self.unloaded_chunks = True
                     self.loaded_chunks.remove(unload_position)
 
     def update_chunks(self):
         """
         Updates the chunks by creating new ones, rendering already created ones and unloading distant ones.
         """
+        self.unloaded_chunks = False
         chunk_position = self.get_chunk_position()
         if np.all(chunk_position == self.chunk_position):
             chunk_quadrant = self.get_chunk_quadrant()
             if np.any(chunk_quadrant != self.chunk_quadrant):
                 self.chunk_quadrant = chunk_quadrant
-                if np.linalg.norm(chunk_quadrant) != 0:
-                    self.gen_chunk(chunk_position, chunk_quadrant)
-                    if np.linalg.norm(chunk_quadrant) > 1:
-                        self.gen_chunk(chunk_position, np.array([chunk_quadrant[0], 0]))
-                        self.gen_chunk(chunk_position, np.array([0, chunk_quadrant[1]]))
+                if np.linalg.norm(chunk_quadrant) > 0:
+                    self.gen_chunks(get_grid_positions(chunk_position, chunk_quadrant,
+                                                       np.linalg.norm(chunk_quadrant) > 1))
         else:
-            self.unload_chunks(self.chunk_position, chunk_position)
+            unload_direction = self.chunk_position - chunk_position
+            self.unload_chunks(get_grid_positions(self.chunk_position, unload_direction,
+                                                  1 + np.linalg.norm(unload_direction) > 1))
             self.chunk_position = chunk_position
 
     def update_positions(self):
@@ -161,7 +141,6 @@ class Map:
         if self.wave.finished():
             self.wave.new_wave()
         self.update_positions()
-        print(self.player.get_position(), self.get_chunk_position(), self.get_chunk_quadrant(), self.loaded_chunks)
         self.update_chunks()
         self.wave.update_enemies(self.player, self.time)
 
@@ -175,6 +154,10 @@ class Map:
         for enemy in self.wave.enemies:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
+
+        # if self.unloaded_chunks:
+        #     self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
+
 
         # if self.unloaded_chunks:
         #     # Redraw every loaded chunk
