@@ -66,7 +66,7 @@ class SpriteSheet:
         """
         self.sprites = []
         self.resolution = resolution
-        spritesheet = pygame.image.load(path).convert()
+        spritesheet = pygame.image.load(path).convert_alpha()
         row = 0
         column = 0
         while row < height / resolution[1]:

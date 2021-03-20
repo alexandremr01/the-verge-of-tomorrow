@@ -59,7 +59,7 @@ class Player(Entity):
     def __init__(self):
         super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0))
         self.health = 5
-        self.velocity = 5
+        self.velocity = 2
         self.direction = 0
         self.hud = Hud(self.health, graphics_dict['items'])
         self.states = []

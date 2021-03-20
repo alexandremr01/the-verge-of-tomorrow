@@ -42,7 +42,7 @@ class Bullet(Entity):
         """
         Verifies if the bullet is visible in the screen.
         """
-        threshold = 16
+        threshold = 150
         if -threshold < self.screen_position[0] < SCREEN_WIDTH + threshold:
             if -threshold < self.screen_position[1] < SCREEN_HEIGHT + threshold:
                 return True
