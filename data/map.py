@@ -1,6 +1,8 @@
 import pygame
 import numpy as np
 from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP
+from random import randint
+from opensimplex import OpenSimplex
 
 from .constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
 from .wave import Wave
@@ -20,10 +22,9 @@ class Map:
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.wave = Wave(self.time)
 
-        self.terrain_tiles = []
-        self.object_tiles = []
+        self.generator = OpenSimplex(randint(0, 10000))
         self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
-        self.chunks = {(0, 0): Chunk(np.array([0, 0]), self.gen_seed())}
+        self.chunks = {(0, 0): Chunk(np.array([0, 0]))}
         self.loaded_chunks = [(0, 0)]
         self.newly_loaded_chunks = [(0, 0)]
         self.unloaded_chunks = True
@@ -61,12 +62,6 @@ class Map:
             quadrant[3] = RIGHT_RECT.collidepoint(dif)
         return (np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])).astype(int)
 
-    def gen_seed(self):
-        """
-        DONT KNOW YET
-        """
-        return 0
-
     def gen_chunks(self, chunk_positions):
         """
         Generates or renders chunks at chunk_positions if not yet loaded.
@@ -76,12 +71,11 @@ class Map:
         """
         for chunk_position in chunk_positions:
             if self.chunks.get(chunk_position) is not None:
-                if self.chunks[chunk_position].tilegrid is not None:
+                if self.chunks[chunk_position].is_rendered():
                     continue
-                self.chunks[chunk_position].render()
             else:
-                seed = self.gen_seed()
-                self.chunks[chunk_position] = Chunk(np.array(chunk_position), seed)
+                self.chunks[chunk_position] = Chunk(np.array(chunk_position))
+            self.chunks[chunk_position].render(self.generator)
             self.newly_loaded_chunks.append(chunk_position)
             self.loaded_chunks.append(chunk_position)
 
@@ -94,8 +88,8 @@ class Map:
         """
         for unload_position in chunk_positions:
             if self.chunks.get(unload_position) is not None:
-                if self.chunks[unload_position].tilegrid is not None:
-                    self.chunks[unload_position].tilegrid = None
+                if self.chunks[unload_position].is_rendered():
+                    self.chunks[unload_position].de_render()
                     self.unloaded_chunks = True
                     self.loaded_chunks.remove(unload_position)
 
