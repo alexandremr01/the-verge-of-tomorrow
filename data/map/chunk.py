@@ -12,12 +12,13 @@ class Chunk:
         return self.tilegrid is not None
 
     def render(self, generator):
-        ref = self.position * CHUNK_SIZE - CHUNK_ARRAY/2 + TILE_ARRAY/2
-        self.tilegrid = [[generator.noise2d(ref[0] + TILE_SIZE * i,
-                                            ref[1] + TILE_SIZE * j)
-                          for i in range(CHUNK_SIZE // TILE_SIZE)]
-                         for j in range(CHUNK_SIZE // TILE_SIZE)]
-        self.decode_tilegrid()
+        # ref = self.position * CHUNK_SIZE - CHUNK_ARRAY/2 + TILE_ARRAY/2
+        # self.tilegrid = [[generator.noise2d(ref[0] + TILE_SIZE * i,
+        #                                     ref[1] + TILE_SIZE * j)
+        #                   for i in range(CHUNK_SIZE // TILE_SIZE)]
+        #                  for j in range(CHUNK_SIZE // TILE_SIZE)]
+        # self.decode_tilegrid()
+        pass
 
     def decode_tilegrid(self):
         pass

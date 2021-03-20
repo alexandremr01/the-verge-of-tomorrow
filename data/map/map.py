@@ -8,9 +8,10 @@ from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
-from .tile import Tile
+from .tile import Tiles
 from data.utils import get_grid_positions
 from os import system
+
 
 class Map:
     """
