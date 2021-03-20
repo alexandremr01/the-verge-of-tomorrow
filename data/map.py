@@ -157,6 +157,7 @@ class Map:
         despawns out of range ones.
         """
         self.time = pygame.time.get_ticks()
+        self.player.update_direction()
         if self.wave.finished():
             self.wave.new_wave()
         self.update_positions()

@@ -7,7 +7,7 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import MAP_WIDTH, MAP_HEIGHT
+from ..constants import MAP_WIDTH, MAP_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT
 from ..setup import graphics_dict
 from .base.entity import Entity
 
@@ -58,6 +58,7 @@ class Player(Entity):
         super().__init__(np.array([MAP_WIDTH, MAP_HEIGHT])/2, graphics_dict['player'].get_image(0))
         self.health = 5
         self.velocity = 5
+        self.direction = 0
         self.hud = Hud(self.health, graphics_dict['items'])
         self.states = []
         for i in range(graphics_dict['player'].get_size()):
@@ -95,6 +96,17 @@ class Player(Entity):
             self.current_state = self.weapon
             self.update_sprite(self.current_state)
         self.hud.update(key)
+
+    def update_direction(self):
+        """
+        Updates the current player's direction.
+        """
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        x_coordinate = mouse_x - (SCREEN_WIDTH // 2)
+        y_coordinate = mouse_y - (SCREEN_HEIGHT // 2)
+        angle = int(np.degrees(np.arctan2(y_coordinate, x_coordinate)))
+        self.direction = -angle
+        self.update_sprite(self.current_state, -angle)
 
     def draw(self, screen):
         """

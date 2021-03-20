@@ -15,12 +15,15 @@ class Entity:
         self.position = np.array(position)
         self.sprite = Sprite(position, sprite_graphic)
 
-    def update_sprite(self, sprite_graphic):
+    def update_sprite(self, sprite_graphic, angle=None):
         """
         Changes current sprite of entity to the
         new sprite_graphic
         """
-        self.sprite = Sprite(self.position, sprite_graphic)
+        if angle is None:
+            self.sprite = Sprite(self.position, sprite_graphic)
+        else:
+            self.sprite = Sprite(self.position, sprite_graphic, angle)
 
     def get_position(self):
         """
