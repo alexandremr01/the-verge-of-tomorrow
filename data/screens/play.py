@@ -3,7 +3,7 @@ Main screen, where the game actually occurs
 """
 
 from .base.state import State
-from ..map import Map
+from data.map.map import Map
 from ..constants import BLACK
 
 

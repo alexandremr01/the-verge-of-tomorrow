@@ -4,12 +4,12 @@ from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOU
 from random import randint
 from opensimplex import OpenSimplex
 
-from .constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
-from .wave import Wave
-from .components.player import Player
+from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
+from data.wave import Wave
+from data.components.player import Player
 from .chunk import Chunk
 from .tile import Tile
-from .utils import get_grid_positions
+from data.utils import get_grid_positions
 from os import system
 
 class Map:

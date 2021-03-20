@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from .constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, TILE_ARRAY
+from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, TILE_ARRAY
 
 
 class Chunk:
