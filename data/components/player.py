@@ -51,6 +51,7 @@ class Hud():
                 screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
         screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
 
+
 class Player(Entity):
     """
     Main character class
@@ -121,7 +122,8 @@ class Player(Entity):
         """
         weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
                            25 * np.sin(np.radians(-self.direction+20)))
-        self.projectiles.add_bullet(self.get_position() + weapon_position, 
+        self.projectiles.add_bullet(self.get_position() + weapon_position,
+                                    weapon_position,
                                     -self.direction, 
                                     self.weapon_type)
 
