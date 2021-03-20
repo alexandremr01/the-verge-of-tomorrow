@@ -41,6 +41,9 @@ ZOMBIE_HEALTH = 110
 PLAYER_INITIAL_HEALTH = 10
 PLAYER_INITIAL_VELOCITY = 5
 
+# Bullet
+BULLET_VELOCITY = 10
+
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
 

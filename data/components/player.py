@@ -10,6 +10,7 @@ from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 from ..constants import MAP_WIDTH, MAP_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT
 from ..setup import graphics_dict
 from .base.entity import Entity
+from .projectiles import Projectiles
 
 
 class Hud():
@@ -61,9 +62,11 @@ class Player(Entity):
         self.direction = 0
         self.hud = Hud(self.health, graphics_dict['items'])
         self.states = []
+        self.projectiles = Projectiles()
         for i in range(graphics_dict['player'].get_size()):
             self.states.append(graphics_dict['player'].get_image(i))
         self.weapon = self.states[0]
+        self.weapon_type = K_1
         self.current_state = self.states[0]
 
     def set_weapon(self, key):
@@ -72,14 +75,17 @@ class Player(Entity):
         """
         if key == K_1:
             self.weapon = self.states[0]
+            self.weapon_type = K_1
             self.update_sprite(self.states[0])
             self.current_state = self.weapon
         elif key == K_2:
             self.weapon = self.states[1]
+            self.weapon_type = K_2
             self.update_sprite(self.states[1])
             self.current_state = self.weapon
         elif key == K_3:
             self.weapon = self.states[2]
+            self.weapon_type = K_3
             self.update_sprite(self.states[2])
             self.current_state = self.weapon
 
@@ -107,10 +113,18 @@ class Player(Entity):
         angle = int(np.degrees(np.arctan2(y_coordinate, x_coordinate)))
         self.direction = -angle
         self.update_sprite(self.current_state, -angle)
+        self.projectiles.update()
+
+    def shoot(self):
+        """
+        Shoots a projectile
+        """
+        self.projectiles.add_bullet(self.get_position(), -self.direction, self.weapon_type)
 
     def draw(self, screen):
         """
         Draws the player's animation
         """
         super().draw(screen)
+        self.projectiles.draw(screen)
         self.hud.draw(screen)

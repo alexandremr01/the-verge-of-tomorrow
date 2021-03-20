@@ -17,6 +17,7 @@ class Sprite(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface(sprite_graphic.get_rect().size).convert_alpha()
+        self.image.set_colorkey((0, 0, 0))
         self.image.blit(sprite_graphic, (0, 0), sprite_graphic.get_rect())
         if initial_angle is not None:
             self.image = pygame.transform.rotozoom(self.image, initial_angle, 1)
@@ -64,7 +65,7 @@ class SpriteSheet:
         """
         self.sprites = []
         self.resolution = resolution
-        spritesheet = pygame.image.load(path).convert_alpha()
+        spritesheet = pygame.image.load(path).convert()
         row = 0
         column = 0
         while row < height / resolution[1]:
@@ -72,7 +73,8 @@ class SpriteSheet:
                 left_edge = resolution[0] * column
                 top_edge = resolution[1] * row
                 rect = pygame.Rect(left_edge, top_edge, resolution[0], resolution[1])
-                image = pygame.Surface(rect.size).convert_alpha()
+                image = pygame.Surface(rect.size)
+                image.set_colorkey((0, 0, 0))
                 image.blit(spritesheet, (0, 0), rect)
                 self.sprites.append(image)
                 column += 1

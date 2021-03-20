@@ -4,7 +4,7 @@ Class supposed to contain enemies that will be rendered at game state
 
 import pygame
 import numpy as np
-from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOUSEBUTTONDOWN
 
 from .constants import MAP_WIDTH, MAP_HEIGHT, CHUNK_SIZE, BLOCK_SIZE
 from .wave import Wave
@@ -149,6 +149,8 @@ class Map:
             if event.type == KEYUP:
                 self.is_moving[event.key] = False
                 self.player.update()
+            if event.type == MOUSEBUTTONUP:
+                self.player.shoot()
 
     def update(self):
         """

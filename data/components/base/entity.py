@@ -11,9 +11,12 @@ class Entity:
     """
     Anything that has position and an image.
     """
-    def __init__(self, position, sprite_graphic):
+    def __init__(self, position, sprite_graphic, angle=None):
         self.position = np.array(position)
-        self.sprite = Sprite(position, sprite_graphic)
+        if angle is None:
+            self.sprite = Sprite(position, sprite_graphic)
+        else:
+            self.sprite = Sprite(position, sprite_graphic, angle)
 
     def update_sprite(self, sprite_graphic, angle=None):
         """
