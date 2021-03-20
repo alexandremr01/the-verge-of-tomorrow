@@ -186,15 +186,15 @@ class Map:
             surface_position = self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY
             for position in self.loaded_chunks:
                 self.chunks[position].draw(self.map_surface,
-                                                  np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
+                                           np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
         elif self.newly_loaded_chunks is not []:
             surface_position = self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY
             for position in self.newly_loaded_chunks:
                 self.chunks[position].draw(self.map_surface,
-                                                  np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
+                                           np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
         self.newly_loaded_chunks = []
 
-        screen.blit(self.map_surface, self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY * 3/2)
+        screen.blit(self.map_surface, self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY * 3 / 2)
 
         screen.center_on_player(self.player.get_position())
         self.player.draw(screen)
