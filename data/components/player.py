@@ -7,7 +7,8 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_INITIAL_VELOCITY, TIME_BETWEEN_COLLISIONS
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, \
+    PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY, TIME_BETWEEN_COLLISIONS
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
@@ -57,15 +58,15 @@ class Player(Entity):
     Main character class
     """
     def __init__(self):
-        super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0))
-        self.health = 5
+        super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0, (50, 50)))
+        self.health = PLAYER_INITIAL_HEALTH
         self.velocity = PLAYER_INITIAL_VELOCITY
         self.direction = 0
         self.hud = Hud(self.health, graphics_dict['items'])
         self.states = []
         self.projectiles = Projectiles()
         for i in range(graphics_dict['player'].get_size()):
-            self.states.append(graphics_dict['player'].get_image(i))
+            self.states.append(graphics_dict['player'].get_image(i, (50, 50)))
         self.weapon = self.states[0]
         self.weapon_type = K_1
         self.current_state = self.states[0]
