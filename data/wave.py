@@ -19,6 +19,7 @@ class Wave:
     """
     def __init__(self, time):
         self.current_wave = 0
+        self.enemiesTurn = 0
 
         self.current_wave_num_enemies = 0
         self.num_enemies_killed = 0
@@ -76,9 +77,12 @@ class Wave:
         Updates enemies' states, spawning or despawning
         them if it is the case
         """
-        for enemy in self.enemies:
-            if not enemy.sprite.rect.colliderect(player.sprite.rect):
-                enemy.ai_move(player.get_position())
+        self.enemiesTurn += 1
+        if self.enemiesTurn == 2:
+            for enemy in self.enemies:
+                if not enemy.sprite.rect.colliderect(player.sprite.rect):
+                    enemy.ai_move(player.get_position())
+            self.enemiesTurn = 0
 
         self.update_alive_enemies(player.get_position())
         if time - self.spawn_timer > TIME_TO_SPAWN and self.num_enemies_to_spawn > 0:
