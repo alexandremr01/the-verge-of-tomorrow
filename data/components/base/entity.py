@@ -34,6 +34,12 @@ class Entity:
         """
         return np.array(self.sprite.rect.center)
 
+    def get_sprite(self):
+        """
+        Returns its sprite
+        """
+        return self.sprite
+
     def move(self, d_x, d_y):
         """
         Moves its image d_x units right and d_y units down

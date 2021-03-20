@@ -4,7 +4,8 @@ import numpy as np
 from pygame.locals import K_1, K_2, K_3
 from .base.entity import Entity
 from ..setup import graphics_dict
-from ..constants import BULLET_VELOCITY, SCREEN_WIDTH, SCREEN_HEIGHT
+from ..constants import (BULLET_VELOCITY, SCREEN_WIDTH, SCREEN_HEIGHT, 
+                         WEAPON_K1_DAMAGE, WEAPON_K2_DAMAGE, WEAPON_K3_DAMAGE)
 
 class Bullet(Entity):
     """
@@ -13,14 +14,23 @@ class Bullet(Entity):
     def __init__(self, initial_position, weapon_position, direction, weapon_type):
         if weapon_type == K_1:
             super().__init__(initial_position, graphics_dict["bullets"].get_image(32), direction)
+            self.damage = WEAPON_K1_DAMAGE
         elif weapon_type == K_2:
             super().__init__(initial_position, graphics_dict["bullets"].get_image(39), direction)
+            self.damage = WEAPON_K2_DAMAGE
         elif weapon_type == K_3:
             super().__init__(initial_position, graphics_dict["bullets"].get_image(48), direction)
+            self.damage = WEAPON_K3_DAMAGE
         self.velocity = BULLET_VELOCITY
         self.direction = direction
         self.screen_position = [SCREEN_WIDTH // 2 + int(weapon_position[0]), 
                                 SCREEN_HEIGHT // 2 + int(weapon_position[1])]
+
+    def get_damage(self):
+        """
+        Returns bullet damage.
+        """
+        return self.damage
 
     def update(self):
         """
@@ -42,7 +52,7 @@ class Bullet(Entity):
         """
         Verifies if the bullet is visible in the screen.
         """
-        threshold = 150
+        threshold = 200
         if -threshold < self.screen_position[0] < SCREEN_WIDTH + threshold:
             if -threshold < self.screen_position[1] < SCREEN_HEIGHT + threshold:
                 return True
@@ -83,3 +93,18 @@ class Projectiles:
         for key in self.projectiles.keys():
             for bullet in self.projectiles[key]:
                 bullet.draw(screen)
+
+    def handle_collision(self, zombie):
+        """
+        Handles collisions between zombie and any projectile.
+        """
+        for key in self.projectiles.keys():
+            num_bullets = len(self.projectiles[key])
+            if num_bullets == 0:
+                continue
+            bullet_damage = self.projectiles[key][0].get_damage()
+            self.projectiles[key] = [bullet for bullet in self.projectiles[key]
+                                     if not pygame.sprite.collide_rect(
+                                     bullet.get_sprite(), zombie.get_sprite())]
+            damage = bullet_damage * (num_bullets - len(self.projectiles[key]))
+            zombie.hurt(damage)

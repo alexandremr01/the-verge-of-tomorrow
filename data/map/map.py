@@ -144,11 +144,19 @@ class Map:
             if event.type == MOUSEBUTTONUP:
                 self.player.shoot()
 
+    def handle_collision(self):
+        """
+        Handles colisions between map objects.
+        """
+        for zombie in self.wave.get_zombies():
+            self.player.get_projectiles().handle_collision(zombie)
+
     def update(self):
         """
         Updates map object.
         """
         self.time = pygame.time.get_ticks()
+        self.handle_collision()
         self.player.update_direction()
         if self.wave.finished():
             self.wave.new_wave()

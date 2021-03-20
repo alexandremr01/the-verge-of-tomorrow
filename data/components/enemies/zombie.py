@@ -15,6 +15,14 @@ class Zombie(Enemy):
         self.health = ZOMBIE_HEALTH
         self.velocity = ZOMBIE_VELOCITY
 
+    def hurt(self, damage):
+        """
+        Decreases zombie health by damage
+        """
+        self.health = self.health - damage
+        if self.health < 0:
+            self.health = 0
+
     def draw(self, screen):
         """
         Draws the zombie sprite in a dynamic way

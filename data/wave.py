@@ -88,6 +88,12 @@ class Wave:
         if self.num_enemies_killed == self.current_wave_num_enemies:
             self.wave_over = True
 
+    def get_zombies(self):
+        """
+        Returns all the zombies alive.
+        """
+        return self.enemies
+
     def finished(self):
         """
         Query to whether current wave is over or not
