@@ -149,6 +149,7 @@ class Map:
         Handles colisions between map objects.
         """
         for zombie in self.wave.get_zombies():
+            self.player.handle_collision(zombie, self.time)
             self.player.get_projectiles().handle_collision(zombie)
 
     def update(self):

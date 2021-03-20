@@ -5,7 +5,7 @@ programmed to stalk and hurt him
 
 import numpy as np
 from ..base.entity import Entity
-from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
+from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH, DEFAULT_ENEMY_DAMAGE
 from ...constants import FRAMES_PER_SECOND
 
 class Enemy(Entity):
@@ -16,6 +16,7 @@ class Enemy(Entity):
         super().__init__(position, sprite_graphic)
         self.health = DEFAULT_ENEMY_HEALTH
         self.velocity = DEFAULT_ENEMY_VELOCITY
+        self.damage = DEFAULT_ENEMY_DAMAGE
 
         self.previous_pos = None
         self.curr_pos = position

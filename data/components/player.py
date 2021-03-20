@@ -7,7 +7,7 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_INITIAL_VELOCITY
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_INITIAL_VELOCITY, TIME_BETWEEN_COLLISIONS
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
@@ -69,6 +69,7 @@ class Player(Entity):
         self.weapon = self.states[0]
         self.weapon_type = K_1
         self.current_state = self.states[0]
+        self.last_collision_time = 0
 
     def get_projectiles(self):
         """
@@ -141,4 +142,23 @@ class Player(Entity):
         self.projectiles.draw(screen)
         self.hud.draw(screen)
 
+    def hurt(self, damage):
+        """
+        Decreases the player's health by damage.
+        """
+        self.health -= damage
+        if self.health <= 0:
+            # TODO: game over screen
+            pass
 
+    def handle_collision(self, zombie, time):
+        """
+        Handle collisions between player and zombie.
+        """
+        if time - self.last_collision_time < TIME_BETWEEN_COLLISIONS:
+            return
+        collide = pygame.sprite.collide_rect(self.get_sprite(), zombie.get_sprite())
+        if collide:
+            self.hurt(zombie.get_damage())
+            self.hud.update(None, self.health)
+            self.last_collision_time = time

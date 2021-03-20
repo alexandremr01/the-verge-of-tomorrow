@@ -3,7 +3,7 @@ Enemy most common in the game
 """
 
 from .enemy import Enemy
-from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, EPSILON
+from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE, EPSILON
 from ...setup import graphics_dict
 
 class Zombie(Enemy):
@@ -14,6 +14,13 @@ class Zombie(Enemy):
         super().__init__(position, graphics_dict["zombie"].get_image(0))
         self.health = ZOMBIE_HEALTH
         self.velocity = ZOMBIE_VELOCITY
+        self.damage = ZOMBIE_DAMAGE
+
+    def get_damage(self):
+        """
+        Returns zombie's damage.
+        """
+        return self.damage
 
     def hurt(self, damage):
         """
