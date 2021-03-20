@@ -55,7 +55,6 @@ class Projectiles:
         Updates the position of all projectiles
         """
         # TODO : Remove projectiles that are not in the screen anymore
-        # TODO : Fix black box around the sprite
         for key in self.projectiles.keys():
             for bullet in self.projectiles[key]:
                 bullet.update()

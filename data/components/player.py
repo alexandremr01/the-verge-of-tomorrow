@@ -119,7 +119,11 @@ class Player(Entity):
         """
         Shoots a projectile
         """
-        self.projectiles.add_bullet(self.get_position(), -self.direction, self.weapon_type)
+        weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
+                           25 * np.sin(np.radians(-self.direction+20)))
+        self.projectiles.add_bullet(self.get_position() + weapon_position, 
+                                    -self.direction, 
+                                    self.weapon_type)
 
     def draw(self, screen):
         """

@@ -21,6 +21,7 @@ class Sprite(pygame.sprite.Sprite):
         self.image.blit(sprite_graphic, (0, 0), sprite_graphic.get_rect())
         if initial_angle is not None:
             self.image = pygame.transform.rotozoom(self.image, initial_angle, 1)
+            self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect().move(initial_center[0] - self.image.get_rect().width / 2,
                                                initial_center[1] - self.image.get_rect().height / 2)
 
