@@ -7,13 +7,13 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import MAP_WIDTH, MAP_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
 
 
-class Hud():
+class Hud:
     """
     Heads-up display containing player's status and score.
     """
@@ -27,7 +27,7 @@ class Hud():
                                pygame.transform.scale(items_graphics.get_image(8), (90, 90))]
         self.weapon_position = (650, 700)
 
-    def update(self, key, health=None): # TODO: include score and status
+    def update(self, key, health=None):  # TODO: include score and status
         """
         Updates all the hud's elements
         """
@@ -45,7 +45,7 @@ class Hud():
         Draws the heads-up display
         """
         for i in range(len(self.heart)):
-            if self.heart[i] == True:
+            if self.heart[i] is True:
                 screen.blit_rel(self.heart_sprites[0], self.heart_positions[i])
             else:
                 screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
@@ -57,7 +57,7 @@ class Player(Entity):
     Main character class
     """
     def __init__(self):
-        super().__init__(np.array([MAP_WIDTH, MAP_HEIGHT])/2, graphics_dict['player'].get_image(0))
+        super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0))
         self.health = 5
         self.velocity = 5
         self.direction = 0
@@ -134,3 +134,5 @@ class Player(Entity):
         super().draw(screen)
         self.projectiles.draw(screen)
         self.hud.draw(screen)
+
+

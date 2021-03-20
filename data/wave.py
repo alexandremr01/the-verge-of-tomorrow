@@ -31,7 +31,7 @@ class Wave:
 
         self.new_wave()
 
-    def new_wave(self): # TODO: night/day dynamics
+    def new_wave(self):  # TODO: night/day dynamics
         """
         Creates a new wave, resetting its params.
         The number of players increases by 5 as each
@@ -52,7 +52,7 @@ class Wave:
         spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
         new_enemy_pos = player_position + spawn_vector
 
-        self.enemies.append(Zombie(new_enemy_pos)) # TODO: use more enemies
+        self.enemies.append(Zombie(new_enemy_pos))  # TODO: use more enemies
         self.num_enemies_to_spawn -= 1
 
     def update_alive_enemies(self, player_position):
