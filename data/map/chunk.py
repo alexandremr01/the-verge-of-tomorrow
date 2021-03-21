@@ -16,8 +16,8 @@ class Chunk:
     def render(self, generator):
         ref = self.position * CHUNK_SIZE - CHUNK_ARRAY / 2 + TILE_ARRAY / 2 + \
               np.array([0, CHUNK_SIZE // RENDER_STEPS]) * self.render_step
-        new_load = np.array([[generator.noise2d(ref[0] + TILE_SIZE * i,
-                                                ref[1] + TILE_SIZE * j)
+        new_load = np.array([[generator.noise2d((ref[0] + TILE_SIZE * j) / TILE_SIZE,
+                                                (ref[1] + TILE_SIZE * i) / TILE_SIZE)
                               for j in range(CHUNK_SIZE // TILE_SIZE)]
                              for i in range((CHUNK_SIZE // TILE_SIZE) // RENDER_STEPS)])
         if self.render_step == 0:
