@@ -148,9 +148,12 @@ class Player(Entity):
         Decreases the player's health by damage.
         """
         self.health -= damage
-        if self.health <= 0:
-            # TODO: game over screen
-            pass
+
+    def is_alive(self):
+        """
+        Returns a boolean indicating whether player is alive or not
+        """
+        return self.health > 0
 
     def handle_collision(self, zombie, time):
         """
