@@ -7,8 +7,8 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import (SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_INITIAL_VELOCITY, 
-                         TIME_BETWEEN_COLLISIONS, WHITE)
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, \
+    PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY, TIME_BETWEEN_COLLISIONS, BLACK
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
@@ -28,22 +28,21 @@ class Hud:
                                pygame.transform.scale(items_graphics.get_image(8), (90, 90))]
         self.weapon_position = (670, 650)
         self.font = pygame.font.SysFont('Arial', 30)
-        self.score_surface = self.font.render('SCORE', False, WHITE)
+        self.score_surface = self.font.render('SCORE', False, BLACK)
         self.score_rect = self.score_surface.get_rect(center=(100, 750))
-        self.weapon_surface = self.font.render('WEAPON', False, WHITE)
+        self.weapon_surface = self.font.render('WEAPON', False, BLACK)
         self.weapon_rect = self.score_surface.get_rect(center=(700, 750))
-        self.score_num_surface = self.font.render('0', False, WHITE)
+        self.score_num_surface = self.font.render('0', False, BLACK)
         self.score_num_rect = self.score_surface.get_rect(center=(100, 710))
         self.score_num = 0
 
-    def update(self, key, health=None, delta_score=None):  # TODO: include score and status
+    def update(self, key, health=None, delta_score=None):  # TODO: include status
         """
         Updates all the hud's elements
         """
         if delta_score is not None:
             self.score_num += delta_score
-            self.score_num_surface = self.font.render(str(self.score_num), False, WHITE)
-            #self.score_num_rect = self.score_surface.get_rect(center=(190, 710))
+            self.score_num_surface = self.font.render(str(self.score_num), False, BLACK)
         if key == K_1:
             self.current_weapon = 0
         elif key == K_2:
@@ -73,8 +72,8 @@ class Player(Entity):
     Main character class
     """
     def __init__(self):
-        super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0))
-        self.health = 5
+        super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0, (50, 50)))
+        self.health = PLAYER_INITIAL_HEALTH
         self.velocity = PLAYER_INITIAL_VELOCITY
         self.score = 0
         self.direction = 0
@@ -82,7 +81,7 @@ class Player(Entity):
         self.states = []
         self.projectiles = Projectiles()
         for i in range(graphics_dict['player'].get_size()):
-            self.states.append(graphics_dict['player'].get_image(i))
+            self.states.append(graphics_dict['player'].get_image(i, (50, 50)))
         self.weapon = self.states[0]
         self.weapon_type = K_1
         self.current_state = self.states[0]
@@ -170,9 +169,12 @@ class Player(Entity):
         Decreases the player's health by damage.
         """
         self.health -= damage
-        if self.health <= 0:
-            # TODO: game over screen
-            pass
+
+    def is_alive(self):
+        """
+        Returns a boolean indicating whether player is alive or not
+        """
+        return self.health > 0
 
     def handle_collision(self, zombie, time):
         """

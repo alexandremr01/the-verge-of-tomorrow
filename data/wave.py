@@ -9,7 +9,7 @@ import numpy as np
 
 from .utils import distance
 from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
-from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE
+from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE, FRAMES_TO_ENEMIES_TURN
 from .constants import ZOMBIE_SCORE
 from .components.enemies.zombie import Zombie
 
@@ -20,6 +20,7 @@ class Wave:
     """
     def __init__(self, time):
         self.current_wave = 0
+        self.enemiesTurn = 0
 
         self.current_wave_num_enemies = 0
         self.num_enemies_killed = 0
@@ -78,9 +79,12 @@ class Wave:
         Updates enemies' states, spawning or despawning
         them if it is the case
         """
-        for enemy in self.enemies:
-            if not enemy.sprite.rect.colliderect(player.sprite.rect):
-                enemy.ai_move(player.get_position())
+        self.enemiesTurn += 1
+        if self.enemiesTurn == FRAMES_TO_ENEMIES_TURN:
+            for enemy in self.enemies:
+                if not enemy.sprite.rect.colliderect(player.sprite.rect):
+                    enemy.ai_move(player.get_position())
+            self.enemiesTurn = 0
 
         self.update_alive_enemies(player.get_position(), player.get_hud())
         if time - self.spawn_timer > TIME_TO_SPAWN and self.num_enemies_to_spawn > 0:

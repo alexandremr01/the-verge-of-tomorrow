@@ -4,31 +4,34 @@ from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOU
 from random import randint
 from opensimplex import OpenSimplex
 
-from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
+from data.constants import SCREEN_ARRAY, CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, \
+    TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, BLACK
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
 from .tile import Tiles
 from data.utils import get_grid_positions
-from os import system
 
 
 class Map:
     """
     Class responsible for holding, managing and drawing map objects.
     """
+
     def __init__(self):
         self.time = pygame.time.get_ticks()
         self.player = Player()
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.wave = Wave(self.time)
 
+        self.tiles = Tiles()
         self.generator = OpenSimplex(randint(0, 10000))
         self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
         self.chunks = {(0, 0): Chunk(np.array([0, 0]))}
+        self.chunks[(0, 0)].render(self.generator)
         self.loaded_chunks = [(0, 0)]
         self.newly_loaded_chunks = [(0, 0)]
-        self.unloaded_chunks = True
+        self.walked_chunks = True
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
 
@@ -43,7 +46,8 @@ class Map:
         player_position = self.player.get_position()
         if CHUNK_RECT.collidepoint(player_position):
             return np.array([0, 0])
-        return (np.floor((np.abs(player_position) + CHUNK_ARRAY/2) / CHUNK_SIZE) * np.sign(player_position)).astype(int)
+        return (np.floor((np.abs(player_position) + CHUNK_ARRAY / 2) / CHUNK_SIZE) * np.sign(player_position)).astype(
+            int)
 
     def get_chunk_quadrant(self):
         """
@@ -91,7 +95,6 @@ class Map:
             if self.chunks.get(unload_position) is not None:
                 if self.chunks[unload_position].is_rendered():
                     self.chunks[unload_position].de_render()
-                    self.unloaded_chunks = True
                     self.loaded_chunks.remove(unload_position)
 
     def update_chunks(self):
@@ -100,7 +103,7 @@ class Map:
         A chunk is created/rendered when the player moves to a new quadrant which is not [0, 0].
         A chunk is unloaded when the player moves to a new chunk.
         """
-        self.unloaded_chunks = False
+        self.walked_chunks = False
         chunk_position = self.get_chunk_position()
         if np.all(chunk_position == self.chunk_position):
             chunk_quadrant = self.get_chunk_quadrant()
@@ -110,6 +113,7 @@ class Map:
                     self.gen_chunks(get_grid_positions(chunk_position, chunk_quadrant,
                                                        np.linalg.norm(chunk_quadrant) > 1))
         else:
+            self.walked_chunks = True
             unload_direction = self.chunk_position - chunk_position
             self.unload_chunks(get_grid_positions(self.chunk_position, unload_direction,
                                                   1 + np.linalg.norm(unload_direction) > 1))
@@ -163,6 +167,9 @@ class Map:
             self.wave.new_wave()
         self.update_positions()
         self.update_chunks()
+        # print("Player position:", self.player.get_position(),
+        #       "Current chunk:", self.get_chunk_position(),
+        #       "Current quadrant:", self.get_chunk_quadrant())
         # print("Player position:", self.player.get_position())
         # print("Current chunk:", self.get_chunk_position())
         # print("Current quadrant:", self.get_chunk_quadrant())
@@ -174,24 +181,24 @@ class Map:
         """
         Draws on the screen the player, enemies and objects in sight.
         """
+        if self.walked_chunks:
+            self.map_surface.fill(BLACK)
+            surface_position = self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY
+            for position in self.loaded_chunks:
+                self.chunks[position].draw(self.map_surface,
+                                           np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
+        elif self.newly_loaded_chunks is not []:
+            surface_position = self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY
+            for position in self.newly_loaded_chunks:
+                self.chunks[position].draw(self.map_surface,
+                                           np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
+        self.newly_loaded_chunks = []
+
+        screen.blit(self.map_surface, self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY * 3 / 2)
+
         screen.center_on_player(self.player.get_position())
         self.player.draw(screen)
 
         for enemy in self.wave.enemies:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
-
-        if self.unloaded_chunks:
-            self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
-            for position in get_grid_positions(self.get_chunk_position()):
-                if tuple(position) in self.loaded_chunks:
-                    self.chunks[tuple(position)].draw(self.map_surface, CHUNK_ARRAY + position * CHUNK_SIZE)
-        elif self.newly_loaded_chunks is not []:
-            for position in get_grid_positions(self.get_chunk_position()):
-                if tuple(position) in self.newly_loaded_chunks:
-                    self.chunks[tuple(position)].draw(self.map_surface, CHUNK_ARRAY + position * CHUNK_SIZE)
-            self.newly_loaded_chunks = []
-        # Player position in surface is given by
-        # CHUNK_ARRAY * 3/2 + self.player.get_position() - self.get_chunk_position() * CHUNK_SIZE
-
-
