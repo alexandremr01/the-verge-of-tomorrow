@@ -7,7 +7,8 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_INITIAL_VELOCITY, TIME_BETWEEN_COLLISIONS
+from ..constants import (SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_INITIAL_VELOCITY, 
+                         TIME_BETWEEN_COLLISIONS, WHITE)
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
@@ -25,12 +26,24 @@ class Hud:
         self.weapon_sprites = [pygame.transform.scale(items_graphics.get_image(7), (90, 90)),
                                pygame.transform.scale(items_graphics.get_image(6), (90, 90)), 
                                pygame.transform.scale(items_graphics.get_image(8), (90, 90))]
-        self.weapon_position = (650, 700)
+        self.weapon_position = (670, 650)
+        self.font = pygame.font.SysFont('Arial', 30)
+        self.score_surface = self.font.render('SCORE', False, WHITE)
+        self.score_rect = self.score_surface.get_rect(center=(100, 750))
+        self.weapon_surface = self.font.render('WEAPON', False, WHITE)
+        self.weapon_rect = self.score_surface.get_rect(center=(700, 750))
+        self.score_num_surface = self.font.render('0', False, WHITE)
+        self.score_num_rect = self.score_surface.get_rect(center=(100, 710))
+        self.score_num = 0
 
-    def update(self, key, health=None):  # TODO: include score and status
+    def update(self, key, health=None, delta_score=None):  # TODO: include score and status
         """
         Updates all the hud's elements
         """
+        if delta_score is not None:
+            self.score_num += delta_score
+            self.score_num_surface = self.font.render(str(self.score_num), False, WHITE)
+            #self.score_num_rect = self.score_surface.get_rect(center=(190, 710))
         if key == K_1:
             self.current_weapon = 0
         elif key == K_2:
@@ -50,6 +63,9 @@ class Hud:
             else:
                 screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
         screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
+        screen.blit_rel(self.score_surface, self.score_rect)
+        screen.blit_rel(self.weapon_surface, self.weapon_rect)
+        screen.blit_rel(self.score_num_surface, self.score_num_rect)
 
 
 class Player(Entity):
@@ -60,6 +76,7 @@ class Player(Entity):
         super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0))
         self.health = 5
         self.velocity = PLAYER_INITIAL_VELOCITY
+        self.score = 0
         self.direction = 0
         self.hud = Hud(self.health, graphics_dict['items'])
         self.states = []
@@ -70,6 +87,12 @@ class Player(Entity):
         self.weapon_type = K_1
         self.current_state = self.states[0]
         self.last_collision_time = 0
+
+    def get_hud(self):
+        """
+        Returns game's hud.
+        """
+        return self.hud
 
     def get_projectiles(self):
         """

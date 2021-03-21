@@ -10,6 +10,7 @@ import numpy as np
 from .utils import distance
 from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE
+from .constants import ZOMBIE_SCORE
 from .components.enemies.zombie import Zombie
 
 class Wave:
@@ -55,7 +56,7 @@ class Wave:
         self.enemies.append(Zombie(new_enemy_pos))  # TODO: use more enemies
         self.num_enemies_to_spawn -= 1
 
-    def update_alive_enemies(self, player_position):
+    def update_alive_enemies(self, player_position, hud):
         """
         Checks each enemy's health and distance to
         player to see if it continues alive or not
@@ -65,6 +66,7 @@ class Wave:
             if enemy.health == 0:
                 self.num_enemies_killed += 1
                 self.total_enemies_killed += 1
+                hud.update(None, delta_score=ZOMBIE_SCORE)
             elif distance(enemy.get_position(), player_position) > DESPAWN_DISTANCE:
                 self.num_enemies_to_spawn += 1
             else:
@@ -80,7 +82,7 @@ class Wave:
             if not enemy.sprite.rect.colliderect(player.sprite.rect):
                 enemy.ai_move(player.get_position())
 
-        self.update_alive_enemies(player.get_position())
+        self.update_alive_enemies(player.get_position(), player.get_hud())
         if time - self.spawn_timer > TIME_TO_SPAWN and self.num_enemies_to_spawn > 0:
             self.generate_enemy(player.get_position())
             self.spawn_timer = time
