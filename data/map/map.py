@@ -27,10 +27,12 @@ class Map:
         self.tiles = Tiles()
         self.generator = OpenSimplex(randint(0, 10000))
         self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
+        self.map_surface.fill(BLACK)
         self.chunks = {(0, 0): Chunk(np.array([0, 0]))}
         self.chunks[(0, 0)].render(self.generator)
-        self.loaded_chunks = [(0, 0)]
-        self.newly_loaded_chunks = [(0, 0)]
+        self.rendering_chunks = [(0, 0)]
+        self.loaded_chunks = []
+        self.newly_loaded_chunks = []
         self.walked_chunks = True
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
@@ -81,8 +83,7 @@ class Map:
             else:
                 self.chunks[chunk_position] = Chunk(np.array(chunk_position))
             self.chunks[chunk_position].render(self.generator)
-            self.newly_loaded_chunks.append(chunk_position)
-            self.loaded_chunks.append(chunk_position)
+            self.rendering_chunks.append(chunk_position)
 
     def unload_chunks(self, chunk_positions):
         """
@@ -103,6 +104,14 @@ class Map:
         A chunk is created/rendered when the player moves to a new quadrant which is not [0, 0].
         A chunk is unloaded when the player moves to a new chunk.
         """
+        if len(self.rendering_chunks) > 0:
+            for position in self.rendering_chunks:
+                self.chunks[position].render(self.generator)
+                if not self.chunks[position].is_rendering:
+                    self.rendering_chunks.remove(position)
+                    self.newly_loaded_chunks.append(position)
+                    self.loaded_chunks.append(position)
+
         self.walked_chunks = False
         chunk_position = self.get_chunk_position()
         if np.all(chunk_position == self.chunk_position):
@@ -181,13 +190,13 @@ class Map:
         """
         Draws on the screen the player, enemies and objects in sight.
         """
-        if self.walked_chunks:
+        if self.walked_chunks and len(self.loaded_chunks) > 0:
             self.map_surface.fill(BLACK)
             surface_position = self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY
             for position in self.loaded_chunks:
                 self.chunks[position].draw(self.map_surface,
                                            np.array(position) * CHUNK_SIZE - surface_position, self.tiles)
-        elif self.newly_loaded_chunks is not []:
+        elif len(self.newly_loaded_chunks) > 0:
             surface_position = self.get_chunk_position() * CHUNK_SIZE - CHUNK_ARRAY
             for position in self.newly_loaded_chunks:
                 self.chunks[position].draw(self.map_surface,
