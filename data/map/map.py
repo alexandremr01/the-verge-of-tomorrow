@@ -33,7 +33,7 @@ class Map:
         self.rendering_chunks = [(0, 0)]
         self.loaded_chunks = []
         self.newly_loaded_chunks = []
-        self.walked_chunks = True
+        self.walked_chunks = False
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
 
