@@ -31,6 +31,8 @@ def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1
     selected = []
     if initial - step < 0:
         selected = vectors[initial - step:] + vectors[0: initial + step + 1]
+    elif initial + step >= len(vectors):
+        selected = vectors[initial - step:] + vectors[: (initial + step) % len(vectors) + 1]
     else:
         selected = vectors[initial - step: initial + step + 1]
     return [tuple(center_position + vector) for vector in selected]
