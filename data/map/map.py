@@ -4,8 +4,7 @@ from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOU
 from random import randint
 from opensimplex import OpenSimplex
 
-from data.constants import SCREEN_ARRAY, CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, \
-    TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, BLACK
+from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
@@ -26,8 +25,6 @@ class Map:
 
         self.tiles = Tiles()
         self.generator = OpenSimplex(randint(0, 10000))
-        self.map_surface = pygame.Surface(3 * CHUNK_ARRAY)
-        self.map_surface.fill(BLACK)
         self.chunks = {(0, 0): Chunk(np.array([0, 0]))}
         self.chunks[(0, 0)].render(self.generator, self.tiles)
         self.rendering_chunks = [(0, 0)]
