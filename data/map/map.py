@@ -20,6 +20,7 @@ class Map:
     def __init__(self):
         self.time = pygame.time.get_ticks()
         self.player = Player()
+        self.player_can_shoot = True
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.wave = Wave(self.time)
 
@@ -139,15 +140,21 @@ class Map:
         """
         Handles input from keyboard and mouse.
         """
+        if self.player_can_shoot:
+            left_mouse_button = pygame.mouse.get_pressed()[0]
+            if left_mouse_button:
+                self.player.shoot(self.time)
         for event in events:
             if event.type == KEYDOWN:
-                self.is_moving[event.key] = True
-                self.player.update(event.key)
+                if not any(self.is_moving.values()):
+                    self.is_moving[event.key] = True
+                    self.player_can_shoot = False
+                    self.player.update(event.key)
             if event.type == KEYUP:
                 self.is_moving[event.key] = False
-                self.player.update()
-            if event.type == MOUSEBUTTONUP:
-                self.player.shoot()
+                if not any(self.is_moving.values()):
+                    self.player_can_shoot = True
+                    self.player.update() 
 
     def handle_collision(self):
         """

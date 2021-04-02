@@ -60,6 +60,9 @@ BULLET_VELOCITY = 10
 WEAPON_K1_DAMAGE = 20
 WEAPON_K2_DAMAGE = 30
 WEAPON_K3_DAMAGE = 40
+WEAPON_K1_DELAY = 150 #milliseconds
+WEAPON_K2_DELAY = 300 #milliseconds
+WEAPON_K3_DELAY = 450 #milliseconds
 
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'

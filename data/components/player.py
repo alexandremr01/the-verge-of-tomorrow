@@ -7,8 +7,10 @@ import pygame
 import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, \
-    PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY, TIME_BETWEEN_COLLISIONS, BLACK
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY 
+from ..constants import TIME_BETWEEN_COLLISIONS, BLACK
+from ..constants import WEAPON_K1_DELAY, WEAPON_K2_DELAY, WEAPON_K3_DELAY    
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
@@ -86,6 +88,7 @@ class Player(Entity):
         self.weapon_type = K_1
         self.current_state = self.states[0]
         self.last_collision_time = 0
+        self.last_shoot_time = [0, 0, 0]
 
     def get_hud(self):
         """
@@ -145,16 +148,30 @@ class Player(Entity):
         self.update_sprite(self.current_state, -angle)
         self.projectiles.update()
 
-    def shoot(self):
+    def shoot(self, time):
         """
         Shoots a projectile
         """
-        weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
-                           25 * np.sin(np.radians(-self.direction+20)))
-        self.projectiles.add_bullet(self.get_position() + weapon_position,
-                                    weapon_position,
-                                    -self.direction, 
-                                    self.weapon_type)
+        can_shoot = False
+        if self.weapon_type == K_1:
+            if time - self.last_shoot_time[0] >= WEAPON_K1_DELAY:
+                self.last_shoot_time[0] = time
+                can_shoot = True
+        elif self.weapon_type == K_2:
+            if time - self.last_shoot_time[1] >= WEAPON_K2_DELAY:
+                self.last_shoot_time[1] = time
+                can_shoot = True
+        elif self.weapon_type == K_3:        
+            if time - self.last_shoot_time[2] >= WEAPON_K3_DELAY:
+                self.last_shoot_time[2] = time
+                can_shoot = True      
+        if can_shoot:
+            weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
+                               25 * np.sin(np.radians(-self.direction+20)))
+            self.projectiles.add_bullet(self.get_position() + weapon_position,
+                                        weapon_position,
+                                        -self.direction, 
+                                        self.weapon_type)
 
     def draw(self, screen):
         """
