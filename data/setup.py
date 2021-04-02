@@ -17,6 +17,7 @@ def load_graphics():
     map_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker.png", (8, 8), 64, 72)
     items_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "items.png", (32, 32), 288, 32)
     bullets_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "firebullet.png", (16, 16), 512, 272)
+    status_bar_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "status_bar.png", (800, 100), 800, 100)
     graphics_dict["test_spritesheet"] = test_spritesheet
     graphics_dict["test_sprite"] = test_spritesheet.get_image(1)
     graphics_dict["player"] = player_graphics
@@ -24,3 +25,4 @@ def load_graphics():
     graphics_dict["map"] = map_graphics
     graphics_dict["items"] = items_graphics
     graphics_dict["bullets"] = bullets_graphics
+    graphics_dict["status_bar"] = status_bar_graphics

@@ -20,23 +20,21 @@ class Hud:
     """
     Heads-up display containing player's status and score.
     """
-    def __init__(self, max_health, items_graphics):
+    def __init__(self, max_health, items_graphics, status_bar_graphics):
         self.heart = [True] * max_health
         self.heart_sprites = [items_graphics.get_image(4), items_graphics.get_image(5)]
-        self.heart_positions = [(20+35*i, 20) for i in range(max_health)]
+        self.heart_positions = [(10+35*i, 745) for i in range(max_health)]
         self.current_weapon = 0
         self.weapon_sprites = [pygame.transform.scale(items_graphics.get_image(7), (90, 90)),
                                pygame.transform.scale(items_graphics.get_image(6), (90, 90)), 
                                pygame.transform.scale(items_graphics.get_image(8), (90, 90))]
-        self.weapon_position = (670, 650)
-        self.font = pygame.font.SysFont('Arial', 30)
-        self.score_surface = self.font.render('SCORE', False, BLACK)
-        self.score_rect = self.score_surface.get_rect(center=(100, 750))
-        self.weapon_surface = self.font.render('WEAPON', False, BLACK)
-        self.weapon_rect = self.score_surface.get_rect(center=(700, 750))
+        self.weapon_position = (385, 715)
+        self.font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 30)
         self.score_num_surface = self.font.render('0', False, BLACK)
-        self.score_num_rect = self.score_surface.get_rect(center=(100, 710))
+        self.score_num_rect = self.score_num_surface.get_rect(center=(685, 755))
         self.score_num = 0
+        self.status_bar = status_bar_graphics.get_image(0)
+        self.status_bar_position = (0, 700)
 
     def update(self, key, health=None, delta_score=None):  # TODO: include status
         """
@@ -58,14 +56,13 @@ class Hud:
         """
         Draws the heads-up display
         """
+        screen.blit_rel(self.status_bar, self.status_bar_position)
         for i in range(len(self.heart)):
             if self.heart[i] is True:
                 screen.blit_rel(self.heart_sprites[0], self.heart_positions[i])
             else:
                 screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
         screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
-        screen.blit_rel(self.score_surface, self.score_rect)
-        screen.blit_rel(self.weapon_surface, self.weapon_rect)
         screen.blit_rel(self.score_num_surface, self.score_num_rect)
 
 
@@ -79,7 +76,7 @@ class Player(Entity):
         self.velocity = PLAYER_INITIAL_VELOCITY
         self.score = 0
         self.direction = 0
-        self.hud = Hud(self.health, graphics_dict['items'])
+        self.hud = Hud(self.health, graphics_dict['items'], graphics_dict['status_bar'])
         self.states = []
         self.projectiles = Projectiles()
         for i in range(graphics_dict['player'].get_size()):

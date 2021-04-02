@@ -184,9 +184,10 @@ class Map:
         for position in self.loaded_chunks:
             screen.blit(self.chunks[position].surface, self.chunks[position].topleft)
 
-        screen.center_on_player(self.player.get_position())
-        self.player.draw(screen)
-
         for enemy in self.wave.enemies:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
+
+        screen.center_on_player(self.player.get_position())
+        self.player.draw(screen)
+
