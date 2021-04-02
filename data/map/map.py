@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOUSEBUTTONDOWN
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOUSEBUTTONDOWN, K_LSHIFT
 from random import randint
 from opensimplex import OpenSimplex
 
@@ -133,13 +133,13 @@ class Map:
         """
         walk_vector = np.array([0, 0])
         if self.is_moving[K_a]:
-            walk_vector[0] -= self.player.velocity
+            walk_vector[0] -= self.player.get_velocity()
         if self.is_moving[K_d]:
-            walk_vector[0] += self.player.velocity
+            walk_vector[0] += self.player.get_velocity()
         if self.is_moving[K_s]:
-            walk_vector[1] += self.player.velocity
+            walk_vector[1] += self.player.get_velocity()
         if self.is_moving[K_w]:
-            walk_vector[1] -= self.player.velocity
+            walk_vector[1] -= self.player.get_velocity()
         self.player.move(walk_vector[0], walk_vector[1])
 
     def handle_input(self, events):
@@ -152,15 +152,19 @@ class Map:
                 self.player.shoot(self.time)
         for event in events:
             if event.type == KEYDOWN:
-                if not any(self.is_moving.values()):
+                if event.key == K_LSHIFT:
+                    self.player.set_running(self.time)
+                elif not any(self.is_moving.values()):
                     self.is_moving[event.key] = True
                     self.player_can_shoot = False
                     self.player.update(event.key)
             if event.type == KEYUP:
+                if event.key == K_LSHIFT:
+                    self.player.stop_running(self.time)
                 self.is_moving[event.key] = False
                 if not any(self.is_moving.values()):
                     self.player_can_shoot = True
-                    self.player.update() 
+                    self.player.update(self.time)
 
     def handle_collision(self):
         """
@@ -176,6 +180,7 @@ class Map:
         """
         self.time = pygame.time.get_ticks()
         self.handle_collision()
+        self.player.update_state(self.time)
         self.player.update_direction()
         if self.wave.finished():
             self.wave.new_wave()

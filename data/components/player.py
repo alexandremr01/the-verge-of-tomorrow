@@ -5,8 +5,10 @@ The player being controlled by the user.
 
 import pygame
 import numpy as np
-from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d
+from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
+import random
 
+from . import player_state
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY 
 from ..constants import TIME_BETWEEN_COLLISIONS, BLACK
@@ -17,17 +19,17 @@ from ..constants import WEAPON_K1_DELAY, WEAPON_K2_DELAY, WEAPON_K3_DELAY, \
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
-
+from .player_state import PlayerStateFSM
 
 class Hud:
     """
     Heads-up display containing player's status and score.
     """
-    def __init__(self, max_health, items_graphics, status_bar_graphics):
+    def __init__(self, max_health, items_graphics, status_bar_graphics, status):
         self.score = 0
-        
-        self.heart = [True] * max_health
-        self.heart_sprites = [items_graphics.get_image(4), items_graphics.get_image(5)]
+
+        self.heart = [1] * max_health
+        self.heart_sprites = [items_graphics.get_image(5), items_graphics.get_image(9), items_graphics.get_image(4)]
         self.heart_positions = [(10+35*i, 745) for i in range(max_health)]
         
         self.current_weapon = 0
@@ -59,6 +61,9 @@ class Hud:
         
         self.status_bar = status_bar_graphics.get_image(0)
         self.status_bar_position = (0, 700)
+        self.status = self.font.render(status, False, BLACK)
+        self.status_rect = self.status.get_rect(center=(280, 755))
+
 
     def set_ammo(self, weapon_type, value):
         """
@@ -77,7 +82,7 @@ class Hud:
             self.ammo_surface[2] = self.small_font.render(weapon_k3_ammo, False, BLACK)
             self.ammo_current_position[2] = self.ammo_position[len(weapon_k3_ammo)]
 
-    def update(self, key, health=None, delta_score=None):  # TODO: include status / must change
+    def update(self, key, health=None, delta_score=None, status="None"):  # TODO: include status / must change
         """
         Updates all the hud's elements
         """
@@ -92,7 +97,17 @@ class Hud:
         elif key == K_3:
             self.current_weapon = 2
         if health is not None:
-            self.heart[health:] = [False] * len(self.heart[health:])
+            hp = health
+            for i in range(len(self.heart)):
+                if hp == 0.5:
+                    self.heart[i] = 0.5
+                    hp = 0
+                elif hp > 0:
+                    self.heart[i] = 1
+                    hp -= 1
+                else:
+                    self.heart[i] = 0
+            self.status = self.font.render(status, False, BLACK)
 
     def draw(self, screen):
         """
@@ -100,14 +115,17 @@ class Hud:
         """
         screen.blit_rel(self.status_bar, self.status_bar_position)
         for i in range(len(self.heart)):
-            if self.heart[i] is True:
+            if self.heart[i] == 0:
                 screen.blit_rel(self.heart_sprites[0], self.heart_positions[i])
-            else:
+            elif self.heart[i] == 0.5:
                 screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
+            else:
+                screen.blit_rel(self.heart_sprites[2], self.heart_positions[i])
         screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
         screen.blit_rel(self.ammo_surface[self.current_weapon], 
                         self.ammo_current_position[self.current_weapon])
         screen.blit_rel(self.score_num_surface, self.score_num_rect)
+        screen.blit_rel(self.status, self.status_rect)
 
     def get_score(self):
         """
@@ -125,19 +143,22 @@ class Player(Entity):
         self.health = PLAYER_INITIAL_HEALTH
         self.velocity = PLAYER_INITIAL_VELOCITY
         self.direction = 0
-        self.hud = Hud(self.health, graphics_dict['items'], graphics_dict['status_bar'])
+        self.state = PlayerStateFSM()
+        self.hud = Hud(self.health, graphics_dict['items'], graphics_dict['status_bar'], self.state.get_state_name())
         self.states = []
         self.projectiles = Projectiles()
         for i in range(graphics_dict['player'].get_size()):
             self.states.append(graphics_dict['player'].get_image(i, (50, 50)))
         self.weapon = self.states[0]
         self.weapon_type = K_1
-        self.current_state = self.states[0]
+        self.current_weapon = self.states[0]
         self.last_collision_time = 0
+        self.last_bleeding_time = 0
         self.last_shoot_time = [0, 0, 0]
         self.bullets = {K_1 : WEAPON_K1_INITIAL_BULLET, 
                         K_2 : WEAPON_K2_INITIAL_BULLET, 
                         K_3 : WEAPON_K3_INITIAL_BULLET}
+
 
     def get_hud(self):
         """
@@ -165,31 +186,60 @@ class Player(Entity):
             self.weapon = self.states[0]
             self.weapon_type = K_1
             self.update_sprite(self.states[0])
-            self.current_state = self.weapon
+            self.current_weapon = self.weapon
         elif key == K_2:
             self.weapon = self.states[1]
             self.weapon_type = K_2
             self.update_sprite(self.states[1])
-            self.current_state = self.weapon
+            self.current_weapon = self.weapon
         elif key == K_3:
             self.weapon = self.states[2]
             self.weapon_type = K_3
             self.update_sprite(self.states[2])
-            self.current_state = self.weapon
+            self.current_weapon = self.weapon
 
-    def update(self, key=None):
+    def update(self, time, key=None):
         """
         Updates the current player's state and heads-up display.
         """
         if key in [K_1, K_2, K_3]:
             self.set_weapon(key)
         elif key in [K_w, K_a, K_s, K_d]:
-            self.current_state = self.states[3]
+            self.current_weapon = self.states[3]
             self.update_sprite(self.states[3])
         else:
-            self.current_state = self.weapon
-            self.update_sprite(self.current_state)
-        self.hud.update(key)
+            self.current_weapon = self.weapon
+            self.update_sprite(self.current_weapon)
+
+    def get_velocity(self):
+        """
+        Updates the current player's state and heads-up display.
+        """
+        state = self.state.get_state()
+        if state == player_state.RunningState:
+            return 2*self.velocity
+        elif state == player_state.SlowState:
+            return 0.8*self.velocity
+        return self.velocity
+
+    def update_state(self, time):
+        if self.state.get_state() == player_state.BleedingState and time - self.last_bleeding_time > player_state.BLEEDING_INTERVAL :
+            self.hurt(player_state.BLEEDING_DAMAGE)
+            self.last_bleeding_time = time
+        self.state.update(time)
+        self.hud.update(key=None, health=self.health, status=self.state.get_state_name())
+
+    def set_running(self, time):
+        """
+        Updates the current player's state and heads-up display.
+        """
+        self.state.send_event(player_state.RUN_EVENT, time)
+
+    def stop_running(self, time):
+        """
+        Updates the current player's state and heads-up display.
+        """
+        self.state.send_event(player_state.STOP_RUN_EVENT, time)
 
     def update_direction(self):
         """
@@ -200,7 +250,7 @@ class Player(Entity):
         y_coordinate = mouse_y - (SCREEN_HEIGHT // 2)
         angle = int(np.degrees(np.arctan2(y_coordinate, x_coordinate)))
         self.direction = -angle
-        self.update_sprite(self.current_state, -angle)
+        self.update_sprite(self.current_weapon, -angle)
         self.projectiles.update()
 
     def shoot(self, time):
@@ -257,6 +307,15 @@ class Player(Entity):
         """
         return self.health > 0
 
+    def apply_random_debuff(self, time):
+        r = random.random()
+        if r < 0.1:
+            self.state.send_event(player_state.SLOW_EVENT, time)
+        elif r < 0.9:
+            self.last_bleeding_time = time
+            self.state.send_event(player_state.BLEED_EVENT, time)
+
+
     def handle_collision(self, zombie, time):
         """
         Handle collisions between player and zombie.
@@ -265,6 +324,9 @@ class Player(Entity):
             return
         collide = pygame.sprite.collide_rect(self.get_sprite(), zombie.get_sprite())
         if collide:
+            self.apply_random_debuff(time)
             self.hurt(zombie.get_damage())
-            self.hud.update(None, self.health)
+            self.hud.update(None, self.health, status=self.state.get_state_name())
             self.last_collision_time = time
+            self.update_state(time)
+
