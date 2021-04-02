@@ -311,7 +311,7 @@ class Player(Entity):
         r = random.random()
         if r < 0.1:
             self.state.send_event(player_state.SLOW_EVENT, time)
-        elif r < 0.9:
+        elif r < 0.2:
             self.last_bleeding_time = time
             self.state.send_event(player_state.BLEED_EVENT, time)
 
