@@ -35,9 +35,16 @@ class StateMachine:
 
         if self.current_state.next is not None:
             self.previous_state = self.current_state
-            self.current_state = self.states_dict[self.previous_state.next]
+            if self.previous_state.next == 'OVER':
+                self.states_dict[self.previous_state.next].set_score(self.previous_state.custom_value)
+                self.current_state = self.states_dict[self.previous_state.next]
+            else:
+                self.current_state = self.states_dict[self.previous_state.next]
 
             if self.previous_state.clear_window is True:
                 screen.fill(BLACK)
-            self.previous_state.next = None
             self.previous_state.clear_window = False
+            self.previous_state.custom_value = None
+            if self.previous_state.next == 'OVER':
+                self.previous_state.reset()
+            self.previous_state.next = None    

@@ -33,6 +33,12 @@ class Map:
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
 
+    def get_player(self):
+        """
+        Returns the player object
+        """
+        return self.player
+
     def get_chunk_position(self):
         """
         Returns the current chunk position on the grid e.g. the primary chunk position is [0, 0]

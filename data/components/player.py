@@ -21,6 +21,7 @@ class Hud:
     Heads-up display containing player's status and score.
     """
     def __init__(self, max_health, items_graphics, status_bar_graphics):
+        self.score = 0
         self.heart = [True] * max_health
         self.heart_sprites = [items_graphics.get_image(4), items_graphics.get_image(5)]
         self.heart_positions = [(10+35*i, 745) for i in range(max_health)]
@@ -43,6 +44,7 @@ class Hud:
         if delta_score is not None:
             self.score_num += delta_score
             self.score_num_surface = self.font.render(str(self.score_num), False, BLACK)
+            self.score = self.score_num
         if key == K_1:
             self.current_weapon = 0
         elif key == K_2:
@@ -65,6 +67,12 @@ class Hud:
         screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
         screen.blit_rel(self.score_num_surface, self.score_num_rect)
 
+    def get_score(self):
+        """
+        Returns player's total score
+        """
+        return self.score
+
 
 class Player(Entity):
     """
@@ -74,7 +82,6 @@ class Player(Entity):
         super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0, (50, 50)))
         self.health = PLAYER_INITIAL_HEALTH
         self.velocity = PLAYER_INITIAL_VELOCITY
-        self.score = 0
         self.direction = 0
         self.hud = Hud(self.health, graphics_dict['items'], graphics_dict['status_bar'])
         self.states = []
@@ -98,6 +105,12 @@ class Player(Entity):
         Returns player projectiles.
         """
         return self.projectiles
+
+    def get_score(self):
+        """
+        Returns the total player's score
+        """
+        return self.hud.get_score()
 
     def set_weapon(self, key):
         """

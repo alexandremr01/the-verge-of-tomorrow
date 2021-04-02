@@ -23,9 +23,10 @@ class Play(State):
         """
         self.map.update()
 
-        if not self.map.player.is_alive():
+        if not self.map.get_player().is_alive():
             self.delay_to_game_over += 1
         if self.delay_to_game_over == TRANSITION_BETWEEN_SCREENS:
+            self.custom_value = self.map.get_player().get_score()
             self.next = 'OVER'
             self.clear_window = True
 
@@ -41,3 +42,9 @@ class Play(State):
         Responds to inputs given through keyboard
         """
         self.map.handle_input(events)
+
+    def reset(self):
+        """
+        Resets all variables to start a new game
+        """
+        self.__init__()
