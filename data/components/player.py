@@ -20,6 +20,7 @@ from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
 from .player_state import PlayerStateFSM
+from ..setup import sound_dict
 
 class Hud:
     """
@@ -281,6 +282,7 @@ class Player(Entity):
                     self.last_shoot_time[0] = time
                     can_shoot = True
                     self.hud.set_ammo(K_1, self.bullets[K_1])
+                    sound_dict['WEAPON_K_1'].play()
         elif self.weapon_type == K_2:
             if time - self.last_shoot_time[1] >= WEAPON_K2_DELAY:
                 if self.bullets[K_2] - 1 >= 0:
@@ -288,6 +290,7 @@ class Player(Entity):
                     self.last_shoot_time[1] = time
                     can_shoot = True
                     self.hud.set_ammo(K_2, self.bullets[K_2])
+                    sound_dict['WEAPON_K_2'].play()
         elif self.weapon_type == K_3:        
             if time - self.last_shoot_time[2] >= WEAPON_K3_DELAY:
                 if self.bullets[K_3] - 1 >= 0:
@@ -295,13 +298,14 @@ class Player(Entity):
                     self.last_shoot_time[2] = time
                     can_shoot = True
                     self.hud.set_ammo(K_3, self.bullets[K_3])
+                    sound_dict['WEAPON_K_3'].play()
         if can_shoot:
             weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
                                25 * np.sin(np.radians(-self.direction+20)))
             self.projectiles.add_bullet(self.get_position() + weapon_position,
                                         weapon_position,
                                         -self.direction, 
-                                        self.weapon_type)
+                                        self.weapon_type)                           
 
     def draw(self, screen):
         """

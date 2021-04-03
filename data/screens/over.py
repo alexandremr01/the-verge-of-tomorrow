@@ -8,6 +8,7 @@ import pygame
 from .base.state import State
 from ..constants import RED, WHITE
 from ..constants import SCREEN_HEIGHT, SCREEN_WIDTH
+from ..setup import sound_dict
 
 class Over(State):
     """
@@ -35,6 +36,7 @@ class Over(State):
         self.score_surface = font.render('SCORE    ' + str(score), False, WHITE)
         self.score_rect = self.score_surface.get_rect(center=(SCREEN_WIDTH/2,
                                                               SCREEN_HEIGHT/2 + 50))
+        sound_dict['gameover'].play()
 
     def draw(self, screen):
         """

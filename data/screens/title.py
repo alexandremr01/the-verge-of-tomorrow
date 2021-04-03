@@ -6,6 +6,7 @@ import pygame
 
 from .base.state import State
 from ..constants import WHITE, SCREEN_WIDTH, SCREEN_HEIGHT
+from ..setup import sound_dict
 
 class Title(State):
     """
@@ -43,3 +44,4 @@ class Title(State):
             if event.type == pygame.KEYDOWN:
                 self.next = 'SELECT'
                 self.clear_window = True
+                sound_dict['beep'].play()

@@ -154,17 +154,15 @@ class Map:
             if event.type == KEYDOWN:
                 if event.key == K_LSHIFT:
                     self.player.set_running(self.time)
-                elif not any(self.is_moving.values()):
-                    self.is_moving[event.key] = True
-                    self.player_can_shoot = False
-                    self.player.update(event.key)
+                self.is_moving[event.key] = True
+                self.player_can_shoot = False
+                self.player.update(event.key)
             if event.type == KEYUP:
                 if event.key == K_LSHIFT:
                     self.player.stop_running(self.time)
                 self.is_moving[event.key] = False
-                if not any(self.is_moving.values()):
-                    self.player_can_shoot = True
-                    self.player.update(self.time)
+                self.player_can_shoot = True
+                self.player.update(self.time)
 
     def handle_collision(self):
         """

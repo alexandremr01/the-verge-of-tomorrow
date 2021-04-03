@@ -62,7 +62,7 @@ WEAPON_K2_DAMAGE = 30
 WEAPON_K3_DAMAGE = 40
 WEAPON_K1_DELAY = 150 #milliseconds
 WEAPON_K2_DELAY = 300 #milliseconds
-WEAPON_K3_DELAY = 450 #milliseconds
+WEAPON_K3_DELAY = 550 #milliseconds
 WEAPON_K1_INITIAL_BULLET = 150
 WEAPON_K2_INITIAL_BULLET = 30
 WEAPON_K3_INITIAL_BULLET = 10
@@ -72,6 +72,8 @@ WEAPON_K3_MAX_BULLET = 20
 
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
+BASE_SOUND_DIR = '../survival-game/resources/sound/'
+BASE_MUSIC_DIR = '../survival-game/resources/music/'
 
 # Numeric
 EPSILON = 0.1
