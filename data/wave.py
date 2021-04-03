@@ -67,7 +67,7 @@ class Wave:
             if enemy.health == 0:
                 self.num_enemies_killed += 1
                 self.total_enemies_killed += 1
-                hud.update(None, delta_score=ZOMBIE_SCORE)
+                hud.increase_score(ZOMBIE_SCORE)
             elif distance(enemy.get_position(), player_position) > DESPAWN_DISTANCE:
                 self.num_enemies_to_spawn += 1
             else:

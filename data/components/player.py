@@ -82,32 +82,44 @@ class Hud:
             self.ammo_surface[2] = self.small_font.render(weapon_k3_ammo, False, BLACK)
             self.ammo_current_position[2] = self.ammo_position[len(weapon_k3_ammo)]
 
-    def update(self, key, health=None, delta_score=None, status="None"):  # TODO: include status / must change
+    def set_weapon(self, key):
         """
-        Updates all the hud's elements
+        Changes the current weapon
         """
-        if delta_score is not None:
-            self.score_num += delta_score
-            self.score_num_surface = self.font.render(str(self.score_num), False, BLACK)
-            self.score = self.score_num
         if key == K_1:
             self.current_weapon = 0
         elif key == K_2:
             self.current_weapon = 1
         elif key == K_3:
             self.current_weapon = 2
-        if health is not None:
-            hp = health
-            for i in range(len(self.heart)):
-                if hp == 0.5:
-                    self.heart[i] = 0.5
-                    hp = 0
-                elif hp > 0:
-                    self.heart[i] = 1
-                    hp -= 1
-                else:
-                    self.heart[i] = 0
-            self.status = self.font.render(status, False, BLACK)
+
+    def increase_score(self, delta_score):
+        """
+        Increases player's score
+        """
+        self.score_num += delta_score
+        self.score_num_surface = self.font.render(str(self.score_num), False, BLACK)
+        self.score = self.score_num
+
+    def set_health(self, health):
+        """
+        Changes player's health
+        """
+        for i in range(len(self.heart)):
+            if health == 0.5:
+                self.heart[i] = 0.5
+                health = 0
+            elif health > 0:
+                self.heart[i] = 1
+                health -= 1
+            else:
+                self.heart[i] = 0
+
+    def set_status(self, status):
+        """
+        Changes the player's status
+        """
+        self.status = self.font.render(status, False, BLACK)
 
     def draw(self, screen):
         """
@@ -186,19 +198,22 @@ class Player(Entity):
             self.weapon = self.states[0]
             self.weapon_type = K_1
             self.update_sprite(self.states[0])
+            self.hud.set_weapon(K_1)
             self.current_weapon = self.weapon
         elif key == K_2:
             self.weapon = self.states[1]
             self.weapon_type = K_2
             self.update_sprite(self.states[1])
+            self.hud.set_weapon(K_2)
             self.current_weapon = self.weapon
         elif key == K_3:
             self.weapon = self.states[2]
             self.weapon_type = K_3
             self.update_sprite(self.states[2])
+            self.hud.set_weapon(K_3)
             self.current_weapon = self.weapon
 
-    def update(self, time, key=None):
+    def update(self, key=None):
         """
         Updates the current player's state and heads-up display.
         """
@@ -227,7 +242,8 @@ class Player(Entity):
             self.hurt(player_state.BLEEDING_DAMAGE)
             self.last_bleeding_time = time
         self.state.update(time)
-        self.hud.update(key=None, health=self.health, status=self.state.get_state_name())
+        self.hud.set_health(self.health)
+        self.hud.set_status(self.state.get_state_name())
 
     def set_running(self, time):
         """
@@ -326,7 +342,8 @@ class Player(Entity):
         if collide:
             self.apply_random_debuff(time)
             self.hurt(zombie.get_damage())
-            self.hud.update(None, self.health, status=self.state.get_state_name())
+            self.hud.set_health(self.health)
+            self.hud.set_status(self.state.get_state_name())
             self.last_collision_time = time
             self.update_state(time)
 
