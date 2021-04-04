@@ -9,6 +9,7 @@ from .constants import BASE_GRAPHICS_DIR, BASE_SOUND_DIR, BASE_MUSIC_DIR
 
 graphics_dict = {}
 sound_dict = {}
+music_dict = {}
 
 def load_graphics():
     """
@@ -20,12 +21,18 @@ def load_graphics():
     items_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "items.png", (32, 32), 352, 32)
     bullets_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "firebullet.png", (16, 16), 512, 272)
     status_bar_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "status_bar.png", (800, 100), 800, 100)
+    title_graphics = [pygame.image.load(BASE_GRAPHICS_DIR + "title_1.png"),
+                     pygame.image.load(BASE_GRAPHICS_DIR + "title_2.png"),
+                     pygame.image.load(BASE_GRAPHICS_DIR + "title_3.png"),
+                     pygame.image.load(BASE_GRAPHICS_DIR + "title_4.png"),
+                     pygame.image.load(BASE_GRAPHICS_DIR + "title_5.png")]
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
     graphics_dict["map"] = map_graphics
     graphics_dict["items"] = items_graphics
     graphics_dict["bullets"] = bullets_graphics
     graphics_dict["status_bar"] = status_bar_graphics
+    graphics_dict["title"] = title_graphics
 
 def load_sound():
     """
@@ -48,3 +55,10 @@ def load_sound():
     sound_dict['WEAPON_K_1'].set_volume(0.2)
     sound_dict['WEAPON_K_2'].set_volume(0.2)
     sound_dict['WEAPON_K_3'].set_volume(0.2)
+    sound_dict['gameover'].set_volume(0.5)
+
+def load_music():
+    """
+    Loads musics from archives into the code
+    """
+    menu_music = pygame.mixer.music.load(BASE_MUSIC_DIR + 'horror_game_menu.wav')

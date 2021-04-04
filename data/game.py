@@ -12,7 +12,7 @@ from .screens.about import About
 from .screens.over import Over
 from .screens.base.state_machine import StateMachine
 from .screens.base.screen_surface import ScreenSurface
-from .setup import load_graphics, load_sound
+from .setup import load_graphics, load_sound, load_music
 
 class Game:
     """
@@ -29,6 +29,7 @@ class Game:
         pygame.display.set_caption('The Verge of Tomorrow')
         load_graphics()
         load_sound()
+        load_music()
 
         state_dict = {
             'TITLE': Title(),
