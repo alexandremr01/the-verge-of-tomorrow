@@ -28,7 +28,7 @@ class Title(State):
         helper_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + SCREEN_WIDTH/3)
         self.helper_rect = self.helper_surface.get_rect(center=helper_center)
 
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
     def update(self):
         """

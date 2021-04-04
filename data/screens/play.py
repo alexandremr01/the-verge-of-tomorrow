@@ -2,6 +2,8 @@
 Main screen, where the game actually occurs
 """
 
+import pygame
+
 from .base.state import State
 from data.map.map import Map
 from ..constants import BLACK, TRANSITION_BETWEEN_SCREENS
@@ -29,6 +31,8 @@ class Play(State):
             self.custom_value = self.map.get_player().get_score()
             self.next = 'OVER'
             self.clear_window = True
+            pygame.mixer.music.stop()
+            pygame.mixer.music.unload()
 
     def draw(self, screen):
         """

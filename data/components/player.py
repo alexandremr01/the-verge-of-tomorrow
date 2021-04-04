@@ -15,7 +15,7 @@ from ..constants import TIME_BETWEEN_COLLISIONS, BLACK
 from ..constants import WEAPON_K1_DELAY, WEAPON_K2_DELAY, WEAPON_K3_DELAY, \
                         WEAPON_K1_INITIAL_BULLET, WEAPON_K2_INITIAL_BULLET, \
                         WEAPON_K3_INITIAL_BULLET, WEAPON_K1_MAX_BULLET, WEAPON_K2_MAX_BULLET, \
-                        WEAPON_K3_MAX_BULLET
+                        WEAPON_K3_MAX_BULLET, TIME_BETWEEN_HEARTBEAT
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
@@ -168,6 +168,7 @@ class Player(Entity):
         self.last_collision_time = 0
         self.last_bleeding_time = 0
         self.last_shoot_time = [0, 0, 0]
+        self.last_heartbeat_time = 0
         self.bullets = {K_1 : WEAPON_K1_INITIAL_BULLET, 
                         K_2 : WEAPON_K2_INITIAL_BULLET, 
                         K_3 : WEAPON_K3_INITIAL_BULLET}
@@ -239,6 +240,9 @@ class Player(Entity):
         return self.velocity
 
     def update_state(self, time):
+        if self.health <= 1 and time - self.last_heartbeat_time >= TIME_BETWEEN_HEARTBEAT:
+            self.last_heartbeat_time = time
+            sound_dict['heartbeat'].play()
         if self.state.get_state() == player_state.BleedingState and time - self.last_bleeding_time > player_state.BLEEDING_INTERVAL :
             self.hurt(player_state.BLEEDING_DAMAGE)
             self.last_bleeding_time = time
@@ -320,6 +324,7 @@ class Player(Entity):
         Decreases the player's health by damage.
         """
         self.health -= damage
+        sound_dict['hit_1'].play()
 
     def is_alive(self):
         """

@@ -45,6 +45,7 @@ def load_sound():
     gameover_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'gameover.wav')
     heartbeat_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'heartbeat.wav')
     item_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'item_collect.wav')
+    hit_1_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'hit1.wav')
     sound_dict['WEAPON_K_1'] = uzi_sound
     sound_dict['WEAPON_K_2'] = ak47_sound
     sound_dict['WEAPON_K_3'] = winchester_sound
@@ -52,13 +53,16 @@ def load_sound():
     sound_dict['gameover'] = gameover_sound
     sound_dict['heartbeat'] = heartbeat_sound
     sound_dict['item_sound'] = item_sound
+    sound_dict['hit_1'] = hit_1_sound
     sound_dict['WEAPON_K_1'].set_volume(0.2)
     sound_dict['WEAPON_K_2'].set_volume(0.2)
     sound_dict['WEAPON_K_3'].set_volume(0.2)
     sound_dict['gameover'].set_volume(0.5)
+    sound_dict['hit_1'].set_volume(0.2)
+    sound_dict['heartbeat'].set_volume(1.0)
 
-def load_music():
+def load_menu_music():
     """
-    Loads musics from archives into the code
+    Loads menu music from archives into the code
     """
     menu_music = pygame.mixer.music.load(BASE_MUSIC_DIR + 'horror_game_menu.wav')
