@@ -25,7 +25,7 @@ class Map:
         self.wave = Wave(self.time)
 
         self.tiles = Tiles()
-        self.generator = OpenSimplex(randint(0, 10000))
+        self.terrain_generator = OpenSimplex(randint(0, 10000))
         self.chunks = {(0, 0): Chunk(np.array([0, 0]))}
         self.chunks[(0, 0)].render(self.generator, self.tiles)
         self.rendering_chunks = [(0, 0)]

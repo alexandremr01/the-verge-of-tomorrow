@@ -22,8 +22,8 @@ class Chunk:
     def render(self, generator, tiles):
         self.is_rendering = True
         start_position = self.topleft + np.array([0, CHUNK_SIZE // RENDER_STEPS * self.render_step])
-        new_load = np.array([[generator.noise2d((start_position[0] + TILE_SIZE * j) / TILE_SIZE,
-                                                -(start_position[1] + TILE_SIZE * i) / TILE_SIZE)
+        new_load = np.array([[generator.noise2d((start_position[0] / TILE_SIZE + j) / 3,
+                                                -(start_position[1] / TILE_SIZE + i) / 3) + 1.0
                               for j in range(CHUNK_TILE_RATIO)]
                              for i in range(CHUNK_TILE_RATIO_STEPS)])
         if self.render_step == 0:
@@ -40,12 +40,26 @@ class Chunk:
     def decode_and_draw(self, row, tiles):
         for i in range(CHUNK_TILE_RATIO_STEPS):
             for j in range(CHUNK_TILE_RATIO):
-                if self.tilegrid[row + i][j] < - 0.2:
-                    self.tilegrid[row + i][j] = 0
-                elif - 0.2 <= self.tilegrid[row + i][j] < 0.1:
-                    self.tilegrid[row + i][j] = 1
+                terrainnoise = self.tilegrid[row + i][j]
+
+                if 0.15 <= terrainnoise < 0.195:
+                    self.tilegrid[row + i][j] = 7
                 else:
-                    self.tilegrid[row + i][j] = 2
+                    if 0.3 <= terrainnoise < 0.7:
+                        if 0.3 <= terrainnoise < 0.39:
+                            self.tilegrid[row + i][j] = 1
+                        elif 0.39 <= terrainnoise < 0.45:
+                            self.tilegrid[row + i][j] = 2
+                        elif 0.45 <= terrainnoise < 0.53:
+                            self.tilegrid[row + i][j] = 3
+                        elif 0.53 <= terrainnoise < 0.61:
+                            self.tilegrid[row + i][j] = 4
+                        elif 0.61 <= terrainnoise < 0.67:
+                            self.tilegrid[row + i][j] = 5
+                        else:
+                            self.tilegrid[row + i][j] = 6
+                    else:
+                        self.tilegrid[row + i][j] = 0
 
                 self.surface.blit(tiles.terrain[self.tilegrid[row + i][j]].sprite.get_image(),
                                   np.array([row + i, j]) * TILE_SIZE)
