@@ -7,8 +7,8 @@ import pygame
 
 from .base.state import State
 from ..utils import is_in_rect
-from ..constants import WHITE, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_MUSIC_DIR
-from ..setup import sound_dict
+from ..constants import RED, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_MUSIC_DIR, TITLE_FRAMERATE
+from ..setup import sound_dict, graphics_dict
 
 class Select(State):
     """
@@ -17,27 +17,73 @@ class Select(State):
     def __init__(self):
         super().__init__()
 
-        font = pygame.font.SysFont('Arial', 25)
+        font = pygame.font.Font('../survival-game/resources/fonts/ARCADECLASSIC.TTF', 
+                                28,
+                                bold=True)
 
-        self.about_surface = font.render('About', False, WHITE)
-        about_center = (SCREEN_WIDTH/3, SCREEN_HEIGHT/3)
-        self.about_rect = self.about_surface.get_rect(center=about_center)
+        self.title_graphics = graphics_dict['title']
+        self.time = pygame.time.get_ticks()
+        self.last_transition_title_time = 0
+        self.counter_title = 0
+        
+        self.button_up = graphics_dict['button'].get_image(0, (136, 40))
+        self.button_down = graphics_dict['button'].get_image(1, (136, 40))
 
-        self.play_surface = font.render('Play', False, WHITE)
-        play_center = (SCREEN_WIDTH/3, 2*SCREEN_HEIGHT/3)
-        self.play_rect = self.play_surface.get_rect(center=play_center)
+        self.about_surface = font.render('About', False, RED)
+        about_button_center = (250, 380)
+        self.about_button_rect = self.button_up.get_rect(center=about_button_center)
+        self.about_rect = self.about_surface.get_rect(center=about_button_center)
+        self.about_button = self.button_up
+
+        self.manual_surface = font.render('Manual', False, RED)
+        manual_button_center = (250, 480)
+        self.manual_button_rect = self.button_up.get_rect(center=manual_button_center)
+        self.manual_rect = self.manual_surface.get_rect(center=manual_button_center)
+        self.manual_button = self.button_up
+
+        self.play_surface = font.render('Play', False, RED)
+        play_button_center = (250, 580)
+        self.play_button_rect = self.button_up.get_rect(center=play_button_center)
+        self.play_rect = self.play_surface.get_rect(center=play_button_center)
+        self.play_button = self.button_up
 
     def update(self):
-        pass
+        self.time = pygame.time.get_ticks()
+        if self.time - self.last_transition_title_time >= TITLE_FRAMERATE:
+            self.last_transition_title_time = self.time
+            self.counter_title += 1
+            if self.counter_title > 4:
+                self.counter_title = 0
+        if (self.about_button is self.button_up 
+            and is_in_rect(self.about_button_rect, pygame.mouse.get_pos())):
+            self.about_button = self.button_down
+            sound_dict['menu_select'].play()
+        elif not is_in_rect(self.about_button_rect, pygame.mouse.get_pos()):
+            self.about_button = self.button_up
+        if (self.manual_button is self.button_up
+            and is_in_rect(self.manual_button_rect, pygame.mouse.get_pos())):
+            self.manual_button = self.button_down
+            sound_dict['menu_select'].play()
+        elif not is_in_rect(self.manual_button_rect, pygame.mouse.get_pos()):
+            self.manual_button = self.button_up
+        if (self.play_button is self.button_up 
+            and is_in_rect(self.play_button_rect, pygame.mouse.get_pos())):
+            self.play_button = self.button_down
+            sound_dict['menu_select'].play()
+        elif not is_in_rect(self.play_button_rect, pygame.mouse.get_pos()):
+            self.play_button = self.button_up
 
     def draw(self, screen):
         """
         Draws the options the game provides for the player to select
         """
-        pygame.draw.rect(screen, ORANGE, self.about_rect)
-        screen.blit_rel(self.about_surface, self.about_rect)
+        screen.blit_rel(self.title_graphics[self.counter_title], (0, 0))
+        screen.blit_rel(self.about_button, self.about_button_rect)
+        screen.blit_rel(self.manual_button, self.manual_button_rect)
+        screen.blit_rel(self.play_button, self.play_button_rect)
 
-        pygame.draw.rect(screen, ORANGE, self.play_rect)
+        screen.blit_rel(self.about_surface, self.about_rect)
+        screen.blit_rel(self.manual_surface, self.manual_rect)
         screen.blit_rel(self.play_surface, self.play_rect)
 
     def handle_input(self, events, keys):

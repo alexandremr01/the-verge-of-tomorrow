@@ -26,6 +26,7 @@ def load_graphics():
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_3.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_4.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_5.png")]
+    button_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "button.png", (34, 10), 68, 10)                 
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
     graphics_dict["map"] = map_graphics
@@ -33,6 +34,7 @@ def load_graphics():
     graphics_dict["bullets"] = bullets_graphics
     graphics_dict["status_bar"] = status_bar_graphics
     graphics_dict["title"] = title_graphics
+    graphics_dict["button"] = button_graphics
 
 def load_sound():
     """
@@ -46,6 +48,7 @@ def load_sound():
     heartbeat_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'heartbeat.wav')
     item_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'item_collect.wav')
     hit_1_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'hit1.wav')
+    menu_select_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'menu_select.wav')
     sound_dict['WEAPON_K_1'] = uzi_sound
     sound_dict['WEAPON_K_2'] = ak47_sound
     sound_dict['WEAPON_K_3'] = winchester_sound
@@ -54,12 +57,14 @@ def load_sound():
     sound_dict['heartbeat'] = heartbeat_sound
     sound_dict['item_sound'] = item_sound
     sound_dict['hit_1'] = hit_1_sound
+    sound_dict['menu_select'] = menu_select_sound
     sound_dict['WEAPON_K_1'].set_volume(0.2)
     sound_dict['WEAPON_K_2'].set_volume(0.2)
     sound_dict['WEAPON_K_3'].set_volume(0.2)
     sound_dict['gameover'].set_volume(0.5)
     sound_dict['hit_1'].set_volume(0.2)
     sound_dict['heartbeat'].set_volume(1.0)
+    sound_dict['menu_select'].set_volume(0.4)
 
 def load_menu_music():
     """
