@@ -8,7 +8,7 @@ class Sprite(pygame.sprite.Sprite):
     """
     Base class for game's sprite
     """
-    def __init__(self, initial_center, sprite_graphic, initial_angle=None):
+    def __init__(self, initial_center, sprite_graphic, initial_angle=None, flip=None):
         """
         param sprite_graphic: Sprite's graphics
         type sprite_graphic: pygame.Surface
@@ -22,6 +22,8 @@ class Sprite(pygame.sprite.Sprite):
         if initial_angle is not None:
             self.image = pygame.transform.rotozoom(self.image, initial_angle, 1)
             self.image.set_colorkey((0, 0, 0))
+        if flip is not None:
+            self.image = pygame.transform.flip(self.image, flip[0], flip[1])
         self.rect = self.image.get_rect().move(initial_center[0] - self.image.get_rect().width / 2,
                                                initial_center[1] - self.image.get_rect().height / 2)
 
