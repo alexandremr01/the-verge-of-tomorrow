@@ -3,6 +3,7 @@ Functions that are generic and therefore useful
 in many classes
 """
 import numpy as np
+import random
 
 def is_in_rect(rect, pos):
     """
@@ -37,3 +38,31 @@ def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1
         selected = vectors[initial - step: initial + step + 1]
     return [tuple(center_position + vector) for vector in selected]
 
+
+class RandomEventGenerator:
+    """
+    Receive a dictionary in the form {"event1": prob1, "event2": prob2, ...} and returns one event based on a
+    random generator. Null event is the one triggered if no other is. Raise exception if sum(prob_i) > 1
+    """
+
+    def __init__(self, event_prob_dict, null_event):
+        self._validate(event_prob_dict)
+        self.event_prob_dict = event_prob_dict
+        self.null_event = null_event
+
+    def generate(self):
+        r = random.random()
+        accum = 0
+        print("R="+str(r))
+        for event, prob in self.event_prob_dict.items():
+            accum += prob
+            if r < accum:
+                print("R=" + str(r) + " leading to " + str(event))
+                return event
+
+    def _validate(self, event_prob_dict):
+        total_prob = 0
+        for event, prob in event_prob_dict.items():
+            total_prob += prob
+        if total_prob > 1.0:
+            raise Exception("RandomEventGenerator invalid probabilities: sum(p_i)>1")

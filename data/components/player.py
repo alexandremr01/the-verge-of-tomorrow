@@ -8,6 +8,7 @@ import numpy as np
 from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
 import random
 
+from ..utils import RandomEventGenerator
 from . import player_state
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY 
@@ -173,6 +174,12 @@ class Player(Entity):
                         K_2 : WEAPON_K2_INITIAL_BULLET, 
                         K_3 : WEAPON_K3_INITIAL_BULLET}
 
+        debuf_probs = {
+            player_state.SLOW_EVENT: 0.1,
+            player_state.BLEED_EVENT: 0.1
+        }
+        self.debuf_generator = RandomEventGenerator(debuf_probs, null_event=None)
+
 
     def get_hud(self):
         """
@@ -333,13 +340,10 @@ class Player(Entity):
         return self.health > 0
 
     def apply_random_debuff(self, time):
-        r = random.random()
-        if r < 0.1:
-            self.state.send_event(player_state.SLOW_EVENT, time)
-        elif r < 0.2:
+        debuf = self.debuf_generator.generate()
+        self.state.send_event(debuf, time)
+        if debuf == player_state.BLEED_EVENT:
             self.last_bleeding_time = time
-            self.state.send_event(player_state.BLEED_EVENT, time)
-
 
     def handle_collision(self, zombie, time):
         """
