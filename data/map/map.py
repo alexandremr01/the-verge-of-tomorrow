@@ -4,13 +4,12 @@ from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOU
 from random import randint
 from opensimplex import OpenSimplex
 
-from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
+from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, SCREEN_WIDTH, SCREEN_HEIGHT
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
 from .tile import Tiles
 from data.utils import get_grid_positions
-
 
 class Map:
     """
@@ -196,7 +195,10 @@ class Map:
         for enemy in self.wave.enemies:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
-
         screen.center_on_player(self.player.get_position())
         self.player.draw(screen)
+
+        if self.wave.is_night(): #TODO: implement day/night logic
+            pass
+
 

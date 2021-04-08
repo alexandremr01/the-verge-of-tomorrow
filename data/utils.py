@@ -50,14 +50,13 @@ class RandomEventGenerator:
         self.event_prob_dict = event_prob_dict
         self.null_event = null_event
 
-    def generate(self):
-        r = random.random()
+    def generate(self, seed=None):
+        np.random.seed(seed)
+        r = np.random.uniform()
         accum = 0
-        print("R="+str(r))
         for event, prob in self.event_prob_dict.items():
             accum += prob
             if r < accum:
-                print("R=" + str(r) + " leading to " + str(event))
                 return event
 
     def _validate(self, event_prob_dict):
@@ -66,3 +65,4 @@ class RandomEventGenerator:
             total_prob += prob
         if total_prob > 1.0:
             raise Exception("RandomEventGenerator invalid probabilities: sum(p_i)>1")
+
