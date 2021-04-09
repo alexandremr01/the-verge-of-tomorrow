@@ -9,7 +9,7 @@ class Tile:
 
     def __init__(self, sprite, collide=False):
         self.sprite = sprite
-        self.walkable = collide
+        self.collide = collide
 
 
 class Tiles:
@@ -48,23 +48,23 @@ class Tiles:
                         5: Tile(Sprite((0, 0), graphics_dict["map"].get_image(15, (50, 50)))),
                         6: Tile(Sprite((0, 0), graphics_dict["map"].get_image(23, (50, 50)))),
                         7: Tile(Sprite((0, 0), graphics_dict["map"].get_image(32, (50, 50)))),
-                        8: Tile(Sprite((0, 0), graphics_dict["map"].get_image(13, (50, 50))), False),
+                        8: Tile(Sprite((0, 0), graphics_dict["map"].get_image(13, (50, 50))), True),
                         9: Tile(Sprite((0, 0), graphics_dict["map"].get_image(11, (50, 50)))),
                         10: Tile(Sprite((0, 0), graphics_dict["map"].get_image(12, (50, 50)))),
                         11: Tile(Sprite((0, 0), graphics_dict["map"].get_image(4, (50, 50)))),
                         12: Tile(Sprite((0, 0), graphics_dict["map"].get_image(5, (50, 50)))),
                         13: Tile(Sprite((0, 0), graphics_dict["map"].get_image(6, (50, 50)))),
                         14: Tile(Sprite((0, 0), graphics_dict["map"].get_image(7, (50, 50)))),
-                        15: Tile(Sprite((0, 0), graphics_dict["map"].get_image(25, (50, 50))), False),
-                        16: Tile(Sprite((0, 0), graphics_dict["map"].get_image(40, (50, 50))), False),
+                        15: Tile(Sprite((0, 0), graphics_dict["map"].get_image(25, (50, 50))), True),
+                        16: Tile(Sprite((0, 0), graphics_dict["map"].get_image(40, (50, 50))), True),
                         17: Tile(Sprite((0, 0), graphics_dict["map"].get_image(33, (50, 50)), None,
-                                        (True, False)), False),
-                        18: Tile(Sprite((0, 0), graphics_dict["map"].get_image(36, (50, 50))), False),
-                        19: Tile(Sprite((0, 0), graphics_dict["map"].get_image(33, (50, 50))), False),
+                                        (True, False)), True),
+                        18: Tile(Sprite((0, 0), graphics_dict["map"].get_image(36, (50, 50))), True),
+                        19: Tile(Sprite((0, 0), graphics_dict["map"].get_image(33, (50, 50))), True),
                         20: Tile(Sprite((0, 0), graphics_dict["map"].get_image(36, (50, 50)), None,
-                                        (True, False)), False),
-                        21: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))), False),
-                        22: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))))
+                                        (True, False)), True),
+                        21: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))), True),
+                        22: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))), True)
                         }
 
     def is_what(self, value, name):
