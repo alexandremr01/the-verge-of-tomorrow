@@ -141,7 +141,7 @@ class Chunk:
         self.is_rendering = True
         if self.structures_step == -1:
             np.random.seed(self.seed)
-            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0, 0.5, 0.3, 0.15, 0.05]))
+            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.6, 0.2, 0.1, 0.05, 0.05]))
             if number_of_structures != 0:
                 self.generate_structure_variables(number_of_structures)
             self.structures_steps = number_of_structures
@@ -170,9 +170,9 @@ class Chunk:
                                   np.array([row + i, j]) * TILE_SIZE)
 
     def decode(self, i, j, tiles):
-        if self.structuregrid[i][j] == 0:
+        if self.structuregrid is None or self.structuregrid[i][j] == 0:
             terrainnoise = self.tilegrid[i][j]
-            if 0.15 <= terrainnoise < 0.195:
+            if 0.15 <= terrainnoise < 0.155:
                 self.tilegrid[i][j] = tiles.code["ROCK"]
             else:
                 if 0.3 <= terrainnoise < 0.7:
