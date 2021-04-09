@@ -1,11 +1,8 @@
 import pygame
-import numpy as np
-from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
-from ..constants import TIME_BETWEEN_COLLISIONS, BLACK
-from ..constants import WEAPON_K1_DELAY, WEAPON_K2_DELAY, WEAPON_K3_DELAY, \
-                        WEAPON_K1_INITIAL_BULLET, WEAPON_K2_INITIAL_BULLET, \
-                        WEAPON_K3_INITIAL_BULLET, WEAPON_K1_MAX_BULLET, WEAPON_K2_MAX_BULLET, \
-                        WEAPON_K3_MAX_BULLET, TIME_BETWEEN_HEARTBEAT
+from pygame.locals import K_1, K_2, K_3
+from ..constants import BLACK
+from data.components.weapon import Uzi, Shotgun, AK47
+
 
 class Hud:
     """
@@ -19,28 +16,26 @@ class Hud:
         self.heart_sprites = [items_graphics.get_image(5), items_graphics.get_image(9), items_graphics.get_image(4)]
         self.heart_positions = [(10 + 35 * i, 745) for i in range(max_health)]
 
-        self.current_weapon = 0
-        self.weapon_sprites = [pygame.transform.scale(items_graphics.get_image(7), (90, 90)),
-                               pygame.transform.scale(items_graphics.get_image(6), (90, 90)),
-                               pygame.transform.scale(items_graphics.get_image(8), (90, 90))]
+        self.current_weapon = Uzi
         self.weapon_position = (385, 715)
 
         self.font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 30)
         self.small_font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 26)
 
-        weapon_k1_ammo = str(WEAPON_K1_INITIAL_BULLET) + '  !' + str(WEAPON_K1_MAX_BULLET)
-        weapon_k2_ammo = str(WEAPON_K2_INITIAL_BULLET) + '  !' + str(WEAPON_K2_MAX_BULLET)
-        weapon_k3_ammo = str(WEAPON_K3_INITIAL_BULLET) + '  !' + str(WEAPON_K3_MAX_BULLET)
-        self.ammo_surface = [self.small_font.render(weapon_k1_ammo, False, BLACK),
-                             self.small_font.render(weapon_k2_ammo, False, BLACK),
-                             self.small_font.render(weapon_k3_ammo, False, BLACK)]
         self.ammo_position = {6: (548, 740),
                               7: (542, 740),
                               8: (540, 740),
                               9: (530, 740)}
-        self.ammo_current_position = [self.ammo_position[len(weapon_k1_ammo)],
-                                      self.ammo_position[len(weapon_k2_ammo)],
-                                      self.ammo_position[len(weapon_k3_ammo)]]
+
+        weapon_types = [Uzi, AK47, Shotgun]
+        self.ammo_surface = {}
+        self.ammo_current_position = {}
+        self.weapon_sprites = {}
+        for weapon in weapon_types:
+            weapon_ammo = str(weapon.initial_ammo) + '  !' + str(weapon.max_ammo)
+            self.ammo_surface[weapon] = self.small_font.render(weapon_ammo, False, BLACK)
+            self.ammo_current_position[weapon] = self.ammo_position[len(weapon_ammo)]
+            self.weapon_sprites[weapon] = pygame.transform.scale(items_graphics.get_image(weapon.image_index), (90, 90))
 
         self.score_num_surface = self.font.render('0', False, BLACK)
         self.score_num_rect = self.score_num_surface.get_rect(center=(685, 755))
@@ -55,29 +50,15 @@ class Hud:
         """
         Changes ammo value of a given weapon
         """
-        if weapon_type == K_1:
-            weapon_k1_ammo = str(value) + '  !' + str(WEAPON_K1_MAX_BULLET)
-            self.ammo_surface[0] = self.small_font.render(weapon_k1_ammo, False, BLACK)
-            self.ammo_current_position[0] = self.ammo_position[len(weapon_k1_ammo)]
-        elif weapon_type == K_2:
-            weapon_k2_ammo = str(value) + '  !' + str(WEAPON_K2_MAX_BULLET)
-            self.ammo_surface[1] = self.small_font.render(weapon_k2_ammo, False, BLACK)
-            self.ammo_current_position[1] = self.ammo_position[len(weapon_k2_ammo)]
-        elif weapon_type == K_3:
-            weapon_k3_ammo = str(value) + '  !' + str(WEAPON_K3_MAX_BULLET)
-            self.ammo_surface[2] = self.small_font.render(weapon_k3_ammo, False, BLACK)
-            self.ammo_current_position[2] = self.ammo_position[len(weapon_k3_ammo)]
+        weapon_ammo = str(value) + '  !' + str(weapon_type.max_ammo)
+        self.ammo_surface[weapon_type] = self.small_font.render(weapon_ammo, False, BLACK)
+        self.ammo_current_position[weapon_type] = self.ammo_position[len(weapon_ammo)]
 
-    def set_weapon(self, key):
+    def set_weapon(self, weapon_type):
         """
         Changes the current weapon
         """
-        if key == K_1:
-            self.current_weapon = 0
-        elif key == K_2:
-            self.current_weapon = 1
-        elif key == K_3:
-            self.current_weapon = 2
+        self.current_weapon = weapon_type
 
     def increase_score(self, delta_score):
         """

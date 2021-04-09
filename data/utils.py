@@ -66,6 +66,7 @@ class RandomEventGenerator:
             accum += prob
             if r < accum:
                 return event
+        return self.null_event
 
     def _validate(self, event_prob_dict):
         total_prob = 0

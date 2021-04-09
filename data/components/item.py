@@ -1,6 +1,9 @@
 from data.components import player_state
 from data.utils import RandomEventGenerator
-
+from pygame.locals import K_1, K_2, K_3
+import pygame
+from . import weapon
+import numpy as np
 
 class ItemGenerator:
     def __init__(self):
@@ -82,9 +85,18 @@ class Ammo(Item):
     def __init__(self):
         super().__init__()
         print("Gerado ammo")
+        weapon_probs = {
+            weapon.Uzi: 0.33,
+            weapon.AK47: 0.33
+        }
+        self.generator = RandomEventGenerator(weapon_probs, null_event=weapon.Shotgun)
 
     def get_sprite(self):
         pass
 
-    def apply_effect(self, player, time):
-        pass
+    def apply_effect(self, player, time): # TODO: write weapon on screen
+        weapon = self.generator.generate()
+        print("Gerou ammo para " + str(weapon.name))
+        player.bullets[weapon] = np.floor(min(weapon.max_ammo, player.bullets[weapon] + weapon.max_ammo / 5))
+        player.update_ammo()
+

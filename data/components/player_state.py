@@ -1,4 +1,4 @@
-
+from ..constants import ZOMBIE_HEALTH
 # Events
 BLEED_EVENT = 1
 SLOW_EVENT = 2
@@ -15,6 +15,9 @@ BLEEDING_INTERVAL = 1000
 MAX_SLOW_TIME = 5000
 TIRED_TIME = 3000
 
+MAX_STRONG_RUNNING_TIME = 5000
+MAX_STRONG_TIME = 10000
+
 BLEEDING_DAMAGE = 0.5
 
 class PlayerStateFSM:
@@ -27,6 +30,9 @@ class PlayerStateFSM:
 
     def get_state(self):
         return type(self._state)
+
+    def get_damage(self, original_damage):
+        return self._state.get_damage(original_damage)
 
     def send_event(self, event, time):
         # print(" Recebi "+str(event))
@@ -52,6 +58,9 @@ class State:
     def get_name(self):
         return "Null"
 
+    def get_damage(self, original_damage):
+        return original_damage
+
 class NeutralState(State) :
     def send_event(self, event, time):
         if event == RUN_EVENT:
@@ -60,6 +69,8 @@ class NeutralState(State) :
             return BleedingState(time)
         if event == SLOW_EVENT:
             return SlowState(time)
+        if event == STRONGER_EVENT:
+            return StrongState(time)
     def get_name(self):
         return "Neutral"
 
@@ -131,3 +142,44 @@ class SlowState(State):
 
     def get_name(self):
         return "Slow"
+
+class StrongState(State):
+    def __init__(self, time):
+        self.start_time = time
+
+    def send_event(self, event, time):
+        if event == RUN_EVENT:
+            return StrongRunState(time, self.start_time)
+
+    def update(self, time):
+        if time - self.start_time > MAX_STRONG_TIME:
+            return NeutralState()
+        return None
+
+    def get_name(self):
+        return "Strong"
+
+    def get_damage(self, original_damage):
+        return ZOMBIE_HEALTH
+
+class StrongRunState(State):
+    def __init__(self, time, start_strong_time):
+        self.start_time = time
+        self.start_strong_time = start_strong_time
+
+    def send_event(self, event, time):
+        if event == STOP_RUN_EVENT:
+            return StrongState(time)
+
+    def update(self, time):
+        if time - self.start_time > MAX_STRONG_RUNNING_TIME:
+            return StrongState(self.start_strong_time)
+        if time - self.start_strong_time > MAX_STRONG_TIME:
+            return NeutralState()
+        return None
+
+    def get_name(self):
+        return "Strong Running"
+
+    def get_damage(self, original_damage):
+        return ZOMBIE_HEALTH

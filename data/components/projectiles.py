@@ -1,26 +1,20 @@
 import pygame
 import numpy as np
 
-from pygame.locals import K_1, K_2, K_3
 from .base.entity import Entity
 from ..setup import graphics_dict
-from ..constants import (BULLET_VELOCITY, SCREEN_WIDTH, SCREEN_HEIGHT, 
-                         WEAPON_K1_DAMAGE, WEAPON_K2_DAMAGE, WEAPON_K3_DAMAGE)
-
+from ..constants import (BULLET_VELOCITY, SCREEN_WIDTH, SCREEN_HEIGHT)
+from data.components.weapon import Uzi, Shotgun, AK47
 class Bullet(Entity):
     """
     A game's projectile
     """
-    def __init__(self, initial_position, weapon_position, direction, weapon_type):
-        if weapon_type == K_1:
-            super().__init__(initial_position, graphics_dict["bullets"].get_image(32), direction)
-            self.damage = WEAPON_K1_DAMAGE
-        elif weapon_type == K_2:
-            super().__init__(initial_position, graphics_dict["bullets"].get_image(39), direction)
-            self.damage = WEAPON_K2_DAMAGE
-        elif weapon_type == K_3:
-            super().__init__(initial_position, graphics_dict["bullets"].get_image(48), direction)
-            self.damage = WEAPON_K3_DAMAGE
+    def __init__(self, initial_position, weapon_position, direction, weapon, damage=None):
+        super().__init__(initial_position, graphics_dict["bullets"].get_image(weapon.bullet_image_index), direction)
+        if damage is None:
+            self.damage = weapon.damage
+        else:
+            self.damage = damage
         self.velocity = BULLET_VELOCITY
         self.direction = direction
         self.screen_position = [SCREEN_WIDTH // 2 + int(weapon_position[0]), 
@@ -65,15 +59,15 @@ class Projectiles:
     """
     def __init__(self):
         self.projectiles = dict()
-        for weapon_type in [K_1, K_2, K_3]:
+        for weapon_type in [Uzi, Shotgun, AK47]:
             self.projectiles[weapon_type] = []
 
-    def add_bullet(self, initial_position, weapon_position, direction, weapon_type):
+    def add_bullet(self, initial_position, weapon_position, direction, weapon_type, damage):
         """
         Adds a new bullet into projectiles
         """
         self.projectiles[weapon_type].append(Bullet(initial_position, weapon_position, 
-                                                    direction, weapon_type))
+                                                    direction, weapon_type, damage))
 
     def update(self):
         """
@@ -102,9 +96,12 @@ class Projectiles:
             num_bullets = len(self.projectiles[key])
             if num_bullets == 0:
                 continue
-            bullet_damage = self.projectiles[key][0].get_damage()
+            collided_bullets = [bullet for bullet in self.projectiles[key]
+                                if pygame.sprite.collide_rect(
+                    bullet.get_sprite(), zombie.get_sprite())]
+            damage = np.sum([bullet.damage for bullet in collided_bullets])
+            zombie.hurt(damage)
             self.projectiles[key] = [bullet for bullet in self.projectiles[key]
                                      if not pygame.sprite.collide_rect(
                                      bullet.get_sprite(), zombie.get_sprite())]
-            damage = bullet_damage * (num_bullets - len(self.projectiles[key]))
-            zombie.hurt(damage)
+
