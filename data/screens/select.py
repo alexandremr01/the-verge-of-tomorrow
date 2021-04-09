@@ -7,7 +7,7 @@ import pygame
 
 from .base.state import State
 from ..utils import is_in_rect
-from ..constants import RED, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_SOUNDTRACK_DIR, TITLE_FRAMERATE
+from ..constants import RED, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_SOUNDTRACK_DIR, TITLE_FRAMERATE, BASE_FONT_DIR
 from ..setup import sound_dict, graphics_dict
 
 class Select(State):
@@ -17,7 +17,7 @@ class Select(State):
     def __init__(self):
         super().__init__()
 
-        font = pygame.font.Font('../survival-game/resources/fonts/ARCADECLASSIC.TTF', 
+        font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF',
                                 28,
                                 bold=True)
 

@@ -107,6 +107,7 @@ class BleedingState(State):
         if event == STOP_BLEEDING_EVENT:
             return NeutralState()
 
+
     def update(self, time):
         if time - self.start_time > MAX_BLEEDING_TIME:
             return NeutralState()

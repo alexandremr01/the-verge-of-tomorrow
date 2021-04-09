@@ -1,15 +1,16 @@
 import pygame
 import numpy as np
-from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOUSEBUTTONDOWN, K_LSHIFT
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_t
 from random import randint
 from opensimplex import OpenSimplex
 
-from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, SCREEN_WIDTH, SCREEN_HEIGHT
+from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
 from .tile import Tiles
 from data.utils import get_grid_positions
+from data.components.item import ItemGenerator
 
 class Map:
     """
@@ -150,6 +151,16 @@ class Map:
             if left_mouse_button:
                 self.player.shoot(self.time)
         for event in events:
+
+            # BEGIN: carteação de teste
+            if event.type == KEYDOWN:
+                if event.key == K_r:
+                    itemgen = ItemGenerator()
+                    self.item = itemgen.generate_item()
+                if event.key == K_t:
+                    self.item.apply_effect(self.player, self.time)
+            # END: carteação de teste
+
             if event.type == KEYDOWN:
                 if event.key == K_LSHIFT:
                     self.player.set_running(self.time)
