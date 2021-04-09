@@ -45,6 +45,7 @@ class Chunk:
             structure_seed = self.seed + position[2]
             np.random.seed(structure_seed)
             number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.2, 0.1])
+            number_of_directions = 4
             np.random.seed(structure_seed)
             directions = np.take([[1, 1, 11], [-1, 1, 12], [-1, -1, 13], [1, -1, 14]],
                                  np.random.choice(np.array([0, 1, 2, 3]), size=number_of_directions,
@@ -61,8 +62,8 @@ class Chunk:
 
     def generate_terrain(self, generator):
         start_position = self.topleft + np.array([0, CHUNK_SIZE // self.terrain_steps * self.terrain_step])
-        new_load = np.array([[(generator.noise2d((start_position[0] / TILE_SIZE + j)/2.5,
-                                                 -(start_position[1] / TILE_SIZE + i)/2.5) + 1) / 2
+        new_load = np.array([[(generator.noise2d((start_position[0] / TILE_SIZE + j)/2.8,
+                                                 -(start_position[1] / TILE_SIZE + i)/2.8) + 1) / 2
                               for j in range(CHUNK_TILE_RATIO)]
                              for i in range(CHUNK_TILE_RATIO_STEPS)])
         if self.terrain_step == 0:
@@ -99,7 +100,7 @@ class Chunk:
                 for j in range(-1, height):
                     x = position[0] + x_direction * i
                     y = position[1] + y_direction * j
-                    self.structuregrid[x][y] = tiles.code["CHECKERED_BASIC_1"]
+                    self.structuregrid[x][y] = tiles.code["CHECKERED_PLAIN"]
 
             # Set left and right walls
             for i in [-2, width]:
@@ -143,6 +144,7 @@ class Chunk:
         if self.structures_step == -1:
             np.random.seed(self.seed)
             number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.6, 0.2, 0.1, 0.05, 0.05]))
+            number_of_structures = 4
             if number_of_structures != 0:
                 self.generate_structure_variables(number_of_structures)
             self.structures_steps = number_of_structures
@@ -175,8 +177,8 @@ class Chunk:
             terrain_noise = self.tilegrid[i][j]
             # if self.structuregrid is not None:
             #     terrain_noise = terrain_noise + np.power(terrain_noise, 3) * (0.68 - terrain_noise)
-            if 0 <= terrain_noise - 0.05 < 0.2:
-                self.tilegrid[i][j] = compare(noise_value=terrain_noise, starting_value=0.05, interval_percentage=0.2,
+            if 0 <= terrain_noise - 0.1 < 0.15:
+                self.tilegrid[i][j] = compare(noise_value=terrain_noise, starting_value=0.1, interval_percentage=0.15,
                                               slices=[tiles.code["GRASS_DARKLEAFS_1"],
                                                       tiles.code["GRASS_DARKLEAFS_2"]],
                                               percentages=[0.6, 0.4])
@@ -192,25 +194,21 @@ class Chunk:
             else:
                 self.tilegrid[i][j] = tiles.code["ROCK"]
         elif tiles.is_what(self.structuregrid[i][j], "FLOOR"):
-            floornoise = self.tilegrid[i][j]
-            if 0.3 <= floornoise < 0.7:
-                if 0.3 <= floornoise < 0.45:
-                    self.tilegrid[i][j] = tiles.code["CHECKERED_BASIC_2"]
-                if 0.45 <= floornoise < 0.55:
-                    if 0.45 <= floornoise < 0.48:
-                        self.tilegrid[i][j] = tiles.code["CHECKERED_GRASS_1"]
-                    if 0.48 <= floornoise < 0.51:
-                        self.tilegrid[i][j] = tiles.code["CHECKERED_GRASS_2"]
-                    if 0.51 <= floornoise < 0.52:
-                        if 0.51 <= floornoise < 0.515:
-                            self.tilegrid[i][j] = tiles.code["GRASS_BRIGHTLEAFS_1"]
-                        else:
-                            self.tilegrid[i][j] = tiles.code["GRASS_BRIGHTLEAFS_2"]
-                    else:
-                        self.tilegrid[i][j] = tiles.code["CHECKERED_GRASS_3"]
-                else:
-                    self.tilegrid[i][j] = tiles.code["CHECKERED_BASIC_3"]
+            floor_noise = self.tilegrid[i][j]
+            if 0 <= floor_noise - 0.1 < 0.2:
+                self.tilegrid[i][j] = compare(noise_value=floor_noise, starting_value=0.1, interval_percentage=0.2,
+                                              slices=[tiles.code["GRASS_BRIGHTLEAFS_1"],
+                                                      tiles.code["GRASS_BRIGHTLEAFS_2"],
+                                                      tiles.code["CHECKERED_GRASS_3"],
+                                                      tiles.code["CHECKERED_GRASS_2"],
+                                                      tiles.code["CHECKERED_GRASS_1"]],
+                                              percentages=[0.1, 0.2, 0.2, 0.25, 0.25])
+            elif 0 <= floor_noise - 0.6 < 0.4:
+                self.tilegrid[i][j] = compare(noise_value=floor_noise, starting_value=0.6, interval_percentage=0.4,
+                                              slices=[tiles.code["CHECKERED_BROKEN_2"],
+                                                      tiles.code["CHECKERED_BROKEN_1"]],
+                                              percentages=[0.4, 0.6])
             else:
-                self.tilegrid[i][j] = tiles.code["CHECKERED_BASIC_1"]
+                self.tilegrid[i][j] = tiles.code["CHECKERED_PLAIN"]
         else:
             self.tilegrid[i][j] = self.structuregrid[i][j]

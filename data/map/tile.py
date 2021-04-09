@@ -7,9 +7,9 @@ class Tile:
     Individual tile with name, sprite and walkable flag.
     """
 
-    def __init__(self, sprite, walkable=True):
+    def __init__(self, sprite, collide=False):
         self.sprite = sprite
-        self.walkable = walkable
+        self.walkable = collide
 
 
 class Tiles:
@@ -26,9 +26,9 @@ class Tiles:
                      "GRASS_BRIGHTLEAFS_3": 6,
                      "GRASS_BRIGHTLEAFS_4": 7,
                      "ROCK": 8,
-                     "CHECKERED_BASIC_1": 9,
-                     "CHECKERED_BASIC_2": 10,
-                     "CHECKERED_BASIC_3": 11,
+                     "CHECKERED_PLAIN": 9,
+                     "CHECKERED_BROKEN_1": 10,
+                     "CHECKERED_BROKEN_2": 11,
                      "CHECKERED_GRASS_1": 12,
                      "CHECKERED_GRASS_2": 13,
                      "CHECKERED_GRASS_3": 14,
@@ -50,8 +50,8 @@ class Tiles:
                         7: Tile(Sprite((0, 0), graphics_dict["map"].get_image(32, (50, 50)))),
                         8: Tile(Sprite((0, 0), graphics_dict["map"].get_image(13, (50, 50))), False),
                         9: Tile(Sprite((0, 0), graphics_dict["map"].get_image(11, (50, 50)))),
-                        10: Tile(Sprite((0, 0), graphics_dict["map"].get_image(4, (50, 50)))),
-                        11: Tile(Sprite((0, 0), graphics_dict["map"].get_image(12, (50, 50)))),
+                        10: Tile(Sprite((0, 0), graphics_dict["map"].get_image(12, (50, 50)))),
+                        11: Tile(Sprite((0, 0), graphics_dict["map"].get_image(4, (50, 50)))),
                         12: Tile(Sprite((0, 0), graphics_dict["map"].get_image(5, (50, 50)))),
                         13: Tile(Sprite((0, 0), graphics_dict["map"].get_image(6, (50, 50)))),
                         14: Tile(Sprite((0, 0), graphics_dict["map"].get_image(7, (50, 50)))),
@@ -71,9 +71,9 @@ class Tiles:
         if name == "TERRAIN":
             return value == 0 or self.code["GRASS_PLAIN"] <= value <= self.code["ROCK"]
         elif name == "STRUCTURE":
-            return self.code["CHECKERED_BASIC_1"] <= value <= self.code["WALL_BROKEN"]
+            return self.code["CHECKERED_PLAIN"] <= value <= self.code["WALL_BROKEN"]
         elif name == "FLOOR":
-            return self.code["CHECKERED_BASIC_1"] <= value <= self.code["CHECKERED_GRASS_3"]
+            return self.code["CHECKERED_PLAIN"] <= value <= self.code["CHECKERED_GRASS_3"]
         elif name == "WALL":
             return self.code["WALL_LEFT_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
 
