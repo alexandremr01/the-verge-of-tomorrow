@@ -5,24 +5,21 @@ The player being controlled by the user.
 
 import pygame
 import numpy as np
-from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
-import random
+from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
 from ..utils import RandomEventGenerator
 from . import player_state
 from .hud import Hud
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY 
-from ..constants import TIME_BETWEEN_COLLISIONS, BLACK
-from ..constants import WEAPON_K1_DELAY, WEAPON_K2_DELAY, WEAPON_K3_DELAY, \
-                        WEAPON_K1_INITIAL_BULLET, WEAPON_K2_INITIAL_BULLET, \
-                        WEAPON_K3_INITIAL_BULLET, WEAPON_K1_MAX_BULLET, WEAPON_K2_MAX_BULLET, \
-                        WEAPON_K3_MAX_BULLET, TIME_BETWEEN_HEARTBEAT
+from ..constants import TIME_BETWEEN_COLLISIONS
+from ..constants import TIME_BETWEEN_HEARTBEAT
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
 from .player_state import PlayerStateFSM
 from ..setup import sound_dict
+from data.components.weapon import Uzi, Shotgun, AK47
 
 class Player(Entity):
     """
@@ -40,15 +37,17 @@ class Player(Entity):
         for i in range(graphics_dict['player'].get_size()):
             self.states.append(graphics_dict['player'].get_image(i, (50, 50)))
         self.weapon = self.states[0]
-        self.weapon_type = K_1
+        self.weapon_type = Uzi
         self.current_weapon = self.states[0]
         self.last_collision_time = 0
         self.last_bleeding_time = 0
         self.last_shoot_time = [0, 0, 0]
         self.last_heartbeat_time = 0
-        self.bullets = {K_1 : WEAPON_K1_INITIAL_BULLET, 
-                        K_2 : WEAPON_K2_INITIAL_BULLET, 
-                        K_3 : WEAPON_K3_INITIAL_BULLET}
+        self.weapons = [Uzi, AK47, Shotgun]
+
+        self.bullets = {}
+        for weapon in self.weapons:
+            self.bullets[weapon] = weapon.initial_ammo
 
         debuf_probs = {
             player_state.SLOW_EVENT: 0.1,
@@ -81,22 +80,19 @@ class Player(Entity):
         """
         if key == K_1:
             self.weapon = self.states[0]
-            self.weapon_type = K_1
+            self.weapon_type = Uzi
             self.update_sprite(self.states[0])
-            self.hud.set_weapon(K_1)
-            self.current_weapon = self.weapon
         elif key == K_2:
             self.weapon = self.states[1]
-            self.weapon_type = K_2
+            self.weapon_type = AK47
             self.update_sprite(self.states[1])
-            self.hud.set_weapon(K_2)
-            self.current_weapon = self.weapon
         elif key == K_3:
             self.weapon = self.states[2]
-            self.weapon_type = K_3
+            self.weapon_type = Shotgun
             self.update_sprite(self.states[2])
-            self.hud.set_weapon(K_3)
-            self.current_weapon = self.weapon
+
+        self.hud.set_weapon(self.weapon_type)
+        self.current_weapon = self.weapon
 
     def update(self, key=None):
         """
@@ -162,37 +158,29 @@ class Player(Entity):
         Shoots a projectile
         """
         can_shoot = False
-        if self.weapon_type == K_1:
-            if time - self.last_shoot_time[0] >= WEAPON_K1_DELAY:
-                if self.bullets[K_1] - 1 >= 0:
-                    self.bullets[K_1] -= 1
-                    self.last_shoot_time[0] = time
-                    can_shoot = True
-                    self.hud.set_ammo(K_1, self.bullets[K_1])
-                    sound_dict['WEAPON_K_1'].play()
-        elif self.weapon_type == K_2:
-            if time - self.last_shoot_time[1] >= WEAPON_K2_DELAY:
-                if self.bullets[K_2] - 1 >= 0:
-                    self.bullets[K_2] -= 1 
-                    self.last_shoot_time[1] = time
-                    can_shoot = True
-                    self.hud.set_ammo(K_2, self.bullets[K_2])
-                    sound_dict['WEAPON_K_2'].play()
-        elif self.weapon_type == K_3:        
-            if time - self.last_shoot_time[2] >= WEAPON_K3_DELAY:
-                if self.bullets[K_3] - 1 >= 0:
-                    self.bullets[K_3] -= 1
-                    self.last_shoot_time[2] = time
-                    can_shoot = True
-                    self.hud.set_ammo(K_3, self.bullets[K_3])
-                    sound_dict['WEAPON_K_3'].play()
+        if time - self.last_shoot_time[0] >= self.weapon_type.delay:
+            if self.bullets[self.weapon_type] - 1 >= 0:
+                self.bullets[self.weapon_type] -= 1
+                self.last_shoot_time[0] = time
+                can_shoot = True
+                self.update_ammo()
+                sound_dict[self.weapon_type.name].play()
+
         if can_shoot:
             weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
                                25 * np.sin(np.radians(-self.direction+20)))
+            damage = self.state.get_damage(self.weapon_type.damage)
             self.projectiles.add_bullet(self.get_position() + weapon_position,
                                         weapon_position,
                                         -self.direction, 
-                                        self.weapon_type)                           
+                                        self.weapon_type, damage)
+
+    def update_ammo(self):
+        """
+        Update ammo for all weapons.
+        """
+        for weapon_type in self.weapons:
+            self.hud.set_ammo(weapon_type, self.bullets[weapon_type])
 
     def draw(self, screen):
         """
