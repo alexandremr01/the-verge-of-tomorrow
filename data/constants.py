@@ -58,7 +58,7 @@ FRAMES_TO_ENEMIES_TURN = 2
 
 # Player
 PLAYER_INITIAL_HEALTH = 5
-PLAYER_INITIAL_VELOCITY = 15
+PLAYER_INITIAL_VELOCITY = 10
 TIME_BETWEEN_COLLISIONS = 2*1000  # milliseconds
 TIME_BETWEEN_HEARTBEAT = 2*1000 #milliseconds
 
@@ -67,8 +67,8 @@ BULLET_VELOCITY = 10
 
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
-BASE_SOUND_EFFECT_DIR = '../survival-game/resources/sound/'
-BASE_SOUNDTRACK_DIR = '../survival-game/resources/music/'
+BASE_SOUND_EFFECT_DIR = '../survival-game/resources/sound_effect/'
+BASE_SOUNDTRACK_DIR = '../survival-game/resources/soundtrack/'
 BASE_FONT_DIR = '../survival-game/resources/fonts/'
 
 # Numeric
