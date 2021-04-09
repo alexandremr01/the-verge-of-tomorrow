@@ -5,7 +5,7 @@ Module that will load sprites, audios and other resources
 import pygame
 
 from .components.base.sprite import SpriteSheet
-from .constants import BASE_GRAPHICS_DIR, BASE_SOUND_DIR, BASE_MUSIC_DIR
+from .constants import BASE_GRAPHICS_DIR, BASE_SOUND_EFFECT_DIR, BASE_SOUNDTRACK_DIR
 
 graphics_dict = {}
 sound_dict = {}
@@ -40,15 +40,15 @@ def load_sound():
     """
     Loads sounds from archives into the code
     """
-    ak47_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'ak47.wav')
-    uzi_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'uzi.wav')
-    winchester_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'winchester.wav')
-    beep_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'alert-beep.wav')
-    gameover_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'gameover.wav')
-    heartbeat_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'heartbeat.wav')
-    item_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'item_collect.wav')
-    hit_1_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'hit1.wav')
-    menu_select_sound = pygame.mixer.Sound(BASE_SOUND_DIR + 'menu_select.wav')
+    ak47_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'ak47.wav')
+    uzi_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'uzi.wav')
+    winchester_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'winchester.wav')
+    beep_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'alert-beep.wav')
+    gameover_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'gameover.wav')
+    heartbeat_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'heartbeat.wav')
+    item_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'item_collect.wav')
+    hit_1_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'hit1.wav')
+    menu_select_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'menu_select.wav')
     sound_dict['WEAPON_K_1'] = uzi_sound
     sound_dict['WEAPON_K_2'] = ak47_sound
     sound_dict['WEAPON_K_3'] = winchester_sound
@@ -70,4 +70,4 @@ def load_menu_music():
     """
     Loads menu music from archives into the code
     """
-    menu_music = pygame.mixer.music.load(BASE_MUSIC_DIR + 'horror_game_menu.wav')
+    menu_music = pygame.mixer.music.load(BASE_SOUNDTRACK_DIR + 'horror_game_menu.wav')

@@ -7,7 +7,7 @@ import pygame
 
 from .base.state import State
 from ..constants import RED, WHITE
-from ..constants import SCREEN_HEIGHT, SCREEN_WIDTH, BASE_MUSIC_DIR
+from ..constants import SCREEN_HEIGHT, SCREEN_WIDTH, BASE_SOUNDTRACK_DIR
 from ..setup import sound_dict
 
 class Over(State):
@@ -56,5 +56,5 @@ class Over(State):
                 self.clear_window = True
                 pygame.mixer.music.stop()
                 pygame.mixer.music.unload()
-                pygame.mixer.music.load(BASE_MUSIC_DIR + 'horror_game_menu.wav')
+                pygame.mixer.music.load(BASE_SOUNDTRACK_DIR + 'horror_game_menu.wav')
                 pygame.mixer.music.play(-1)

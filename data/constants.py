@@ -79,8 +79,8 @@ WEAPON_K3_MAX_BULLET = 20
 
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
-BASE_SOUND_DIR = '../survival-game/resources/sound/'
-BASE_MUSIC_DIR = '../survival-game/resources/music/'
+BASE_SOUND_EFFECT_DIR = '../survival-game/resources/sound_effect/'
+BASE_SOUNDTRACK_DIR = '../survival-game/resources/soundtrack/'
 
 # Numeric
 EPSILON = 0.1

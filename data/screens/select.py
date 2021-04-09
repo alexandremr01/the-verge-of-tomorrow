@@ -7,7 +7,7 @@ import pygame
 
 from .base.state import State
 from ..utils import is_in_rect
-from ..constants import RED, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_MUSIC_DIR, TITLE_FRAMERATE
+from ..constants import RED, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_SOUNDTRACK_DIR, TITLE_FRAMERATE
 from ..setup import sound_dict, graphics_dict
 
 class Select(State):
@@ -102,5 +102,5 @@ class Select(State):
                 self.clear_window = True
                 pygame.mixer.music.stop()
                 pygame.mixer.music.unload()
-                pygame.mixer.music.load(BASE_MUSIC_DIR + 'dark_ambiance.wav')
+                pygame.mixer.music.load(BASE_SOUNDTRACK_DIR + 'dark_ambiance.wav')
                 pygame.mixer.music.play(-1)

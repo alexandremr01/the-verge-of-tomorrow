@@ -3,8 +3,7 @@ A survival game inspired by classic arcade games. This project was a assignment 
 
 - [**Acknowledgments**](#acknowledgments)
 - [**Running The Game**](#running-the-game)
-- [**How To Play**](#how-to-play)
-- [**Features**](#features)
+- [**Screenshots**](#screenshots)
 
 ## Acknowledgments
 This project used several free resources. We would like to thank every
@@ -30,18 +29,22 @@ pixel artist and sound producer which made their art available to use.
 [Sprite](https://blackdragon1727.itch.io/pixel-bullet-16x16) <br/>
 [Pixel Artist - blackdragon1727](https://blackdragon1727.itch.io/)
 
+* **Buttons** <br/>
+[Sprite](https://adwitr.itch.io/button-asset-pack) <br/>
+[Pixel Artist - adwitr](https://adwitr.itch.io/)
+
 * **Sound** <br/>
+All sound effects and soundtracks are under Creative Commons License. <br/>
+[Freesound](https://freesound.org/) <br/>
+[OpenGameArt](https://opengameart.org/)
 
 ## Running The Game
 You must run the following command to install dependencies before starting the game. <br/>
     
-    pip install -r requirements.txt
+    ./install.sh
 
 Run the main file after all packages were successfully installed.
 
-    python main.py
+    python3 main.py
 
-## How To Play
-
-
-## Features
+## Screenshots
