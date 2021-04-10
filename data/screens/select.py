@@ -92,11 +92,15 @@ class Select(State):
         else if play box is clicked, initiates game
         """
         if pygame.mouse.get_pressed()[0]:
-            if is_in_rect(self.about_rect, pygame.mouse.get_pos()):
+            if is_in_rect(self.about_button_rect, pygame.mouse.get_pos()):
                 sound_dict['beep'].play()
                 self.next = 'ABOUT'
                 self.clear_window = True
-            elif is_in_rect(self.play_rect, pygame.mouse.get_pos()):
+            elif is_in_rect(self.manual_button_rect, pygame.mouse.get_pos()):
+                sound_dict['beep'].play()
+                self.next = 'MANUAL'
+                self.clear_window = True   
+            elif is_in_rect(self.play_button_rect, pygame.mouse.get_pos()):
                 sound_dict['beep'].play()
                 self.next = 'PLAY'
                 self.clear_window = True

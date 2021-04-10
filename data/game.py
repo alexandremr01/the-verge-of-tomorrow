@@ -8,6 +8,7 @@ from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FRAMES_PER_SECOND
 from .screens.title import Title
 from .screens.select import Select
 from .screens.play import Play
+from .screens.manual import Manual
 from .screens.about import About
 from .screens.over import Over
 from .screens.base.state_machine import StateMachine
@@ -35,6 +36,7 @@ class Game:
             'TITLE': Title(),
             'SELECT': Select(),
             'PLAY': Play(),
+            'MANUAL': Manual(),
             'ABOUT': About(),
             'OVER': Over()
         }
