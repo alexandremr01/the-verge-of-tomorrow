@@ -17,7 +17,7 @@ def load_graphics():
     """
     player_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "player.png", (59, 45), 236, 45)
     zombie_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "zombie.png", (45, 45), 90, 45)
-    map_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker_night.png", (8, 8), 64, 72)
+    map_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker.png", (8, 8), 64, 72)
     map_night_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker_night.png", (8, 8), 64, 72)
     items_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "items.png", (32, 32), 352, 32)
     bullets_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "firebullet.png", (16, 16), 512, 272)
@@ -28,7 +28,7 @@ def load_graphics():
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_4.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_5.png")]
     button_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "button.png", (34, 10), 68, 10)   
-    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")          
+    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
     graphics_dict["map"] = map_graphics
