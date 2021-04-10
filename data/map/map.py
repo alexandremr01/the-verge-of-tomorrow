@@ -1,15 +1,17 @@
 import pygame
 import numpy as np
-from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, MOUSEBUTTONUP, MOUSEBUTTONDOWN, K_LSHIFT
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_t
 from random import randint
 from opensimplex import OpenSimplex
 
-from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, SCREEN_WIDTH, SCREEN_HEIGHT
+from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, \
+    CHUNK_TILE_RATIO, TILE_SIZE
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
 from .tile import Tiles
 from data.utils import get_grid_positions
+from data.components.item import ItemGenerator
 
 class Map:
     """
@@ -38,7 +40,7 @@ class Map:
         """
         return self.player
 
-    def get_chunk_position(self):
+    def get_chunk_position(self, position=None):
         """
         Returns the current chunk position on the grid e.g. the primary chunk position is [0, 0]
         its right neighbor is [1, 0] and its bottom neighbor is [0, 1].
@@ -46,11 +48,14 @@ class Map:
         :return: current chunk position on the grid
         :rtype: numpy array
         """
-        player_position = self.player.get_position()
+        if position is None:
+            player_position = self.player.get_position()
+        else:
+            player_position = position
         if CHUNK_RECT.collidepoint(player_position):
             return np.array([0, 0])
-        return (np.floor((np.abs(player_position) + CHUNK_ARRAY / 2) / CHUNK_SIZE) * np.sign(player_position)).astype(
-            int)
+        return (np.floor((np.abs(player_position) + CHUNK_ARRAY / 2) / CHUNK_SIZE) *
+                np.sign(player_position)).astype(int)
 
     def get_chunk_quadrant(self):
         """
@@ -69,6 +74,18 @@ class Map:
         if not quadrant[2]:
             quadrant[3] = RIGHT_RECT.collidepoint(dif)
         return (np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])).astype(int)
+
+    def get_tile(self, position=None):
+        if position is None:
+            player_position = self.player.get_position()
+        else:
+            player_position = position
+        chunk_position = self.get_chunk_position(position)
+        position_in_chunk = player_position - (chunk_position * CHUNK_SIZE - CHUNK_ARRAY / 2)
+        i, j = position_in_chunk // TILE_SIZE
+        i = int(i - i // CHUNK_TILE_RATIO)
+        j = int(j - j // CHUNK_TILE_RATIO)
+        return self.tiles.sprites[self.chunks[tuple(chunk_position)].tilegrid[i][j]]
 
     def gen_chunks(self, chunk_positions):
         """
@@ -139,7 +156,13 @@ class Map:
             walk_vector[1] += self.player.get_velocity()
         if self.is_moving[K_w]:
             walk_vector[1] -= self.player.get_velocity()
-        self.player.move(walk_vector[0], walk_vector[1])
+        new_position = self.player.get_position() + walk_vector
+        if not self.chunks[tuple(self.get_chunk_position(new_position))].is_rendering:
+            next_tile = self.get_tile(new_position)
+            if not next_tile.collide:
+                self.player.move(walk_vector[0], walk_vector[1])
+        else:
+            self.player.move(walk_vector[0], walk_vector[1])
 
     def handle_input(self, events):
         """
@@ -150,6 +173,16 @@ class Map:
             if left_mouse_button:
                 self.player.shoot(self.time)
         for event in events:
+
+            # BEGIN: carteação de teste
+            if event.type == KEYDOWN:
+                if event.key == K_r:
+                    itemgen = ItemGenerator()
+                    self.item = itemgen.generate_item()
+                if event.key == K_t:
+                    self.item.apply_effect(self.player, self.time)
+            # END: carteação de teste
+
             if event.type == KEYDOWN:
                 if event.key == K_LSHIFT:
                     self.player.set_running(self.time)

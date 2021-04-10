@@ -5,7 +5,7 @@ Title screen. Just for exposure
 import pygame
 
 from .base.state import State
-from ..constants import WHITE, SCREEN_WIDTH, SCREEN_HEIGHT, TITLE_FRAMERATE, TITLE_MESSAGE_FRAMERATE
+from ..constants import WHITE, SCREEN_WIDTH, SCREEN_HEIGHT, TITLE_FRAMERATE, TITLE_MESSAGE_FRAMERATE, BASE_FONT_DIR
 from ..setup import sound_dict, graphics_dict, music_dict
 
 class Title(State):
@@ -23,7 +23,7 @@ class Title(State):
         self.counter_title = 0
         self.show_message = True
 
-        helper_font = pygame.font.Font('../survival-game/resources/fonts/ARCADECLASSIC.TTF', 20)
+        helper_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 20)
         self.helper_surface = helper_font.render('Press   any   key   to   continue', False, WHITE)
         helper_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + SCREEN_WIDTH/3)
         self.helper_rect = self.helper_surface.get_rect(center=helper_center)

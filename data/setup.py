@@ -53,9 +53,9 @@ def load_sound():
     menu_select_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'menu_select.wav')
     monster_scream_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'monster_scream.wav')
     dying_zombie_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'dying.wav')
-    sound_dict['WEAPON_K_1'] = uzi_sound
-    sound_dict['WEAPON_K_2'] = ak47_sound
-    sound_dict['WEAPON_K_3'] = winchester_sound
+    sound_dict['Uzi'] = uzi_sound
+    sound_dict['AK47'] = ak47_sound
+    sound_dict['Shotgun'] = winchester_sound
     sound_dict['beep'] = beep_sound
     sound_dict['gameover'] = gameover_sound
     sound_dict['heartbeat'] = heartbeat_sound
@@ -64,9 +64,9 @@ def load_sound():
     sound_dict['menu_select'] = menu_select_sound
     sound_dict['monster_scream'] = monster_scream_sound
     sound_dict['dying_zombie'] = dying_zombie_sound
-    sound_dict['WEAPON_K_1'].set_volume(0.2)
-    sound_dict['WEAPON_K_2'].set_volume(0.2)
-    sound_dict['WEAPON_K_3'].set_volume(0.2)
+    sound_dict['Uzi'].set_volume(0.2)
+    sound_dict['AK47'].set_volume(0.2)
+    sound_dict['Shotgun'].set_volume(0.2)
     sound_dict['gameover'].set_volume(0.5)
     sound_dict['hit_1'].set_volume(0.3)
     sound_dict['heartbeat'].set_volume(1.0)

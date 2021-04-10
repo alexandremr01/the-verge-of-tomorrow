@@ -1,3 +1,4 @@
+from ..constants import ZOMBIE_HEALTH, PLAYER_INITIAL_VELOCITY
 
 # Events
 BLEED_EVENT = 1
@@ -15,7 +16,11 @@ BLEEDING_INTERVAL = 1000
 MAX_SLOW_TIME = 5000
 TIRED_TIME = 3000
 
+MAX_STRONG_RUNNING_TIME = 5000
+MAX_STRONG_TIME = 10000
+
 BLEEDING_DAMAGE = 0.5
+
 
 class PlayerStateFSM:
     def __init__(self):
@@ -27,6 +32,12 @@ class PlayerStateFSM:
 
     def get_state(self):
         return type(self._state)
+
+    def get_damage(self, original_damage):
+        return self._state.get_damage(original_damage)
+
+    def get_velocity(self):
+        return self._state.get_velocity()
 
     def send_event(self, event, time):
         # print(" Recebi "+str(event))
@@ -42,6 +53,7 @@ class PlayerStateFSM:
         if next_state != None:
             self._state = next_state
 
+
 class State:
     def send_event(self, event, time):
         return None
@@ -52,7 +64,14 @@ class State:
     def get_name(self):
         return "Null"
 
-class NeutralState(State) :
+    def get_damage(self, original_damage):
+        return original_damage
+
+    def get_velocity(self):
+        return PLAYER_INITIAL_VELOCITY
+
+
+class NeutralState(State):
     def send_event(self, event, time):
         if event == RUN_EVENT:
             return RunningState(time)
@@ -60,10 +79,14 @@ class NeutralState(State) :
             return BleedingState(time)
         if event == SLOW_EVENT:
             return SlowState(time)
+        if event == STRONGER_EVENT:
+            return StrongState(time)
+
     def get_name(self):
         return "Neutral"
 
-class TiredState(State) :
+
+class TiredState(State):
     def __init__(self, time):
         self.start_time = time
 
@@ -83,6 +106,7 @@ class TiredState(State) :
     def get_name(self):
         return "Tired"
 
+
 class RunningState(State):
     def __init__(self, time):
         self.start_time = time
@@ -98,6 +122,10 @@ class RunningState(State):
 
     def get_name(self):
         return "Running"
+
+    def get_velocity(self):
+        return 2.0 * PLAYER_INITIAL_VELOCITY
+
 
 class BleedingState(State):
     def __init__(self, time):
@@ -115,6 +143,7 @@ class BleedingState(State):
     def get_name(self):
         return "Bleeding"
 
+
 class SlowState(State):
     def __init__(self, time):
         self.start_time = time
@@ -130,3 +159,52 @@ class SlowState(State):
 
     def get_name(self):
         return "Slow"
+
+    def get_velocity(self):
+        return 0.5 * PLAYER_INITIAL_VELOCITY
+
+
+class StrongState(State):
+    def __init__(self, time):
+        self.start_time = time
+
+    def send_event(self, event, time):
+        if event == RUN_EVENT:
+            return StrongRunState(time, self.start_time)
+
+    def update(self, time):
+        if time - self.start_time > MAX_STRONG_TIME:
+            return NeutralState()
+        return None
+
+    def get_name(self):
+        return "Strong"
+
+    def get_damage(self, original_damage):
+        return ZOMBIE_HEALTH
+
+
+class StrongRunState(State):
+    def __init__(self, time, start_strong_time):
+        self.start_time = time
+        self.start_strong_time = start_strong_time
+
+    def send_event(self, event, time):
+        if event == STOP_RUN_EVENT:
+            return StrongState(time)
+
+    def update(self, time):
+        if time - self.start_time > MAX_STRONG_RUNNING_TIME:
+            return StrongState(self.start_strong_time)
+        if time - self.start_strong_time > MAX_STRONG_TIME:
+            return NeutralState()
+        return None
+
+    def get_name(self):
+        return "Running"
+
+    def get_damage(self, original_damage):
+        return ZOMBIE_HEALTH
+
+    def get_velocity(self):
+        return 2.0 * PLAYER_INITIAL_VELOCITY

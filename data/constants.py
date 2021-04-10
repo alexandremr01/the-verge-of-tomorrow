@@ -58,29 +58,18 @@ FRAMES_TO_ENEMIES_TURN = 2
 
 # Player
 PLAYER_INITIAL_HEALTH = 5
-PLAYER_INITIAL_VELOCITY = 10
+PLAYER_INITIAL_VELOCITY = 3
 TIME_BETWEEN_COLLISIONS = 2*1000  # milliseconds
 TIME_BETWEEN_HEARTBEAT = 2*1000 #milliseconds
 
 # Bullet
 BULLET_VELOCITY = 10
-WEAPON_K1_DAMAGE = 20
-WEAPON_K2_DAMAGE = 30
-WEAPON_K3_DAMAGE = 40
-WEAPON_K1_DELAY = 150 #milliseconds
-WEAPON_K2_DELAY = 300 #milliseconds
-WEAPON_K3_DELAY = 550 #milliseconds
-WEAPON_K1_INITIAL_BULLET = 150
-WEAPON_K2_INITIAL_BULLET = 30
-WEAPON_K3_INITIAL_BULLET = 10
-WEAPON_K1_MAX_BULLET = 150
-WEAPON_K2_MAX_BULLET = 40
-WEAPON_K3_MAX_BULLET = 20
 
 # Directories
 BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
 BASE_SOUND_EFFECT_DIR = '../survival-game/resources/sound_effect/'
 BASE_SOUNDTRACK_DIR = '../survival-game/resources/soundtrack/'
+BASE_FONT_DIR = '../survival-game/resources/fonts/'
 
 # Numeric
 EPSILON = 0.1

@@ -5,148 +5,21 @@ The player being controlled by the user.
 
 import pygame
 import numpy as np
-from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
-import random
+from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
 from ..utils import RandomEventGenerator
 from . import player_state
+from .hud import Hud
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY 
-from ..constants import TIME_BETWEEN_COLLISIONS, BLACK
-from ..constants import WEAPON_K1_DELAY, WEAPON_K2_DELAY, WEAPON_K3_DELAY, \
-                        WEAPON_K1_INITIAL_BULLET, WEAPON_K2_INITIAL_BULLET, \
-                        WEAPON_K3_INITIAL_BULLET, WEAPON_K1_MAX_BULLET, WEAPON_K2_MAX_BULLET, \
-                        WEAPON_K3_MAX_BULLET, TIME_BETWEEN_HEARTBEAT
+from ..constants import TIME_BETWEEN_COLLISIONS
+from ..constants import TIME_BETWEEN_HEARTBEAT
 from ..setup import graphics_dict
 from .base.entity import Entity
 from .projectiles import Projectiles
 from .player_state import PlayerStateFSM
 from ..setup import sound_dict
-
-class Hud:
-    """
-    Heads-up display containing player's status and score.
-    """
-    def __init__(self, max_health, items_graphics, status_bar_graphics, status):
-        self.score = 0
-
-        self.heart = [1] * max_health
-        self.heart_sprites = [items_graphics.get_image(5), items_graphics.get_image(9), items_graphics.get_image(4)]
-        self.heart_positions = [(10+35*i, 745) for i in range(max_health)]
-        
-        self.current_weapon = 0
-        self.weapon_sprites = [pygame.transform.scale(items_graphics.get_image(7), (90, 90)),
-                               pygame.transform.scale(items_graphics.get_image(6), (90, 90)), 
-                               pygame.transform.scale(items_graphics.get_image(8), (90, 90))]
-        self.weapon_position = (385, 715)
-        
-        self.font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 30)
-        self.small_font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 26)
-        
-        weapon_k1_ammo = str(WEAPON_K1_INITIAL_BULLET) + '  !' + str(WEAPON_K1_MAX_BULLET)
-        weapon_k2_ammo = str(WEAPON_K2_INITIAL_BULLET) + '  !' + str(WEAPON_K2_MAX_BULLET)
-        weapon_k3_ammo = str(WEAPON_K3_INITIAL_BULLET) + '  !' + str(WEAPON_K3_MAX_BULLET)
-        self.ammo_surface = [self.small_font.render(weapon_k1_ammo, False, BLACK),
-                             self.small_font.render(weapon_k2_ammo, False, BLACK),
-                             self.small_font.render(weapon_k3_ammo, False, BLACK)]
-        self.ammo_position = {6 : (548, 740), 
-                              7 : (542, 740),
-                              8 : (540, 740),
-                              9 : (530, 740)}    
-        self.ammo_current_position = [self.ammo_position[len(weapon_k1_ammo)],
-                                      self.ammo_position[len(weapon_k2_ammo)],
-                                      self.ammo_position[len(weapon_k3_ammo)]]
-        
-        self.score_num_surface = self.font.render('0', False, BLACK)
-        self.score_num_rect = self.score_num_surface.get_rect(center=(685, 755))
-        self.score_num = 0
-        
-        self.status_bar = status_bar_graphics.get_image(0)
-        self.status_bar_position = (0, 700)
-        self.status = self.font.render(status, False, BLACK)
-        self.status_rect = self.status.get_rect(center=(280, 755))
-
-
-    def set_ammo(self, weapon_type, value):
-        """
-        Changes ammo value of a given weapon
-        """
-        if weapon_type == K_1:
-            weapon_k1_ammo = str(value) + '  !' + str(WEAPON_K1_MAX_BULLET)
-            self.ammo_surface[0] = self.small_font.render(weapon_k1_ammo, False, BLACK)
-            self.ammo_current_position[0] = self.ammo_position[len(weapon_k1_ammo)]
-        elif weapon_type == K_2:
-            weapon_k2_ammo = str(value) + '  !' + str(WEAPON_K2_MAX_BULLET)
-            self.ammo_surface[1] = self.small_font.render(weapon_k2_ammo, False, BLACK)
-            self.ammo_current_position[1] = self.ammo_position[len(weapon_k2_ammo)]
-        elif weapon_type == K_3:
-            weapon_k3_ammo = str(value) + '  !' + str(WEAPON_K3_MAX_BULLET)
-            self.ammo_surface[2] = self.small_font.render(weapon_k3_ammo, False, BLACK)
-            self.ammo_current_position[2] = self.ammo_position[len(weapon_k3_ammo)]
-
-    def set_weapon(self, key):
-        """
-        Changes the current weapon
-        """
-        if key == K_1:
-            self.current_weapon = 0
-        elif key == K_2:
-            self.current_weapon = 1
-        elif key == K_3:
-            self.current_weapon = 2
-
-    def increase_score(self, delta_score):
-        """
-        Increases player's score
-        """
-        self.score_num += delta_score
-        self.score_num_surface = self.font.render(str(self.score_num), False, BLACK)
-        self.score = self.score_num
-
-    def set_health(self, health):
-        """
-        Changes player's health
-        """
-        for i in range(len(self.heart)):
-            if health == 0.5:
-                self.heart[i] = 0.5
-                health = 0
-            elif health > 0:
-                self.heart[i] = 1
-                health -= 1
-            else:
-                self.heart[i] = 0
-
-    def set_status(self, status):
-        """
-        Changes the player's status
-        """
-        self.status = self.font.render(status, False, BLACK)
-
-    def draw(self, screen):
-        """
-        Draws the heads-up display
-        """
-        screen.blit_rel(self.status_bar, self.status_bar_position)
-        for i in range(len(self.heart)):
-            if self.heart[i] == 0:
-                screen.blit_rel(self.heart_sprites[0], self.heart_positions[i])
-            elif self.heart[i] == 0.5:
-                screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
-            else:
-                screen.blit_rel(self.heart_sprites[2], self.heart_positions[i])
-        screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
-        screen.blit_rel(self.ammo_surface[self.current_weapon], 
-                        self.ammo_current_position[self.current_weapon])
-        screen.blit_rel(self.score_num_surface, self.score_num_rect)
-        screen.blit_rel(self.status, self.status_rect)
-
-    def get_score(self):
-        """
-        Returns player's total score
-        """
-        return self.score
-
+from data.components.weapon import Uzi, Shotgun, AK47
 
 class Player(Entity):
     """
@@ -155,7 +28,6 @@ class Player(Entity):
     def __init__(self):
         super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0, (50, 50)))
         self.health = PLAYER_INITIAL_HEALTH
-        self.velocity = PLAYER_INITIAL_VELOCITY
         self.direction = 0
         self.state = PlayerStateFSM()
         self.hud = Hud(self.health, graphics_dict['items'], graphics_dict['status_bar'], self.state.get_state_name())
@@ -164,15 +36,17 @@ class Player(Entity):
         for i in range(graphics_dict['player'].get_size()):
             self.states.append(graphics_dict['player'].get_image(i, (50, 50)))
         self.weapon = self.states[0]
-        self.weapon_type = K_1
         self.current_weapon = self.states[0]
         self.last_collision_time = 0
         self.last_bleeding_time = 0
         self.last_shoot_time = [0, 0, 0]
         self.last_heartbeat_time = 0
-        self.bullets = {K_1 : WEAPON_K1_INITIAL_BULLET, 
-                        K_2 : WEAPON_K2_INITIAL_BULLET, 
-                        K_3 : WEAPON_K3_INITIAL_BULLET}
+        self.weapons = {"Uzi": Uzi(),"AK47" : AK47(),"Shotgun" : Shotgun()}
+        self.current_weapon_name = "Uzi"
+
+        self.bullets = {}
+        for weapon_name in self.weapons:
+            self.bullets[weapon_name] = self.weapons[weapon_name].get_initial_ammo()
 
         debuf_probs = {
             player_state.SLOW_EVENT: 0.1,
@@ -205,22 +79,19 @@ class Player(Entity):
         """
         if key == K_1:
             self.weapon = self.states[0]
-            self.weapon_type = K_1
+            self.current_weapon_name = "Uzi"
             self.update_sprite(self.states[0])
-            self.hud.set_weapon(K_1)
-            self.current_weapon = self.weapon
         elif key == K_2:
             self.weapon = self.states[1]
-            self.weapon_type = K_2
+            self.current_weapon_name = "AK47"
             self.update_sprite(self.states[1])
-            self.hud.set_weapon(K_2)
-            self.current_weapon = self.weapon
         elif key == K_3:
             self.weapon = self.states[2]
-            self.weapon_type = K_3
+            self.current_weapon_name = "Shotgun"
             self.update_sprite(self.states[2])
-            self.hud.set_weapon(K_3)
-            self.current_weapon = self.weapon
+
+        self.hud.set_weapon(self.weapons[self.current_weapon_name])
+        self.current_weapon = self.weapon
 
     def update(self, key=None):
         """
@@ -239,12 +110,7 @@ class Player(Entity):
         """
         Updates the current player's state and heads-up display.
         """
-        state = self.state.get_state()
-        if state == player_state.RunningState:
-            return 2*self.velocity
-        elif state == player_state.SlowState:
-            return 0.8*self.velocity
-        return self.velocity
+        return self.state.get_velocity()
 
     def update_state(self, time):
         if self.health <= 1 and time - self.last_heartbeat_time >= TIME_BETWEEN_HEARTBEAT:
@@ -286,37 +152,29 @@ class Player(Entity):
         Shoots a projectile
         """
         can_shoot = False
-        if self.weapon_type == K_1:
-            if time - self.last_shoot_time[0] >= WEAPON_K1_DELAY:
-                if self.bullets[K_1] - 1 >= 0:
-                    self.bullets[K_1] -= 1
-                    self.last_shoot_time[0] = time
-                    can_shoot = True
-                    self.hud.set_ammo(K_1, self.bullets[K_1])
-                    sound_dict['WEAPON_K_1'].play()
-        elif self.weapon_type == K_2:
-            if time - self.last_shoot_time[1] >= WEAPON_K2_DELAY:
-                if self.bullets[K_2] - 1 >= 0:
-                    self.bullets[K_2] -= 1 
-                    self.last_shoot_time[1] = time
-                    can_shoot = True
-                    self.hud.set_ammo(K_2, self.bullets[K_2])
-                    sound_dict['WEAPON_K_2'].play()
-        elif self.weapon_type == K_3:        
-            if time - self.last_shoot_time[2] >= WEAPON_K3_DELAY:
-                if self.bullets[K_3] - 1 >= 0:
-                    self.bullets[K_3] -= 1
-                    self.last_shoot_time[2] = time
-                    can_shoot = True
-                    self.hud.set_ammo(K_3, self.bullets[K_3])
-                    sound_dict['WEAPON_K_3'].play()
+        if time - self.last_shoot_time[0] >= self.weapons[self.current_weapon_name].get_delay():
+            if self.bullets[self.current_weapon_name] - 1 >= 0:
+                self.bullets[self.current_weapon_name] -= 1
+                self.last_shoot_time[0] = time
+                can_shoot = True
+                self.update_ammo()
+                sound_dict[self.current_weapon_name].play()
+
         if can_shoot:
             weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
                                25 * np.sin(np.radians(-self.direction+20)))
+            damage = self.state.get_damage(self.weapons[self.current_weapon_name].get_damage())
             self.projectiles.add_bullet(self.get_position() + weapon_position,
                                         weapon_position,
                                         -self.direction, 
-                                        self.weapon_type)                           
+                                        self.weapons[self.current_weapon_name], damage)
+
+    def update_ammo(self):
+        """
+        Update ammo for all weapons.
+        """
+        for weapon_name in self.weapons:
+            self.hud.set_ammo(self.weapons[weapon_name], self.bullets[weapon_name])
 
     def draw(self, screen):
         """

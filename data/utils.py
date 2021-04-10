@@ -39,6 +39,14 @@ def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1
     return [tuple(center_position + vector) for vector in selected]
 
 
+def compare(noise_value, starting_value, interval_percentage, slices, percentages):
+    carry = starting_value
+    for s in enumerate(slices):
+        if 0 <= noise_value - carry < percentages[s[0]] * interval_percentage:
+            return s[1]
+        carry += percentages[s[0]] * interval_percentage
+
+
 class RandomEventGenerator:
     """
     Receive a dictionary in the form {"event1": prob1, "event2": prob2, ...} and returns one event based on a
@@ -58,6 +66,7 @@ class RandomEventGenerator:
             accum += prob
             if r < accum:
                 return event
+        return self.null_event
 
     def _validate(self, event_prob_dict):
         total_prob = 0
