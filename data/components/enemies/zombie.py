@@ -6,7 +6,7 @@ import numpy as np
 
 from .enemy import Enemy
 from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE, EPSILON, FRAMES_TO_ENEMIES_TURN
-from ...setup import graphics_dict
+from ...setup import graphics_dict, sound_dict
 
 class Zombie(Enemy):
     """
@@ -32,6 +32,7 @@ class Zombie(Enemy):
         self.health = self.health - damage
         if self.health < 0:
             self.health = 0
+            sound_dict['dying_zombie'].play()
 
     def draw(self, screen):
         """
