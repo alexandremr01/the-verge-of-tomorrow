@@ -30,19 +30,19 @@ class Select(State):
         self.button_down = graphics_dict['button'].get_image(1, (136, 40))
 
         self.about_surface = font.render('About', False, RED)
-        about_button_center = (250, 380)
+        about_button_center = (SCREEN_WIDTH // 2, 380)
         self.about_button_rect = self.button_up.get_rect(center=about_button_center)
         self.about_rect = self.about_surface.get_rect(center=about_button_center)
         self.about_button = self.button_up
 
         self.manual_surface = font.render('Manual', False, RED)
-        manual_button_center = (250, 480)
+        manual_button_center = (SCREEN_WIDTH // 2, 480)
         self.manual_button_rect = self.button_up.get_rect(center=manual_button_center)
         self.manual_rect = self.manual_surface.get_rect(center=manual_button_center)
         self.manual_button = self.button_up
 
         self.play_surface = font.render('Play', False, RED)
-        play_button_center = (250, 580)
+        play_button_center = (SCREEN_WIDTH // 2, 580)
         self.play_button_rect = self.button_up.get_rect(center=play_button_center)
         self.play_rect = self.play_surface.get_rect(center=play_button_center)
         self.play_button = self.button_up

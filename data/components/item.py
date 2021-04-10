@@ -96,6 +96,6 @@ class Ammo(Item):
 
     def apply_effect(self, player, time): # TODO: write weapon on screen
         weapon = self.generator.generate()
-        player.bullets[weapon] = int(np.floor(min(weapon.max_ammo, player.bullets[weapon] + weapon.max_ammo / 5)))
+        player.bullets[weapon] = int(np.floor(min(weapon.get_max_ammo(), player.bullets[weapon] + weapon.get_max_ammo() / 5)))
         player.update_ammo()
 

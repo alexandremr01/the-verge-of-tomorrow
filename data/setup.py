@@ -18,6 +18,7 @@ def load_graphics():
     player_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "player.png", (59, 45), 236, 45)
     zombie_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "zombie.png", (45, 45), 90, 45)
     map_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker.png", (8, 8), 64, 72)
+    map_night_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker_night.png", (8, 8), 64, 72)
     items_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "items.png", (32, 32), 352, 32)
     bullets_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "firebullet.png", (16, 16), 512, 272)
     status_bar_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "status_bar.png", (800, 100), 800, 100)
@@ -27,10 +28,11 @@ def load_graphics():
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_4.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_5.png")]
     button_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "button.png", (34, 10), 68, 10)                 
-    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")
+    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")             
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
     graphics_dict["map"] = map_graphics
+    graphics_dict["map_night"] = map_night_graphics
     graphics_dict["items"] = items_graphics
     graphics_dict["bullets"] = bullets_graphics
     graphics_dict["status_bar"] = status_bar_graphics
@@ -51,6 +53,8 @@ def load_sound():
     item_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'item_collect.wav')
     hit_1_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'hit1.wav')
     menu_select_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'menu_select.wav')
+    monster_scream_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'monster_scream.wav')
+    dying_zombie_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'dying.wav')
     sound_dict['Uzi'] = uzi_sound
     sound_dict['AK47'] = ak47_sound
     sound_dict['Shotgun'] = winchester_sound
@@ -60,13 +64,16 @@ def load_sound():
     sound_dict['item_sound'] = item_sound
     sound_dict['hit_1'] = hit_1_sound
     sound_dict['menu_select'] = menu_select_sound
+    sound_dict['monster_scream'] = monster_scream_sound
+    sound_dict['dying_zombie'] = dying_zombie_sound
     sound_dict['Uzi'].set_volume(0.2)
     sound_dict['AK47'].set_volume(0.2)
     sound_dict['Shotgun'].set_volume(0.2)
     sound_dict['gameover'].set_volume(0.5)
-    sound_dict['hit_1'].set_volume(0.2)
+    sound_dict['hit_1'].set_volume(0.3)
     sound_dict['heartbeat'].set_volume(1.0)
     sound_dict['menu_select'].set_volume(0.4)
+    sound_dict['dying_zombie'].set_volume(0.4)
 
 def load_menu_music():
     """

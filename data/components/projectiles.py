@@ -10,9 +10,9 @@ class Bullet(Entity):
     A game's projectile
     """
     def __init__(self, initial_position, weapon_position, direction, weapon, damage=None):
-        super().__init__(initial_position, graphics_dict["bullets"].get_image(weapon.bullet_image_index), direction)
+        super().__init__(initial_position, graphics_dict["bullets"].get_image(weapon.get_bullet_image_index()), direction)
         if damage is None:
-            self.damage = weapon.damage
+            self.damage = weapon.get_damage()
         else:
             self.damage = damage
         self.velocity = BULLET_VELOCITY
@@ -59,15 +59,15 @@ class Projectiles:
     """
     def __init__(self):
         self.projectiles = dict()
-        for weapon_type in [Uzi, Shotgun, AK47]:
-            self.projectiles[weapon_type] = []
+        for weapon_name in ["Uzi", "Shotgun", "AK47"]:
+            self.projectiles[weapon_name] = []
 
-    def add_bullet(self, initial_position, weapon_position, direction, weapon_type, damage):
+    def add_bullet(self, initial_position, weapon_position, direction, weapon, damage):
         """
         Adds a new bullet into projectiles
         """
-        self.projectiles[weapon_type].append(Bullet(initial_position, weapon_position, 
-                                                    direction, weapon_type, damage))
+        self.projectiles[weapon.get_name()].append(Bullet(initial_position, weapon_position, 
+                                                    direction, weapon, damage))
 
     def update(self):
         """

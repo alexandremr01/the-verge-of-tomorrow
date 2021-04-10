@@ -16,7 +16,8 @@ class Hud:
         self.heart_sprites = [items_graphics.get_image(5), items_graphics.get_image(9), items_graphics.get_image(4)]
         self.heart_positions = [(10 + 35 * i, 745) for i in range(max_health)]
 
-        self.current_weapon = Uzi
+
+        self.current_weapon_name = "Uzi"
         self.weapon_position = (385, 715)
 
         self.font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 30)
@@ -27,15 +28,16 @@ class Hud:
                               8: (540, 740),
                               9: (530, 740)}
 
-        weapon_types = [Uzi, AK47, Shotgun]
+        weapon_types = [Uzi(), AK47(), Shotgun()]
         self.ammo_surface = {}
         self.ammo_current_position = {}
         self.weapon_sprites = {}
         for weapon in weapon_types:
-            weapon_ammo = str(weapon.initial_ammo) + '  !' + str(weapon.max_ammo)
-            self.ammo_surface[weapon] = self.small_font.render(weapon_ammo, False, BLACK)
-            self.ammo_current_position[weapon] = self.ammo_position[len(weapon_ammo)]
-            self.weapon_sprites[weapon] = pygame.transform.scale(items_graphics.get_image(weapon.image_index), (90, 90))
+            weapon_ammo = str(weapon.get_initial_ammo()) + '  !' + str(weapon.get_max_ammo())
+            self.ammo_surface[weapon.get_name()] = self.small_font.render(weapon_ammo, False, BLACK)
+            self.ammo_current_position[weapon.get_name()] = self.ammo_position[len(weapon_ammo)]
+            self.weapon_sprites[weapon.get_name()] = pygame.transform.scale(items_graphics.get_image(
+                                                                 weapon.get_image_index()), (90, 90))
 
         self.score_num_surface = self.font.render('0', False, BLACK)
         self.score_num_rect = self.score_num_surface.get_rect(center=(685, 755))
@@ -46,19 +48,19 @@ class Hud:
         self.status = self.font.render(status, False, BLACK)
         self.status_rect = self.status.get_rect(center=(280, 755))
 
-    def set_ammo(self, weapon_type, value):
+    def set_ammo(self, weapon, value):
         """
         Changes ammo value of a given weapon
         """
-        weapon_ammo = str(value) + '  !' + str(weapon_type.max_ammo)
-        self.ammo_surface[weapon_type] = self.small_font.render(weapon_ammo, False, BLACK)
-        self.ammo_current_position[weapon_type] = self.ammo_position[len(weapon_ammo)]
+        weapon_ammo = str(value) + '  !' + str(weapon.get_max_ammo())
+        self.ammo_surface[weapon.get_name()] = self.small_font.render(weapon_ammo, False, BLACK)
+        self.ammo_current_position[weapon.get_name()] = self.ammo_position[len(weapon_ammo)]
 
-    def set_weapon(self, weapon_type):
+    def set_weapon(self, weapon):
         """
         Changes the current weapon
         """
-        self.current_weapon = weapon_type
+        self.current_weapon_name = weapon.get_name()
 
     def increase_score(self, delta_score):
         """
@@ -100,9 +102,9 @@ class Hud:
                 screen.blit_rel(self.heart_sprites[1], self.heart_positions[i])
             else:
                 screen.blit_rel(self.heart_sprites[2], self.heart_positions[i])
-        screen.blit_rel(self.weapon_sprites[self.current_weapon], self.weapon_position)
-        screen.blit_rel(self.ammo_surface[self.current_weapon],
-                        self.ammo_current_position[self.current_weapon])
+        screen.blit_rel(self.weapon_sprites[self.current_weapon_name], self.weapon_position)
+        screen.blit_rel(self.ammo_surface[self.current_weapon_name],
+                        self.ammo_current_position[self.current_weapon_name])
         screen.blit_rel(self.score_num_surface, self.score_num_rect)
         screen.blit_rel(self.status, self.status_rect)
 
