@@ -28,7 +28,6 @@ class Player(Entity):
     def __init__(self):
         super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0, (50, 50)))
         self.health = PLAYER_INITIAL_HEALTH
-        self.velocity = PLAYER_INITIAL_VELOCITY
         self.direction = 0
         self.state = PlayerStateFSM()
         self.hud = Hud(self.health, graphics_dict['items'], graphics_dict['status_bar'], self.state.get_state_name())
@@ -111,12 +110,7 @@ class Player(Entity):
         """
         Updates the current player's state and heads-up display.
         """
-        state = self.state.get_state()
-        if state == player_state.RunningState:
-            return 2*self.velocity
-        elif state == player_state.SlowState:
-            return 0.8*self.velocity
-        return self.velocity
+        return self.state.get_velocity()
 
     def update_state(self, time):
         if self.health <= 1 and time - self.last_heartbeat_time >= TIME_BETWEEN_HEARTBEAT:

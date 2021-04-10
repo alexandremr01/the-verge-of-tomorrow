@@ -10,7 +10,7 @@ class Uzi(Weapon):
     max_ammo = 150
     name = "Uzi"
     bullet_image_index = 32
-    image_index = 6
+    image_index = 7
 
 
 class AK47(Weapon):
@@ -20,7 +20,7 @@ class AK47(Weapon):
     max_ammo = 40
     name = "AK47"
     bullet_image_index = 39
-    image_index = 7
+    image_index = 6
 
 
 class Shotgun(Weapon):
