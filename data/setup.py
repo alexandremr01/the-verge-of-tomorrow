@@ -27,6 +27,7 @@ def load_graphics():
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_4.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_5.png")]
     button_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "button.png", (34, 10), 68, 10)                 
+    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
     graphics_dict["map"] = map_graphics
@@ -35,6 +36,7 @@ def load_graphics():
     graphics_dict["status_bar"] = status_bar_graphics
     graphics_dict["title"] = title_graphics
     graphics_dict["button"] = button_graphics
+    graphics_dict["about"] = menu_about_graphics
 
 def load_sound():
     """
