@@ -25,7 +25,7 @@ class Select(State):
         self.time = pygame.time.get_ticks()
         self.last_transition_title_time = 0
         self.counter_title = 0
-        
+
         self.button_up = graphics_dict['button'].get_image(0, (136, 40))
         self.button_down = graphics_dict['button'].get_image(1, (136, 40))
 
