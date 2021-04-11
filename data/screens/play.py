@@ -6,6 +6,7 @@ import pygame
 
 from data.map.map import Map
 from .base.state import State
+from ..utils import is_in_rect
 from ..constants import BLACK, PLAY_TO_OVER_DELAY, LOADING_TIME, TITLE_FRAMERATE
 from ..constants import WHITE, LOADBAR_HEIGHT, LOADBAR_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
 from ..setup import graphics_dict
@@ -33,11 +34,24 @@ class Play(State):
         loadbar_top = 4*SCREEN_HEIGHT/5
         self.loadbar_rect = pygame.Rect(loadbar_left, loadbar_top, LOADBAR_WIDTH, LOADBAR_HEIGHT)
 
+        self.quit_button_hover = 0
+        self.quit_button = graphics_dict["quit_button"]
+        self.quit_button_rect = pygame.Rect(self.quit_button[0].get_rect())
+        self.quit_button_rect.left = SCREEN_WIDTH - self.quit_button_rect.width - 10
+        self.quit_button_rect.top = 10
+
+        self.pause_button_hover = 0
+        self.pause_button = graphics_dict["pause_button"]
+        self.pause_button_rect = pygame.Rect(self.pause_button[0].get_rect())
+        self.pause_button_rect.left = self.quit_button_rect.left - self.pause_button_rect.width - 10
+        self.pause_button_rect.top = 10
+
     def update(self):
         """
         Updates the game
         """
-        self.map.update()
+        if self.next is None:
+            self.map.update()
 
         if self.loading:
             self.time = pygame.time.get_ticks()
@@ -76,15 +90,27 @@ class Play(State):
         else:
             screen.fill(BLACK)
             self.map.draw(screen)
+            screen.blit_rel(self.quit_button[self.quit_button_hover], self.quit_button_rect)
+            screen.blit_rel(self.pause_button[self.pause_button_hover], self.pause_button_rect)
 
     def handle_input(self, events, keys):
         """
         Responds to inputs given through keyboard
         """
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.next = 'PAUSE'
+        self.pause_button_hover = 0
+        self.quit_button_hover = 0
+        if is_in_rect(self.pause_button_rect, pygame.mouse.get_pos()):
+            self.pause_button_hover = 1
+            if pygame.mouse.get_pressed()[0]:
+                self.next = 'PAUSE'
+        if is_in_rect(self.quit_button_rect, pygame.mouse.get_pos()):
+            self.quit_button_hover = 1
+            if pygame.mouse.get_pressed()[0]:
+                self.next = 'OVER'
+                self.custom_value = self.map.get_player().get_score()
+                self.clear_window = True
+                pygame.mixer.music.stop()
+                pygame.mixer.music.unload()
 
         self.map.handle_input(events)
 
