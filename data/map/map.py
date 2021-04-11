@@ -85,6 +85,9 @@ class Map:
         j, i = position_in_chunk // TILE_SIZE
         i = int(i - i // CHUNK_TILE_RATIO)
         j = int(j - j // CHUNK_TILE_RATIO)
+        if self.chunks[tuple(chunk_position)].structuregrid is not None:
+            if self.tiles.is_what(self.chunks[tuple(chunk_position)].structuregrid[i][j], "ITEM"):
+                return self.tiles.sprites[self.chunks[tuple(chunk_position)].structuregrid[i][j]]
         return self.tiles.sprites[self.chunks[tuple(chunk_position)].tilegrid[i][j]]
 
     def gen_chunks(self, chunk_positions):
@@ -159,8 +162,11 @@ class Map:
             walk_vector[1] -= self.player.get_velocity()
         new_position = self.player.get_position() + walk_vector
         if not self.chunks[tuple(self.get_chunk_position(new_position))].is_rendering:
-            if not self.get_tile(new_position).collide:
+            tile = self.get_tile(new_position)
+            if not tile.collide:
                 self.player.move(walk_vector[0], walk_vector[1])
+                if tile.item is not None:
+                    print("despawn and use item")
         else:
             self.player.move(walk_vector[0], walk_vector[1])
 

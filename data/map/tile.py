@@ -1,3 +1,4 @@
+from ..components.item import Skull
 from ..setup import graphics_dict
 from ..components.base.sprite import Sprite
 
@@ -7,9 +8,10 @@ class Tile:
     Individual tile with name, sprite and walkable flag.
     """
 
-    def __init__(self, sprite, collide=False):
+    def __init__(self, sprite, collide=False, item=None):
         self.sprite = sprite
         self.collide = collide
+        self.item = item
 
 
 class Tiles:
@@ -39,7 +41,12 @@ class Tiles:
                      "WALL_BOTTOM_LEFT": 19,
                      "WALL_TOP_LEFT": 20,
                      "WALL_PILLAR": 21,
-                     "WALL_BROKEN": 22}
+                     "WALL_BROKEN": 22,
+                     "ITEM_SKULL": 23,
+                     "ITEM_HEALTH": 24,
+                     "ITEM_BLUEPOTION": 25,
+                     "ITEM_GREENPOTION": 26,
+                     "ITEM_AMMO": 27}
 
         self.sprites = {1: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50)))),
                         2: Tile(Sprite((0, 0), graphics_dict["map"].get_image(16, (50, 50)))),
@@ -63,8 +70,9 @@ class Tiles:
                         19: Tile(Sprite((0, 0), graphics_dict["map"].get_image(33, (50, 50))), True),
                         20: Tile(Sprite((0, 0), graphics_dict["map"].get_image(36, (50, 50)), None,
                                         (True, False)), True),
-                        21: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))), True),
-                        22: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))), True)
+                        21: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), True),
+                        22: Tile(Sprite((0, 0), graphics_dict["map"].get_image(9, (50, 50)))),
+                        23: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), item=Skull())
                         }
 
     def is_what(self, value, name):
@@ -78,5 +86,7 @@ class Tiles:
             return self.code["WALL_LEFT_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
         elif name == "CORNER":
             return self.code["WALL_BOTTOM_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
+        elif name == "ITEM":
+            return self.code["ITEM_SKULL"] <= value <= self.code["ITEM_AMMO"]
 
 
