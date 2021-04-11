@@ -45,6 +45,11 @@ class Play(State):
         """
         Responds to inputs given through keyboard
         """
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.next = 'PAUSE'
+
         self.map.handle_input(events)
 
     def reset(self):
