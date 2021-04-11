@@ -82,7 +82,7 @@ class Map:
             player_position = position
         chunk_position = self.get_chunk_position(position)
         position_in_chunk = player_position - (chunk_position * CHUNK_SIZE - CHUNK_ARRAY / 2)
-        i, j = position_in_chunk // TILE_SIZE
+        j, i = position_in_chunk // TILE_SIZE
         i = int(i - i // CHUNK_TILE_RATIO)
         j = int(j - j // CHUNK_TILE_RATIO)
         return self.tiles.sprites[self.chunks[tuple(chunk_position)].tilegrid[i][j]]
@@ -147,6 +147,7 @@ class Map:
         """
         Updates positions of player and enemies.
         """
+        self.handle_collision()
         walk_vector = np.array([0, 0])
         if self.is_moving[K_a]:
             walk_vector[0] -= self.player.get_velocity()
@@ -158,8 +159,7 @@ class Map:
             walk_vector[1] -= self.player.get_velocity()
         new_position = self.player.get_position() + walk_vector
         if not self.chunks[tuple(self.get_chunk_position(new_position))].is_rendering:
-            next_tile = self.get_tile(new_position)
-            if not next_tile.collide:
+            if not self.get_tile(new_position).collide:
                 self.player.move(walk_vector[0], walk_vector[1])
         else:
             self.player.move(walk_vector[0], walk_vector[1])
@@ -209,12 +209,11 @@ class Map:
         Updates map object.
         """
         self.time = pygame.time.get_ticks()
-        self.handle_collision()
+        self.update_positions()
         self.player.update_state(self.time)
         self.player.update_direction()
         if self.wave.finished():
             self.wave.new_wave()
-        self.update_positions()
         self.update_chunks()
         self.wave.update_enemies(self.player, self.time)
 

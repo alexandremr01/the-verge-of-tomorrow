@@ -76,5 +76,7 @@ class Tiles:
             return self.code["CHECKERED_PLAIN"] <= value <= self.code["CHECKERED_GRASS_3"]
         elif name == "WALL":
             return self.code["WALL_LEFT_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
+        elif name == "CORNER":
+            return self.code["WALL_BOTTOM_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
 
 

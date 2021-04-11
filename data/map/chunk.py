@@ -45,7 +45,7 @@ class Chunk:
             structure_seed = self.seed + position[2]
             np.random.seed(structure_seed)
             number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.2, 0.1])
-            number_of_directions = 4
+            # number_of_directions = 4
             np.random.seed(structure_seed)
             directions = np.take([[1, 1, 11], [-1, 1, 12], [-1, -1, 13], [1, -1, 14]],
                                  np.random.choice(np.array([0, 1, 2, 3]), size=number_of_directions,
@@ -62,8 +62,8 @@ class Chunk:
 
     def generate_terrain(self, generator):
         start_position = self.topleft + np.array([0, CHUNK_SIZE // self.terrain_steps * self.terrain_step])
-        new_load = np.array([[(generator.noise2d((start_position[0] / TILE_SIZE + j)/2.8,
-                                                 -(start_position[1] / TILE_SIZE + i)/2.8) + 1) / 2
+        new_load = np.array([[(generator.noise2d((start_position[0] / TILE_SIZE + j) / 2.8,
+                                                 -(start_position[1] / TILE_SIZE + i) / 2.8) + 1) / 2
                               for j in range(CHUNK_TILE_RATIO)]
                              for i in range(CHUNK_TILE_RATIO_STEPS)])
         if self.terrain_step == 0:
@@ -72,17 +72,17 @@ class Chunk:
         else:
             self.tilegrid = np.concatenate((self.tilegrid, new_load), axis=0)
 
-    def check_wall_collision(self, x, y, tiles):
-        if tiles.is_what(self.structuregrid[x + 1][y], "FLOOR"):
-            if tiles.is_what(self.structuregrid[x][y + 1], "FLOOR"):
-                self.structuregrid[x][y] = tiles.code["WALL_BOTTOM_RIGHT"]
+    def check_wall_intersection(self, i, j, tiles):
+        if tiles.is_what(self.structuregrid[i][j + 1], "FLOOR"):
+            if tiles.is_what(self.structuregrid[i + 1][j], "FLOOR"):
+                self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_RIGHT"]
             else:
-                self.structuregrid[x][y] = tiles.code["WALL_TOP_RIGHT"]
+                self.structuregrid[i][j] = tiles.code["WALL_TOP_RIGHT"]
         else:
-            if tiles.is_what(self.structuregrid[x][y + 1], "FLOOR"):
-                self.structuregrid[x][y] = tiles.code["WALL_BOTTOM_LEFT"]
+            if tiles.is_what(self.structuregrid[i + 1][j], "FLOOR"):
+                self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_LEFT"]
             else:
-                self.structuregrid[x][y] = tiles.code["WALL_TOP_LEFT"]
+                self.structuregrid[i][j] = tiles.code["WALL_TOP_LEFT"]
 
     def generate_structure(self, tiles):
         position = 0
@@ -91,53 +91,88 @@ class Chunk:
                 position = s[1]
                 break
 
+        horizontal_walls = []
+        vertical_walls = []
+
         for direction, length in self.structures[position]:
-            x_direction, y_direction = direction
+            i_direction, j_direction = direction
             width, height = length
 
             # Set floor
-            for i in range(-1, width):
-                for j in range(-1, height):
-                    x = position[0] + x_direction * i
-                    y = position[1] + y_direction * j
-                    self.structuregrid[x][y] = tiles.code["CHECKERED_PLAIN"]
+            for x in range(-1, width):
+                for y in range(-1, height):
+                    i = position[0] + i_direction * y
+                    j = position[1] + j_direction * x
+                    self.structuregrid[i][j] = tiles.code["CHECKERED_PLAIN"]
+                    if (i, j) in horizontal_walls:
+                        horizontal_walls.remove((i, j))
+                    elif (i, j) in vertical_walls:
+                        vertical_walls.remove((i, j))
 
             # Set left and right walls
-            for i in [-2, width]:
-                for j in range(-1, height):
-                    x = position[0] + x_direction * i
-                    y = position[1] + y_direction * j
-                    if self.structuregrid[x][y] == tiles.code["WALL_TOP_BOTTOM"]:
-                        self.check_wall_collision(x, y, tiles)
-                    elif not tiles.is_what(self.structuregrid[x][y], "FLOOR"):
-                        self.structuregrid[x][y] = tiles.code["WALL_LEFT_RIGHT"]
+            for x in [-2, width]:
+                for y in range(-1, height):
+                    i = position[0] + i_direction * y
+                    j = position[1] + j_direction * x
+                    if self.structuregrid[i][j] == tiles.code["WALL_TOP_BOTTOM"]:
+                        self.check_wall_intersection(i, j, tiles)
+                        horizontal_walls.remove((i, j))
+                    elif not tiles.is_what(self.structuregrid[i][j], "FLOOR"):
+                        self.structuregrid[i][j] = tiles.code["WALL_LEFT_RIGHT"]
+                        vertical_walls.append((i, j))
 
             # Set top and bottom walls
-            for j in [-2, height]:
-                for i in range(-1, width):
-                    x = position[0] + x_direction * i
-                    y = position[1] + y_direction * j
-                    if self.structuregrid[x][y] == tiles.code["WALL_LEFT_RIGHT"]:
-                        self.check_wall_collision(x, y, tiles)
-                    elif not tiles.is_what(self.structuregrid[x][y], "FLOOR"):
-                        self.structuregrid[x][y] = tiles.code["WALL_TOP_BOTTOM"]
+            for y in [-2, height]:
+                for x in range(-1, width):
+                    i = position[0] + i_direction * y
+                    j = position[1] + j_direction * x
+                    if self.structuregrid[i][j] == tiles.code["WALL_LEFT_RIGHT"]:
+                        self.check_wall_intersection(i, j, tiles)
+                        vertical_walls.remove((i, j))
+                    elif not tiles.is_what(self.structuregrid[i][j], "FLOOR"):
+                        self.structuregrid[i][j] = tiles.code["WALL_TOP_BOTTOM"]
+                        horizontal_walls.append((i, j))
 
             # Set Corners
-            for i in [-2, width]:
-                for j in [-2, height]:
-                    x = position[0] + x_direction * i
-                    y = position[1] + y_direction * j
-                    if tiles.is_what(self.structuregrid[x][y], "TERRAIN"):
-                        if tiles.is_what(self.structuregrid[x + 1][y], "WALL"):
-                            if tiles.is_what(self.structuregrid[x][y + 1], "WALL"):
-                                self.structuregrid[x][y] = tiles.code["WALL_TOP_LEFT"]
+            for x in [-2, width]:
+                for y in [-2, height]:
+                    i = position[0] + i_direction * y
+                    j = position[1] + j_direction * x
+                    if tiles.is_what(self.structuregrid[i][j], "TERRAIN"):
+                        if tiles.is_what(self.structuregrid[i][j + 1], "WALL"):
+                            if tiles.is_what(self.structuregrid[i + 1][j], "WALL"):
+                                self.structuregrid[i][j] = tiles.code["WALL_TOP_LEFT"]
                             else:
-                                self.structuregrid[x][y] = tiles.code["WALL_BOTTOM_LEFT"]
+                                self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_LEFT"]
                         else:
-                            if tiles.is_what(self.structuregrid[x][y + 1], "WALL"):
-                                self.structuregrid[x][y] = tiles.code["WALL_TOP_RIGHT"]
+                            if tiles.is_what(self.structuregrid[i + 1][j], "WALL"):
+                                self.structuregrid[i][j] = tiles.code["WALL_TOP_RIGHT"]
                             else:
-                                self.structuregrid[x][y] = tiles.code["WALL_BOTTOM_RIGHT"]
+                                self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_RIGHT"]
+
+        # Select which walls will be doors
+        for i in range(len(vertical_walls)):
+            f = vertical_walls[i]
+            s = vertical_walls[i + 1]
+            if f[1] == s[1]:
+                if not tiles.is_what(self.structuregrid[f[0] + 1][f[1]], "CORNER") and not tiles.is_what(
+                        self.structuregrid[f[0] - 1][f[1]], "CORNER"):
+                    if not tiles.is_what(self.structuregrid[s[0] + 1][s[1]], "CORNER") and not tiles.is_what(
+                            self.structuregrid[s[0] - 1][s[1]], "CORNER"):
+                        self.structuregrid[f[0]][f[1]] = tiles.code["CHECKERED_PLAIN"]
+                        self.structuregrid[s[0]][s[1]] = tiles.code["CHECKERED_PLAIN"]
+                        break
+        for i in range(len(horizontal_walls)):
+            f = horizontal_walls[i]
+            s = horizontal_walls[i + 1]
+            if f[0] == s[0]:
+                if not tiles.is_what(self.structuregrid[f[0]][f[1] + 1], "CORNER") and not tiles.is_what(
+                        self.structuregrid[f[0]][f[1] - 1], "CORNER"):
+                    if not tiles.is_what(self.structuregrid[s[0]][s[1] + 1], "CORNER") and not tiles.is_what(
+                            self.structuregrid[s[0]][s[1] - 1], "CORNER"):
+                        self.structuregrid[f[0]][f[1]] = tiles.code["CHECKERED_PLAIN"]
+                        self.structuregrid[s[0]][s[1]] = tiles.code["CHECKERED_PLAIN"]
+                break
 
     def render(self, generator, tiles):
         self.is_rendering = True
@@ -170,7 +205,7 @@ class Chunk:
             for j in range(CHUNK_TILE_RATIO):
                 self.decode(row + i, j, tiles)
                 self.surface.blit(tiles.sprites[self.tilegrid[row + i][j]].sprite.get_image(),
-                                  np.array([row + i, j]) * TILE_SIZE)
+                                  np.array([j, row + i]) * TILE_SIZE)
 
     def decode(self, i, j, tiles):
         if self.structuregrid is None or self.structuregrid[i][j] == 0:
