@@ -48,7 +48,7 @@ class Chunk:
             structure_seed = self.seed + position[2]
             np.random.seed(structure_seed)
             number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.2, 0.1])
-            # number_of_directions = 4
+            number_of_directions = 4
             np.random.seed(structure_seed)
             directions = np.take([[1, 1, 11], [-1, 1, 12], [-1, -1, 13], [1, -1, 14]],
                                  np.random.choice(np.array([0, 1, 2, 3]), size=number_of_directions,
@@ -97,6 +97,7 @@ class Chunk:
         horizontal_walls = []
         vertical_walls = []
         floor = []
+        corners = []
 
         for direction, length in self.structures[position]:
             i_direction, j_direction = direction
@@ -113,6 +114,8 @@ class Chunk:
                         horizontal_walls.remove([i, j])
                     elif [i, j] in vertical_walls:
                         vertical_walls.remove([i, j])
+                    elif [i, j] in corners:
+                        corners.remove([i, j])
 
             # Set left and right walls
             for x in [-2, width]:
@@ -121,6 +124,7 @@ class Chunk:
                     j = position[1] + j_direction * x
                     if self.structuregrid[i][j] == tiles.code["WALL_TOP_BOTTOM"]:
                         self.check_wall_intersection(i, j, tiles)
+                        corners.append([i, j])
                         horizontal_walls.remove([i, j])
                     elif not tiles.is_what(self.structuregrid[i][j], "FLOOR"):
                         self.structuregrid[i][j] = tiles.code["WALL_LEFT_RIGHT"]
@@ -133,6 +137,7 @@ class Chunk:
                     j = position[1] + j_direction * x
                     if self.structuregrid[i][j] == tiles.code["WALL_LEFT_RIGHT"]:
                         self.check_wall_intersection(i, j, tiles)
+                        corners.append([i, j])
                         vertical_walls.remove([i, j])
                     elif not tiles.is_what(self.structuregrid[i][j], "FLOOR"):
                         self.structuregrid[i][j] = tiles.code["WALL_TOP_BOTTOM"]
@@ -144,6 +149,7 @@ class Chunk:
                     i = position[0] + i_direction * y
                     j = position[1] + j_direction * x
                     if tiles.is_what(self.structuregrid[i][j], "TERRAIN"):
+                        corners.append([i, j])
                         if tiles.is_what(self.structuregrid[i][j + 1], "WALL"):
                             if tiles.is_what(self.structuregrid[i + 1][j], "WALL"):
                                 self.structuregrid[i][j] = tiles.code["WALL_TOP_LEFT"]
@@ -154,7 +160,14 @@ class Chunk:
                                 self.structuregrid[i][j] = tiles.code["WALL_TOP_RIGHT"]
                             else:
                                 self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_RIGHT"]
-
+        # Puts shadow on tiles
+        for wall_position in vertical_walls:
+            if tiles.is_what(self.structuregrid[wall_position[0]][wall_position[1] + 1], "FLOOR"):
+                self.structuregrid[wall_position[0]][wall_position[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT"]
+            elif tiles.is_what(self.structuregrid[wall_position[0]][wall_position[1] + 1], "TERRAIN"):
+                np.random.seed(self.seed + wall_position[0] + wall_position[1])
+                self.structuregrid[wall_position[0]][wall_position[1] + 1] =\
+                    np.random.choice([tiles.code["GRASS_SHADOW_LEFT_1"], tiles.code["GRASS_SHADOW_LEFT_2"]])
         # Select which walls will be doors
         for i in range(len(vertical_walls)):
             f = vertical_walls[i]
@@ -167,6 +180,15 @@ class Chunk:
                         self.structuregrid[f[0]][f[1]] = tiles.code["WALL_BROKEN"]
                         self.structuregrid[s[0]][s[1]] = tiles.code["WALL_BROKEN"]
                         break
+        # Puts shadow on tiles
+        for wall_position in horizontal_walls:
+            if tiles.is_what(self.structuregrid[wall_position[0] + 1][wall_position[1]], "FLOOR"):
+                self.structuregrid[wall_position[0] + 1][wall_position[1]] = tiles.code["CHECKERED_SHADOW_TOP"]
+            elif tiles.is_what(self.structuregrid[wall_position[0] + 1][wall_position[1]], "TERRAIN"):
+                np.random.seed(self.seed + wall_position[0] + wall_position[1])
+                self.structuregrid[wall_position[0] + 1][wall_position[1]] =\
+                    np.random.choice([tiles.code["GRASS_SHADOW_TOP_1"], tiles.code["GRASS_SHADOW_TOP_2"]])
+        # Select which walls will be doors
         for i in range(len(horizontal_walls)):
             f = horizontal_walls[i]
             s = horizontal_walls[i + 1]
@@ -178,6 +200,30 @@ class Chunk:
                         self.structuregrid[f[0]][f[1]] = tiles.code["WALL_BROKEN"]
                         self.structuregrid[s[0]][s[1]] = tiles.code["WALL_BROKEN"]
                     break
+        # Puts shadow on tiles
+        for corner in corners:
+            if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_TOP_LEFT"]:
+                if not tiles.is_what(self.structuregrid[corner[0] + 1][corner[1] + 1], "TERRAIN"):
+                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_TOP_LEFT_FULL"]
+            if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_TOP_RIGHT"]:
+                if not tiles.is_what(self.structuregrid[corner[0]][corner[1] + 1], "TERRAIN"):
+                    self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT_CORNER"]
+                else:
+                    self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["GRASS_SHADOW_LEFT_CORNER"]
+            if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_BOTTOM_LEFT"]:
+                if not tiles.is_what(self.structuregrid[corner[0] + 1][corner[1]], "TERRAIN"):
+                    self.structuregrid[corner[0] + 1][corner[1]] = tiles.code["CHECKERED_SHADOW_TOP_CORNER"]
+                else:
+                    self.structuregrid[corner[0] + 1][corner[1]] = tiles.code["GRASS_SHADOW_TOP_CORNER"]
+            if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_BOTTOM_RIGHT"]:
+                if not tiles.is_what(self.structuregrid[corner[0] + 1][corner[1] + 1], "TERRAIN"):
+                    self.structuregrid[corner[0] + 1][corner[1]] = tiles.code["CHECKERED_SHADOW_TOP"]
+                    self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT"]
+                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_TOP_LEFT"]
+                else:
+                    self.structuregrid[corner[0] + 1][corner[1]] = tiles.code["GRASS_SHADOW_TOP_1"]
+                    self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["GRASS_SHADOW_LEFT_1"]
+                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["GRASS_SHADOW_TOP_LEFT"]
 
         # Generating items
         np.random.seed(self.seed)
@@ -189,7 +235,7 @@ class Chunk:
         if self.structures_step == -1:
             np.random.seed(self.seed)
             number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.6, 0.2, 0.1, 0.05, 0.05]))
-            # number_of_structures = 4
+            number_of_structures = 4
             if number_of_structures != 0:
                 self.generate_structure_variables(number_of_structures)
             self.structures_steps = number_of_structures
@@ -214,10 +260,10 @@ class Chunk:
         for i in range(CHUNK_TILE_RATIO_STEPS):
             for j in range(CHUNK_TILE_RATIO):
                 self.decode(row + i, j, tiles)
-                self.surface.blit(tiles.sprites[self.tilegrid[row + i][j]].sprite.get_image(),
+                self.surface.blit(tiles.tilesdict[self.tilegrid[row + i][j]].sprite.get_image(),
                                   np.array([j, row + i]) * TILE_SIZE)
                 if self.structuregrid is not None and tiles.is_what(self.structuregrid[row + i][j], "ITEM"):
-                    self.surface.blit(tiles.sprites[self.structuregrid[row + i][j]].sprite.get_image(),
+                    self.surface.blit(tiles.tilesdict[self.structuregrid[row + i][j]].sprite.get_image(),
                                       np.array([j, row + i]) * TILE_SIZE)
 
     def decode(self, i, j, tiles):
@@ -241,7 +287,7 @@ class Chunk:
                                               percentages=[0.05, 0.1, 0.15, 0.7])
             else:
                 self.tilegrid[i][j] = tiles.code["ROCK"]
-        elif tiles.is_what(self.structuregrid[i][j], "FLOOR"):
+        elif tiles.is_what(self.structuregrid[i][j], "FLOOR") and not tiles.is_what(self.structuregrid[i][j], "FLOOR_SHADOW"):
             floor_noise = self.tilegrid[i][j]
             if 0 <= floor_noise - 0.1 < 0.2:
                 self.tilegrid[i][j] = compare(noise_value=floor_noise, starting_value=0.1, interval_percentage=0.2,

@@ -87,8 +87,8 @@ class Map:
         j = int(j - j // CHUNK_TILE_RATIO)
         if self.chunks[tuple(chunk_position)].structuregrid is not None:
             if self.tiles.is_what(self.chunks[tuple(chunk_position)].structuregrid[i][j], "ITEM"):
-                return self.tiles.sprites[self.chunks[tuple(chunk_position)].structuregrid[i][j]]
-        return self.tiles.sprites[self.chunks[tuple(chunk_position)].tilegrid[i][j]]
+                return self.tiles.tilesdict[self.chunks[tuple(chunk_position)].structuregrid[i][j]]
+        return self.tiles.tilesdict[self.chunks[tuple(chunk_position)].tilegrid[i][j]]
 
     def gen_chunks(self, chunk_positions):
         """
