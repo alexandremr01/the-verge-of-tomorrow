@@ -5,7 +5,8 @@ Enemy most common in the game
 import numpy as np
 
 from .enemy import Enemy
-from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE, EPSILON, FRAMES_TO_ENEMIES_TURN
+from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE
+from ...constants import EPSILON, FRAMES_TO_ENEMIES_TURN
 from ...setup import graphics_dict, sound_dict
 
 class Zombie(Enemy):
