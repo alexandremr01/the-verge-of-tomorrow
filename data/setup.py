@@ -17,20 +17,28 @@ def load_graphics():
     """
     player_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "player.png", (59, 45), 236, 45)
     zombie_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "zombie.png", (45, 45), 90, 45)
+    bat_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "bat.png", (64, 64), 256, 64)
     map_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker.png", (8, 8), 64, 72)
     map_night_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker_night.png", (8, 8), 64, 72)
     items_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "items.png", (32, 32), 352, 32)
     bullets_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "firebullet.png", (16, 16), 512, 272)
     status_bar_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "status_bar.png", (800, 100), 800, 100)
+    button_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "button.png", (34, 10), 68, 10)
+    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")
+
     title_graphics = [pygame.image.load(BASE_GRAPHICS_DIR + "title_1.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_2.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_3.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_4.png"),
                      pygame.image.load(BASE_GRAPHICS_DIR + "title_5.png")]
-    button_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "button.png", (34, 10), 68, 10)   
-    menu_about_graphics = pygame.image.load(BASE_GRAPHICS_DIR + "menu_about.png")
+    pause_button_graphics = [pygame.transform.scale(pygame.image.load(BASE_GRAPHICS_DIR + "black_pause.png"), (40, 40)),
+                             pygame.transform.scale(pygame.image.load(BASE_GRAPHICS_DIR + "white_pause.png"), (40, 40))]
+    quit_button_graphics = [pygame.transform.scale(pygame.image.load(BASE_GRAPHICS_DIR + "black_home.png"), (40, 40)),
+                            pygame.transform.scale(pygame.image.load(BASE_GRAPHICS_DIR + "white_home.png"), (40, 40))]
+
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
+    graphics_dict["bat"] = bat_graphics
     graphics_dict["map"] = map_graphics
     graphics_dict["map_night"] = map_night_graphics
     graphics_dict["items"] = items_graphics
@@ -39,6 +47,8 @@ def load_graphics():
     graphics_dict["title"] = title_graphics
     graphics_dict["button"] = button_graphics
     graphics_dict["about"] = menu_about_graphics
+    graphics_dict["pause_button"] = pause_button_graphics
+    graphics_dict["quit_button"] = quit_button_graphics
 
 def load_sound():
     """

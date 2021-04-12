@@ -11,8 +11,8 @@ from .utils import distance
 from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE, FRAMES_TO_ENEMIES_TURN
 from .constants import DAY_WAVE_DURATION, NIGHT_WAVE_DURATION
-from .constants import ZOMBIE_SCORE
 from .components.enemies.zombie import Zombie
+from .components.enemies.bat import Bat
 
 
 class DayNightFSM:
@@ -100,7 +100,10 @@ class Wave:
         spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
         new_enemy_pos = player_position + spawn_vector
 
-        self.enemies.append(Zombie(new_enemy_pos))  # TODO: use more enemies
+        if self.num_enemies_to_spawn%2 == 1:
+            self.enemies.append(Zombie(new_enemy_pos))
+        else:
+            self.enemies.append(Bat(new_enemy_pos))
         self.num_enemies_to_spawn -= 1
 
     def update_alive_enemies(self, player_position, hud):
@@ -113,14 +116,14 @@ class Wave:
             if enemy.health == 0:
                 self.num_enemies_killed += 1
                 self.total_enemies_killed += 1
-                hud.increase_score(ZOMBIE_SCORE)
+                hud.increase_score(enemy.score)
             elif distance(enemy.get_position(), player_position) > DESPAWN_DISTANCE:
                 self.num_enemies_to_spawn += 1
             else:
                 live_enemies.append(enemy)
         self.enemies = live_enemies
 
-    def update_enemies(self, player, time):
+    def update_enemies(self, player, time, validate_pos):
         """
         Updates enemies' states, spawning or despawning
         them if it is the case
@@ -129,7 +132,7 @@ class Wave:
         if self.enemiesTurn == FRAMES_TO_ENEMIES_TURN:
             for enemy in self.enemies:
                 if not enemy.sprite.rect.colliderect(player.sprite.rect):
-                    enemy.ai_move(player.get_position())
+                    enemy.ai_move(player.get_position(), validate_pos)
             self.enemiesTurn = 0
 
         self.update_alive_enemies(player.get_position(), player.get_hud())

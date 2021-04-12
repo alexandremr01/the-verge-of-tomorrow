@@ -11,7 +11,7 @@ from ..utils import RandomEventGenerator
 from . import player_state
 from .hud import Hud
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
-from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY 
+from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY
 from ..constants import TIME_BETWEEN_COLLISIONS
 from ..constants import TIME_BETWEEN_HEARTBEAT
 from ..setup import graphics_dict

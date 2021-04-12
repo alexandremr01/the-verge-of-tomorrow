@@ -7,7 +7,7 @@ import pygame
 
 from .base.state import State
 from ..utils import is_in_rect
-from ..constants import RED, ORANGE, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_SOUNDTRACK_DIR, TITLE_FRAMERATE, BASE_FONT_DIR
+from ..constants import BUTTON_RED, SCREEN_WIDTH, SCREEN_HEIGHT, BASE_SOUNDTRACK_DIR, TITLE_FRAMERATE, BASE_FONT_DIR
 from ..setup import sound_dict, graphics_dict
 
 class Select(State):
@@ -25,23 +25,23 @@ class Select(State):
         self.time = pygame.time.get_ticks()
         self.last_transition_title_time = 0
         self.counter_title = 0
-        
+
         self.button_up = graphics_dict['button'].get_image(0, (136, 40))
         self.button_down = graphics_dict['button'].get_image(1, (136, 40))
 
-        self.about_surface = font.render('About', False, RED)
+        self.about_surface = font.render('About', False, BUTTON_RED)
         about_button_center = (SCREEN_WIDTH // 2, 380)
         self.about_button_rect = self.button_up.get_rect(center=about_button_center)
         self.about_rect = self.about_surface.get_rect(center=about_button_center)
         self.about_button = self.button_up
 
-        self.manual_surface = font.render('Manual', False, RED)
+        self.manual_surface = font.render('Manual', False, BUTTON_RED)
         manual_button_center = (SCREEN_WIDTH // 2, 480)
         self.manual_button_rect = self.button_up.get_rect(center=manual_button_center)
         self.manual_rect = self.manual_surface.get_rect(center=manual_button_center)
         self.manual_button = self.button_up
 
-        self.play_surface = font.render('Play', False, RED)
+        self.play_surface = font.render('Play', False, BUTTON_RED)
         play_button_center = (SCREEN_WIDTH // 2, 580)
         self.play_button_rect = self.button_up.get_rect(center=play_button_center)
         self.play_rect = self.play_surface.get_rect(center=play_button_center)

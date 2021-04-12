@@ -11,6 +11,7 @@ from .screens.play import Play
 from .screens.manual import Manual
 from .screens.about import About
 from .screens.over import Over
+from .screens.pause import Pause
 from .screens.base.state_machine import StateMachine
 from .screens.base.screen_surface import ScreenSurface
 from .setup import load_graphics, load_sound, load_menu_music
@@ -38,7 +39,8 @@ class Game:
             'PLAY': Play(),
             'MANUAL': Manual(),
             'ABOUT': About(),
-            'OVER': Over()
+            'OVER': Over(),
+            'PAUSE': Pause()
         }
         self.state_machine = StateMachine(state_dict, 'TITLE')
 

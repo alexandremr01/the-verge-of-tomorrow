@@ -5,7 +5,8 @@ Enemy most common in the game
 import numpy as np
 
 from .enemy import Enemy
-from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE, EPSILON, FRAMES_TO_ENEMIES_TURN
+from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE, ZOMBIE_SCORE
+from ...constants import FRAMES_TO_ENEMIES_TURN, EPSILON
 from ...setup import graphics_dict, sound_dict
 
 class Zombie(Enemy):
@@ -16,6 +17,7 @@ class Zombie(Enemy):
         super().__init__(position, graphics_dict["zombie"].get_image(0))
         self.health = ZOMBIE_HEALTH
         self.velocity = ZOMBIE_VELOCITY*FRAMES_TO_ENEMIES_TURN
+        self.score = ZOMBIE_SCORE
         self.looking_angle = 0
         self.damage = ZOMBIE_DAMAGE
 

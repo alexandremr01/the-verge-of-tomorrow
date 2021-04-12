@@ -2,6 +2,9 @@
 __pycache__
 *.pyc
 
+# audio effects
+*.wav
+
 # vim aux files
 *.swp
 

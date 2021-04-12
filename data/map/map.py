@@ -11,6 +11,7 @@ from data.components.player import Player
 from .chunk import Chunk
 from .tile import Tiles
 from data.utils import get_grid_positions
+from data.utils import is_in_rect
 from data.components.item import ItemGenerator
 
 class Map:
@@ -162,11 +163,8 @@ class Map:
             walk_vector[1] -= self.player.get_velocity()
         new_position = self.player.get_position() + walk_vector
         if not self.chunks[tuple(self.get_chunk_position(new_position))].is_rendering:
-            tile = self.get_tile(new_position)
-            if not tile.collide:
+            if self.is_valid_position(new_position):
                 self.player.move(walk_vector[0], walk_vector[1])
-                if tile.item is not None:
-                    print("despawn and use item")
         else:
             self.player.move(walk_vector[0], walk_vector[1])
 
@@ -210,6 +208,19 @@ class Map:
             self.player.handle_collision(zombie, self.time)
             self.player.get_projectiles().handle_collision(zombie)
 
+    def is_valid_position(self, new_posic):
+        """
+        Determines whether the new position is occupied
+        or not
+        """
+        collision = False
+
+        collision = collision or self.get_tile(new_posic).collide
+        for zombie in self.wave.get_zombies():
+            collision = collision or is_in_rect(zombie.sprite.rect, new_posic)
+
+        return not collision
+
     def update(self):
         """
         Updates map object.
@@ -221,7 +232,7 @@ class Map:
         if self.wave.finished():
             self.wave.new_wave()
         self.update_chunks()
-        self.wave.update_enemies(self.player, self.time)
+        self.wave.update_enemies(self.player, self.time, lambda pos : not self.get_tile(pos).collide)
 
     def draw(self, screen):
         """
