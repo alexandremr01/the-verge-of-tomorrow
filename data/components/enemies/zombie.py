@@ -6,7 +6,7 @@ from math import pi, cos, sin
 import numpy as np
 
 from .enemy import Enemy
-from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE
+from ...constants import ZOMBIE_HEALTH, ZOMBIE_VELOCITY, ZOMBIE_DAMAGE, ZOMBIE_SCORE
 from ...constants import EPSILON, FRAMES_TO_ENEMIES_TURN, EPSILON
 from ...setup import graphics_dict, sound_dict
 
@@ -18,6 +18,7 @@ class Zombie(Enemy):
         super().__init__(position, graphics_dict["zombie"].get_image(0))
         self.health = ZOMBIE_HEALTH
         self.velocity = ZOMBIE_VELOCITY*FRAMES_TO_ENEMIES_TURN
+        self.score = ZOMBIE_SCORE
         self.looking_angle = 0
         self.damage = ZOMBIE_DAMAGE
 
@@ -47,17 +48,6 @@ class Zombie(Enemy):
         else:
             self.update_sprite(graphics_dict["zombie"].get_image(0), self.looking_angle)
         super().draw(screen)
-
-    def counter_clockwise_move(self, diff, validate_pos):
-        """
-        Movement vector is planned counter_clockwise
-        """
-        step = 5*pi/180
-        rotation_matrix = np.array([[cos(step), -sin(step)], [sin(step), cos(step)]])
-        while not validate_pos(self.curr_pos + diff*self.velocity):
-            diff = rotation_matrix.dot(diff)
-
-        return diff
 
     def clockwise_move(self, diff, validate_pos):
         """
