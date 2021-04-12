@@ -6,7 +6,7 @@ import pygame
 
 from .base.state import State
 from ..utils import is_in_rect
-from ..constants import WHITE, ORANGE, RED, BLACK, SCREEN_HEIGHT, SCREEN_WIDTH, BASE_FONT_DIR
+from ..constants import WHITE, BUTTON_RED, BLACK, SCREEN_HEIGHT, SCREEN_WIDTH, BASE_FONT_DIR
 from ..constants import MANUAL_SCREEN_INPUT_LAG
 from ..setup import graphics_dict, sound_dict
 
@@ -75,13 +75,13 @@ class Manual(State):
         self.button_up = graphics_dict['button'].get_image(0, (136, 40))
         self.button_down = graphics_dict['button'].get_image(1, (136, 40))
         
-        self.next_surface = font.render('NEXT', False, RED)
+        self.next_surface = font.render('NEXT', False, BUTTON_RED)
         next_button_center = (680, 35)
         self.next_button_rect = self.button_up.get_rect(center=next_button_center)
         self.next_rect = self.next_surface.get_rect(center=next_button_center)
         self.next_button = self.button_up
 
-        self.back_surface = font.render('BACK', False, RED)
+        self.back_surface = font.render('BACK', False, BUTTON_RED)
         back_button_center = (100, 35)
         self.back_button_rect = self.button_up.get_rect(center=back_button_center)
         self.back_rect = self.back_surface.get_rect(center=back_button_center)
@@ -133,6 +133,7 @@ class Manual(State):
             self.last_input_time = time
             if (is_in_rect(self.back_button_rect, 
                           pygame.mouse.get_pos()) and self.current_manual_page == 0):
+                sound_dict['beep'].play()          
                 self.next = 'SELECT'
                 self.clear_window = True
             elif (is_in_rect(self.next_button_rect, pygame.mouse.get_pos()) and 
