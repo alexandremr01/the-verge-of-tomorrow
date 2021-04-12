@@ -120,7 +120,7 @@ class Wave:
                 live_enemies.append(enemy)
         self.enemies = live_enemies
 
-    def update_enemies(self, player, time):
+    def update_enemies(self, player, time, validate_pos):
         """
         Updates enemies' states, spawning or despawning
         them if it is the case
@@ -129,7 +129,7 @@ class Wave:
         if self.enemiesTurn == FRAMES_TO_ENEMIES_TURN:
             for enemy in self.enemies:
                 if not enemy.sprite.rect.colliderect(player.sprite.rect):
-                    enemy.ai_move(player.get_position())
+                    enemy.ai_move(player.get_position(), validate_pos)
             self.enemiesTurn = 0
 
         self.update_alive_enemies(player.get_position(), player.get_hud())

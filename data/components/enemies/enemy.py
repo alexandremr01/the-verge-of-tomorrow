@@ -4,6 +4,7 @@ programmed to stalk and hurt him
 """
 
 import numpy as np
+from math import pi
 from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
 from ...constants import DEFAULT_ENEMY_DAMAGE, FRAMES_TO_ENEMIES_TURN
@@ -30,10 +31,10 @@ class Enemy(Entity):
         """
         return (np.array(self.curr_pos) - np.array(self.previous_pos))*FRAMES_PER_SECOND/FRAMES_TO_ENEMIES_TURN
 
-    def ai_move(self, target): # TODO: it only goes in the direction of target, should be smarter
+    def ai_move(self, target, validate_pos):
         """
-        Function responsible for making the enemy go towards
-        the player
+        Default trajectory planning for a enemy
+        It's simply going in the direction of the player
         param target: where it should go, supposedly the player position
         type target: numpy array
         """

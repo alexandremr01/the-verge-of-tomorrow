@@ -229,7 +229,7 @@ class Map:
         if self.wave.finished():
             self.wave.new_wave()
         self.update_chunks()
-        self.wave.update_enemies(self.player, self.time)
+        self.wave.update_enemies(self.player, self.time, lambda pos : not self.get_tile(pos).collide)
 
     def draw(self, screen):
         """
