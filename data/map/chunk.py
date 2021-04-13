@@ -160,14 +160,7 @@ class Chunk:
                                 self.structuregrid[i][j] = tiles.code["WALL_TOP_RIGHT"]
                             else:
                                 self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_RIGHT"]
-        # Puts shadow on tiles
-        for wall_position in vertical_walls:
-            if tiles.is_what(self.structuregrid[wall_position[0]][wall_position[1] + 1], "FLOOR"):
-                self.structuregrid[wall_position[0]][wall_position[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT"]
-            elif tiles.is_what(self.structuregrid[wall_position[0]][wall_position[1] + 1], "TERRAIN"):
-                np.random.seed(self.seed + wall_position[0] + wall_position[1])
-                self.structuregrid[wall_position[0]][wall_position[1] + 1] =\
-                    np.random.choice([tiles.code["GRASS_SHADOW_LEFT_1"], tiles.code["GRASS_SHADOW_LEFT_2"]])
+
         # Select which walls will be doors
         for i in range(len(vertical_walls)):
             f = vertical_walls[i]
@@ -177,18 +170,16 @@ class Chunk:
                         self.structuregrid[f[0] - 1][f[1]], "CORNER"):
                     if not tiles.is_what(self.structuregrid[s[0] + 1][s[1]], "CORNER") and not tiles.is_what(
                             self.structuregrid[s[0] - 1][s[1]], "CORNER"):
+                        vertical_walls.remove(f)
+                        vertical_walls.remove(s)
                         self.structuregrid[f[0]][f[1]] = tiles.code["WALL_BROKEN"]
                         self.structuregrid[s[0]][s[1]] = tiles.code["WALL_BROKEN"]
+                        for pos in [f, s]:
+                            if tiles.is_what(self.structuregrid[pos[0] + 1][pos[1]], "WALL"):
+                                self.structuregrid[pos[0] + 1][pos[1]] = tiles.code["WALL_BOTTOM_CORNER_BROKEN"]
+                            else:
+                                self.structuregrid[pos[0] - 1][pos[1]] = tiles.code["WALL_TOP_CORNER_BROKEN"]
                         break
-        # Puts shadow on tiles
-        for wall_position in horizontal_walls:
-            if tiles.is_what(self.structuregrid[wall_position[0] + 1][wall_position[1]], "FLOOR"):
-                self.structuregrid[wall_position[0] + 1][wall_position[1]] = tiles.code["CHECKERED_SHADOW_TOP"]
-            elif tiles.is_what(self.structuregrid[wall_position[0] + 1][wall_position[1]], "TERRAIN"):
-                np.random.seed(self.seed + wall_position[0] + wall_position[1])
-                self.structuregrid[wall_position[0] + 1][wall_position[1]] =\
-                    np.random.choice([tiles.code["GRASS_SHADOW_TOP_1"], tiles.code["GRASS_SHADOW_TOP_2"]])
-        # Select which walls will be doors
         for i in range(len(horizontal_walls)):
             f = horizontal_walls[i]
             s = horizontal_walls[i + 1]
@@ -197,10 +188,32 @@ class Chunk:
                         self.structuregrid[f[0]][f[1] - 1], "CORNER"):
                     if not tiles.is_what(self.structuregrid[s[0]][s[1] + 1], "CORNER") and not tiles.is_what(
                             self.structuregrid[s[0]][s[1] - 1], "CORNER"):
+                        horizontal_walls.remove(f)
+                        horizontal_walls.remove(s)
                         self.structuregrid[f[0]][f[1]] = tiles.code["WALL_BROKEN"]
                         self.structuregrid[s[0]][s[1]] = tiles.code["WALL_BROKEN"]
+                        for pos in [f, s]:
+                            if tiles.is_what(self.structuregrid[pos[0]][pos[1] + 1], "WALL"):
+                                self.structuregrid[pos[0]][pos[1] + 1] = tiles.code["WALL_RIGHT_CORNER_BROKEN"]
+                            else:
+                                self.structuregrid[pos[0]][pos[1] - 1] = tiles.code["WALL_LEFT_CORNER_BROKEN"]
                     break
+
         # Puts shadow on tiles
+        for wall_position in vertical_walls:
+            if tiles.is_what(self.structuregrid[wall_position[0]][wall_position[1] + 1], "FLOOR"):
+                self.structuregrid[wall_position[0]][wall_position[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT"]
+            elif tiles.is_what(self.structuregrid[wall_position[0]][wall_position[1] + 1], "TERRAIN"):
+                np.random.seed(self.seed + wall_position[0] + wall_position[1])
+                self.structuregrid[wall_position[0]][wall_position[1] + 1] = \
+                    np.random.choice([tiles.code["GRASS_SHADOW_LEFT_1"], tiles.code["GRASS_SHADOW_LEFT_2"]])
+        for wall_position in horizontal_walls:
+            if tiles.is_what(self.structuregrid[wall_position[0] + 1][wall_position[1]], "FLOOR"):
+                self.structuregrid[wall_position[0] + 1][wall_position[1]] = tiles.code["CHECKERED_SHADOW_TOP"]
+            elif tiles.is_what(self.structuregrid[wall_position[0] + 1][wall_position[1]], "TERRAIN"):
+                np.random.seed(self.seed + wall_position[0] + wall_position[1])
+                self.structuregrid[wall_position[0] + 1][wall_position[1]] = \
+                    np.random.choice([tiles.code["GRASS_SHADOW_TOP_1"], tiles.code["GRASS_SHADOW_TOP_2"]])
         for corner in corners:
             if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_TOP_LEFT"]:
                 if not tiles.is_what(self.structuregrid[corner[0] + 1][corner[1] + 1], "TERRAIN"):

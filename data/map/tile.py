@@ -151,14 +151,14 @@ class Tiles:
             64: Tile(Sprite((0, 0), graphics_dict["map"].get_image(33, (50, 50))), collide=True),
             65: Tile(Sprite((0, 0), graphics_dict["map"].get_image(36, (50, 50)), flip=(True, False)), collide=True),
 
-            66: Tile(Sprite((0, 0), graphics_dict["map"].get_image(29, (50, 50)), flip=(False, True)), collide=True),
+            66: Tile(Sprite((0, 0), graphics_dict["map"].get_image(29, (50, 50))), collide=True),
             67: Tile(Sprite((0, 0), graphics_dict["map"].get_image(1, (50, 50))), collide=True),
             68: Tile(Sprite((0, 0), graphics_dict["map"].get_image(21, (50, 50))), collide=True),
             69: Tile(Sprite((0, 0), graphics_dict["map"].get_image(1, (50, 50)), flip=(False, True)), collide=True),
             70: Tile(Sprite((0, 0), graphics_dict["map"].get_image(20, (50, 50))), collide=True),
-            71: Tile(Sprite((0, 0), graphics_dict["map"].get_image(25, (50, 50))), collide=True),
+            71: Tile(Sprite((0, 0), graphics_dict["map"].get_image(28, (50, 50))), collide=True),
             72: Tile(Sprite((0, 0), graphics_dict["map"].get_image(20, (50, 50)), flip=(True, False)), collide=True),
-            73: Tile(Sprite((0, 0), graphics_dict["map"].get_image(25, (50, 50)), flip=(True, False)), collide=True),
+            73: Tile(Sprite((0, 0), graphics_dict["map"].get_image(28, (50, 50)), flip=(True, False)), collide=True),
             74: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50)))),
 
             75: Tile(Sprite((0, 0), graphics_dict["map"].get_image(9, (50, 50)))),
