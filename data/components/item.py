@@ -1,6 +1,5 @@
 from data.components import player_state
 from data.utils import RandomEventGenerator
-from pygame.locals import K_1, K_2, K_3
 import pygame
 from . import weapon
 import numpy as np
@@ -39,7 +38,7 @@ class Skull(Item):
         print("Gerado skull")
 
     def get_sprite(self):
-        pass
+        return "ITEM_SKULL"
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STRONGER_EVENT, time)
@@ -51,7 +50,7 @@ class Health(Item):
         print("Gerado health")
 
     def get_sprite(self):
-        pass
+        return "ITEM_HEALTH"
 
     def apply_effect(self, player, time):
         player.health += 1
@@ -63,7 +62,7 @@ class BluePotion(Item):
         print("Gerado bp")
 
     def get_sprite(self):
-        pass
+        return "ITEM_BLUEPOTION"
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STOP_BLEEDING_EVENT, time)
@@ -75,7 +74,7 @@ class GreenPotion(Item):
         print("Gerado gp")
 
     def get_sprite(self):
-        pass
+        return "ITEM_GREENPOTION"
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STOP_SLOW_EVENT, time)
@@ -92,7 +91,7 @@ class Ammo(Item):
         self.generator = RandomEventGenerator(weapon_probs, null_event=weapon.Shotgun)
 
     def get_sprite(self):
-        pass
+        return "ITEM_AMMO"
 
     def apply_effect(self, player, time): # TODO: write weapon on screen
         weapon = self.generator.generate()
