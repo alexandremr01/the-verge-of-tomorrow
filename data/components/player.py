@@ -130,7 +130,7 @@ class Player(Entity):
         self.hud.set_status(self.state.get_state_name())
 
     def write(self, text, time, duration):
-        small_font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 26)
+        small_font = pygame.font.Font('./resources/fonts/ARCADE_N.TTF', 20)
         surface_text = small_font.render(text, False, BLACK)
         self.text_expiration_time = time + duration
         self.text = (surface_text, text)
