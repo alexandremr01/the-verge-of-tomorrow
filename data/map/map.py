@@ -172,6 +172,7 @@ class Map:
                 item = self.get_tile(new_position).item()
                 item.apply_effect(self.player, self.time)
                 i, j = self.get_tile(new_position, True)
+                chunk.structuregrid[i][j] = chunk.tilegrid[i][j]
                 chunk.surface.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite.get_image(),
                                    np.array([j, i]) * TILE_SIZE)
         else:
