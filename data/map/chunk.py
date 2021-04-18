@@ -16,6 +16,7 @@ class Chunk:
         self.structures = None
         self.seed = np.random.randint(0, 10000)
         self.surface = None
+        self.surface_night = None
         self.is_rendering = True
         self.terrain_step = 0
         self.terrain_steps = RENDER_STEPS
@@ -32,6 +33,7 @@ class Chunk:
         self.tilegrid = None
         self.structuregrid = None
         self.surface = None
+        self.surface_night = None
         self.structures = None
         self.structures_step = -1
         self.terrain_step = self.draw_step = 0
@@ -73,6 +75,7 @@ class Chunk:
         if self.terrain_step == 0:
             self.tilegrid = new_load
             self.surface = pygame.Surface(CHUNK_ARRAY)
+            self.surface_night = pygame.Surface(CHUNK_ARRAY)
         else:
             self.tilegrid = np.concatenate((self.tilegrid, new_load), axis=0)
 
@@ -280,9 +283,13 @@ class Chunk:
                 self.decode(row + i, j, tiles)
                 self.surface.blit(tiles.tilesdict[self.tilegrid[row + i][j]].sprite.get_image(),
                                   np.array([j, row + i]) * TILE_SIZE)
+                self.surface_night.blit(tiles.tilesdict[self.tilegrid[row + i][j]].sprite_night.get_image(),
+                                  np.array([j, row + i]) * TILE_SIZE)
                 if self.structuregrid is not None and tiles.is_what(self.structuregrid[row + i][j], "ITEM"):
-                    self.surface.blit(tiles.tilesdict[self.structuregrid[row + i][j]].sprite.get_image(),
+                    self.surface_night.blit(tiles.tilesdict[self.structuregrid[row + i][j]].sprite.get_image(),
                                       np.array([j, row + i]) * TILE_SIZE)
+
+
 
     def decode(self, i, j, tiles):
         if self.structuregrid is None or self.structuregrid[i][j] == 0:
