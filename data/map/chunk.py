@@ -219,6 +219,11 @@ class Chunk:
                 self.structuregrid[wall_position[0] + 1][wall_position[1]] = \
                     np.random.choice([tiles.code["GRASS_SHADOW_TOP_1"], tiles.code["GRASS_SHADOW_TOP_2"]])
         for corner in corners:
+            if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_TOP_LEFT"]:
+                if not tiles.is_what(self.structuregrid[corner[0] + 1][corner[1] + 1], "TERRAIN"):
+                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_TOP_LEFT_FULL"]
+                else:
+                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["GRASS_SHADOW_TOP_LEFT_FULL"]
             if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_TOP_RIGHT"]:
                 if not tiles.is_what(self.structuregrid[corner[0]][corner[1] + 1], "TERRAIN"):
                     self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT_CORNER"]
@@ -235,14 +240,12 @@ class Chunk:
                     self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_LEFT"]
                     self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_TOP_LEFT"]
                 else:
-                    self.structuregrid[corner[0] + 1][corner[1]] = tiles.code["GRASS_SHADOW_TOP_1"]
-                    self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["GRASS_SHADOW_LEFT_1"]
+                    if not self.structuregrid[corner[0] + 1][corner[1]] == tiles.code["GRASS_SHADOW_TOP_LEFT_FULL"]:
+                        self.structuregrid[corner[0] + 1][corner[1]] = tiles.code["GRASS_SHADOW_TOP_1"]
+                    if not self.structuregrid[corner[0]][corner[1] + 1] == tiles.code["GRASS_SHADOW_TOP_LEFT_FULL"]:
+                        self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["GRASS_SHADOW_LEFT_1"]
                     self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["GRASS_SHADOW_TOP_LEFT"]
-            if self.structuregrid[corner[0]][corner[1]] == tiles.code["WALL_TOP_LEFT"]:
-                if not tiles.is_what(self.structuregrid[corner[0] + 1][corner[1] + 1], "TERRAIN"):
-                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["CHECKERED_SHADOW_TOP_LEFT_FULL"]
-                else:
-                    self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["GRASS_SHADOW_TOP_LEFT_FULL"]
+
 
         # Generating items
         np.random.seed(self.seed)
