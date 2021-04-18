@@ -81,10 +81,10 @@ TIME_BETWEEN_HEARTBEAT = 2*1000  # milliseconds
 BULLET_VELOCITY = 10
 
 # Directories
-BASE_GRAPHICS_DIR = '../survival-game/resources/graphics/'
-BASE_SOUND_EFFECT_DIR = '../survival-game/resources/sound_effect/'
-BASE_SOUNDTRACK_DIR = '../survival-game/resources/soundtrack/'
-BASE_FONT_DIR = '../survival-game/resources/fonts/'
+BASE_GRAPHICS_DIR = '../the-verge-of-tomorrow/resources/graphics/'
+BASE_SOUND_EFFECT_DIR = '../the-verge-of-tomorrow/resources/sound_effect/'
+BASE_SOUNDTRACK_DIR = '../the-verge-of-tomorrow/resources/soundtrack/'
+BASE_FONT_DIR = '../the-verge-of-tomorrow/resources/fonts/'
 
 # Numeric
 EPSILON = 0.1
