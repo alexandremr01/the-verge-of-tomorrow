@@ -161,6 +161,7 @@ class Chunk:
                             else:
                                 self.structuregrid[i][j] = tiles.code["WALL_BOTTOM_RIGHT"]
 
+        number_of_directions = len(self.structures[position])
         # Select which walls will be doors
         for i in range(len(vertical_walls)):
             f = vertical_walls[i]
@@ -300,7 +301,8 @@ class Chunk:
                                               percentages=[0.05, 0.1, 0.15, 0.7])
             else:
                 self.tilegrid[i][j] = tiles.code["ROCK"]
-        elif tiles.is_what(self.structuregrid[i][j], "FLOOR") and not tiles.is_what(self.structuregrid[i][j], "FLOOR_SHADOW"):
+        elif (tiles.is_what(self.structuregrid[i][j], "FLOOR") or tiles.is_what(self.structuregrid[i][j], "ITEM"))\
+                and not tiles.is_what(self.structuregrid[i][j], "FLOOR_SHADOW"):
             floor_noise = self.tilegrid[i][j]
             if 0 <= floor_noise - 0.1 < 0.2:
                 self.tilegrid[i][j] = compare(noise_value=floor_noise, starting_value=0.1, interval_percentage=0.2,

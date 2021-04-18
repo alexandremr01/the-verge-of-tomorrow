@@ -98,9 +98,9 @@ class Tiles:
         self.tilesdict = {
             1: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50)))),
 
-            2: Tile(Sprite((0, 0), graphics_dict["map"].get_image(22, (50, 50)), initial_angle=-90)),
-            3: Tile(Sprite((0, 0), graphics_dict["map"].get_image(30, (50, 50)), initial_angle=-90)),
-            4: Tile(Sprite((0, 0), graphics_dict["map"].get_image(14, (50, 50)), initial_angle=-90, flip=(True, False))),
+            2: Tile(Sprite((0, 0), graphics_dict["map"].get_image(22, (50, 50)), initial_angle=90, flip=(False, True))),
+            3: Tile(Sprite((0, 0), graphics_dict["map"].get_image(30, (50, 50)), initial_angle=90, flip=(False, True))),
+            4: Tile(Sprite((0, 0), graphics_dict["map"].get_image(14, (50, 50)), initial_angle=90, flip=(False, True))),
             5: Tile(Sprite((0, 0), graphics_dict["map"].get_image(22, (50, 50)))),
             6: Tile(Sprite((0, 0), graphics_dict["map"].get_image(30, (50, 50)))),
             7: Tile(Sprite((0, 0), graphics_dict["map"].get_image(14, (50, 50)))),
@@ -129,8 +129,8 @@ class Tiles:
 
             40: Tile(Sprite((0, 0), graphics_dict["map"].get_image(11, (50, 50)))),
 
-            41: Tile(Sprite((0, 0), graphics_dict["map"].get_image(26, (50, 50)), initial_angle=-90, flip=(True, False))),
-            42: Tile(Sprite((0, 0), graphics_dict["map"].get_image(18, (50, 50)), initial_angle=-90, flip=(True, False))),
+            41: Tile(Sprite((0, 0), graphics_dict["map"].get_image(26, (50, 50)), initial_angle=90, flip=(False, True))),
+            42: Tile(Sprite((0, 0), graphics_dict["map"].get_image(18, (50, 50)), initial_angle=90, flip=(False, True))),
             43: Tile(Sprite((0, 0), graphics_dict["map"].get_image(26, (50, 50)))),
             44: Tile(Sprite((0, 0), graphics_dict["map"].get_image(18, (50, 50)))),
             45: Tile(Sprite((0, 0), graphics_dict["map"].get_image(3, (50, 50)))),

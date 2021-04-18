@@ -76,7 +76,7 @@ class Map:
             quadrant[3] = RIGHT_RECT.collidepoint(dif)
         return (np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])).astype(int)
 
-    def get_tile(self, position=None):
+    def get_tile(self, position=None, getposition=False):
         if position is None:
             player_position = self.player.get_position()
         else:
@@ -86,6 +86,8 @@ class Map:
         j, i = position_in_chunk // TILE_SIZE
         i = int(i - i // CHUNK_TILE_RATIO)
         j = int(j - j // CHUNK_TILE_RATIO)
+        if getposition:
+            return i, j
         if self.chunks[tuple(chunk_position)].structuregrid is not None:
             if self.tiles.is_what(self.chunks[tuple(chunk_position)].structuregrid[i][j], "ITEM"):
                 return self.tiles.tilesdict[self.chunks[tuple(chunk_position)].structuregrid[i][j]]
@@ -162,9 +164,15 @@ class Map:
         if self.is_moving[K_w]:
             walk_vector[1] -= self.player.get_velocity()
         new_position = self.player.get_position() + walk_vector
-        if not self.chunks[tuple(self.get_chunk_position(new_position))].is_rendering:
+        chunk = self.chunks[tuple(self.get_chunk_position(new_position))]
+        if not chunk.is_rendering:
             if self.is_valid_position(new_position):
                 self.player.move(walk_vector[0], walk_vector[1])
+            if self.get_tile(new_position).item is not None:
+                print("use item")
+                i, j = self.get_tile(new_position, True)
+                chunk.surface.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite.get_image(),
+                                   np.array([j, i]) * TILE_SIZE)
         else:
             self.player.move(walk_vector[0], walk_vector[1])
 
@@ -213,9 +221,8 @@ class Map:
         Determines whether the new position is occupied
         or not
         """
-        collision = False
 
-        collision = collision or self.get_tile(new_posic).collide
+        collision = self.get_tile(new_posic).collide
         for zombie in self.wave.get_zombies():
             collision = collision or is_in_rect(zombie.sprite.rect, new_posic)
 
