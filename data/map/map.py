@@ -170,7 +170,10 @@ class Map:
                 self.player.move(walk_vector[0], walk_vector[1])
             if self.get_tile(new_position).item is not None:
                 item = self.get_tile(new_position).item()
-                item.apply_effect(self.player, self.time)
+                if item.is_potion():
+                    self.player.bag.set_item(item, self.time)
+                else:
+                    item.apply_effect(self.player, self.time)
                 i, j = self.get_tile(new_position, True)
                 chunk.structuregrid[i][j] = chunk.tilegrid[i][j]
                 chunk.surface.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite.get_image(),
@@ -189,15 +192,9 @@ class Map:
             if left_mouse_button:
                 self.player.shoot(self.time)
         for event in events:
-
-            # BEGIN: carteação de teste
             if event.type == KEYDOWN:
-                if event.key == K_r:
-                    itemgen = ItemGenerator()
-                    self.item = itemgen.generate_item()
                 if event.key == K_t:
-                    self.item.apply_effect(self.player, self.time)
-            # END: carteação de teste
+                    self.player.bag.use(self.player, self.time)
 
             if event.type == KEYDOWN:
                 if event.key == K_LSHIFT:

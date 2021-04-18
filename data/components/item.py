@@ -8,11 +8,11 @@ from ..constants import PLAYER_INITIAL_HEALTH, BLACK
 class ItemGenerator:
     def __init__(self):
         item_probs = {
-            # Skull: 0.1,
-            # Health: 0.1,
-            # BluePotion: 0.30,
-            # GreenPotion: 0.30,
-            Ammo: 0.9
+            Skull: 0.1,
+            Health: 0.1,
+            BluePotion: 0.30,
+            GreenPotion: 0.30,
+            Ammo: 0.2
         }
         self.debuf_generator = RandomEventGenerator(item_probs, null_event=Ammo)
 
@@ -28,6 +28,9 @@ class Item:
 
     def get_sprite(self):
         pass
+
+    def is_potion(self):
+        return False
 
     def apply_effect(self, player, time):
         pass
@@ -51,6 +54,9 @@ class Health(Item):
     def get_sprite(self):
         return "ITEM_HEALTH"
 
+    def is_potion(self):
+        return True
+
     def apply_effect(self, player, time):
         player.health = min(player.health + 1, PLAYER_INITIAL_HEALTH)
 
@@ -62,6 +68,9 @@ class BluePotion(Item):
     def get_sprite(self):
         return "ITEM_BLUEPOTION"
 
+    def is_potion(self):
+        return True
+
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STOP_BLEEDING_EVENT, time)
 
@@ -72,6 +81,9 @@ class GreenPotion(Item):
 
     def get_sprite(self):
         return "ITEM_GREENPOTION"
+
+    def is_potion(self):
+        return True
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STOP_SLOW_EVENT, time)
