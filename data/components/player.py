@@ -10,7 +10,7 @@ from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d
 from ..utils import RandomEventGenerator
 from . import player_state
 from .hud import Hud
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, BLACK
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY
 from ..constants import TIME_BETWEEN_COLLISIONS
 from ..constants import TIME_BETWEEN_HEARTBEAT
@@ -43,6 +43,9 @@ class Player(Entity):
         self.last_heartbeat_time = 0
         self.weapons = {"Uzi": Uzi(),"AK47" : AK47(),"Shotgun" : Shotgun()}
         self.current_weapon_name = "Uzi"
+
+        self.text = None
+        self.text_expiration_time = 0
 
         self.bullets = {}
         for weapon_name in self.weapons:
@@ -113,6 +116,9 @@ class Player(Entity):
         return self.state.get_velocity()
 
     def update_state(self, time):
+        if time > self.text_expiration_time:
+            self.text = None
+
         if self.health <= 1 and time - self.last_heartbeat_time >= TIME_BETWEEN_HEARTBEAT:
             self.last_heartbeat_time = time
             sound_dict['heartbeat'].play()
@@ -122,6 +128,12 @@ class Player(Entity):
         self.state.update(time)
         self.hud.set_health(self.health)
         self.hud.set_status(self.state.get_state_name())
+
+    def write(self, text, time, duration):
+        small_font = pygame.font.Font('./resources/fonts/ARCADECLASSIC.TTF', 26)
+        surface_text = small_font.render(text, False, BLACK)
+        self.text_expiration_time = time + duration
+        self.text = (surface_text, text)
 
     def set_running(self, time):
         """
@@ -181,6 +193,8 @@ class Player(Entity):
         Draws the player's animation
         """
         super().draw(screen)
+        if self.text is not None:
+            screen.blit_rel(self.text[0], (SCREEN_WIDTH/2 - 20 - len(self.text[1]), SCREEN_HEIGHT/2 - 50))
         self.projectiles.draw(screen)
         self.hud.draw(screen)
 
