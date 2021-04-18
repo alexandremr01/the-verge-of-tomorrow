@@ -1,7 +1,6 @@
-from ..components.item import Skull
+from ..components.item import Skull, Health, BluePotion, GreenPotion, Ammo
 from ..setup import graphics_dict
 from ..components.base.sprite import Sprite
-
 
 class Tile:
     """
@@ -165,11 +164,11 @@ class Tiles:
             76: Tile(Sprite((0, 0), graphics_dict["map"].get_image(8, (50, 50)))),
             77: Tile(Sprite((0, 0), graphics_dict["map"].get_image(10, (50, 50)))),
 
-            90: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), item=1),
-            91: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), item=2),
-            92: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), item=3),
-            93: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), item=4),
-            94: Tile(Sprite((0, 0), graphics_dict["map"].get_image(37, (50, 50))), item=5)
+            90: Tile(Sprite((0, 0), graphics_dict["items"].get_image(3, (50, 50)).convert_alpha()), item=Skull),
+            91: Tile(Sprite((0, 0), graphics_dict["items"].get_image(2, (50, 50)).convert_alpha()), item=Health),
+            92: Tile(Sprite((0, 0), graphics_dict["items"].get_image(0, (50, 50)).convert_alpha()), item=BluePotion),
+            93: Tile(Sprite((0, 0), graphics_dict["items"].get_image(1, (50, 50)).convert_alpha()), item=GreenPotion),
+            94: Tile(Sprite((0, 0), graphics_dict["items"].get_image(10, (50, 50)).convert_alpha()), item=Ammo)
         }
 
     def is_what(self, value, name):

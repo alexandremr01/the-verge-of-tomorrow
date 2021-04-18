@@ -23,6 +23,7 @@ class Chunk:
         self.structures_steps = 0
         self.draw_step = 0
         self.draw_steps = RENDER_STEPS
+        self.item_generator = ItemGenerator()
 
     def is_rendered(self):
         return self.tilegrid is not None
@@ -242,7 +243,9 @@ class Chunk:
         # Generating items
         np.random.seed(self.seed)
         item_position = floor[np.random.randint(len(floor))]
-        self.structuregrid[item_position[0]][item_position[1]] = tiles.code["ITEM_SKULL"]  # Should generate random item
+
+        item = self.item_generator.generate_item()
+        self.structuregrid[item_position[0]][item_position[1]] = tiles.code[item.get_sprite()]  # Should generate random item
 
     def render(self, generator, tiles):
         self.is_rendering = True
