@@ -5,6 +5,9 @@ import pygame
 import numpy as np
 from ..constants import PLAYER_INITIAL_HEALTH, BLACK
 
+POTION_TEXT_DURATION = 500
+WEAPON_TEXT_DURATION = 1000
+
 class ItemGenerator:
     def __init__(self):
         item_probs = {
@@ -59,6 +62,9 @@ class Health(Item):
 
     def apply_effect(self, player, time):
         player.health = min(player.health + 1, PLAYER_INITIAL_HEALTH)
+        # Write in screen
+        text = '+ HEALTH'
+        player.write(text, time, WEAPON_TEXT_DURATION)
 
 
 class BluePotion(Item):
@@ -73,6 +79,9 @@ class BluePotion(Item):
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STOP_BLEEDING_EVENT, time)
+        # Write in screen
+        text = 'STOP BLEEDING'
+        player.write(text, time, WEAPON_TEXT_DURATION)
 
 
 class GreenPotion(Item):
@@ -87,8 +96,11 @@ class GreenPotion(Item):
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STOP_SLOW_EVENT, time)
+        # Write in screen
+        text = 'STOP SLOW'
+        player.write(text, time, WEAPON_TEXT_DURATION)
 
-WEAPON_TEXT_DURATION = 1000
+
 class Ammo(Item):
     def __init__(self):
         super().__init__()
