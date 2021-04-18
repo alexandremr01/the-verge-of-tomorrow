@@ -4,6 +4,7 @@ in many classes
 """
 import numpy as np
 import random
+import math
 
 def is_in_rect(rect, pos):
     """
@@ -46,6 +47,20 @@ def compare(noise_value, starting_value, interval_percentage, slices, percentage
             return s[1]
         carry += percentages[s[0]] * interval_percentage
 
+def rotate(origin, point, angle):
+    """
+    Rotate a point counterclockwise by a given angle around a given origin.
+
+    The angle should be given in radians.
+    """
+    ox, oy = origin
+    px, py = point
+
+    angle = np.radians(angle)
+
+    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+    return qx, qy
 
 class RandomEventGenerator:
     """

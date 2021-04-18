@@ -13,6 +13,7 @@ from .chunk import Chunk
 from .tile import Tiles
 from data.utils import get_grid_positions
 from data.utils import is_in_rect
+from ..setup import graphics_dict
 from data.components.item import ItemGenerator
 
 class Map:
@@ -239,7 +240,7 @@ class Map:
         self.turn.update(self.time)
         self.update_positions()
         self.player.update_state(self.time)
-        self.player.update_direction()
+        self.player.update_direction(not self.turn.is_day())
         if self.wave.finished():
             self.wave.new_wave()
         self.update_chunks()
@@ -259,8 +260,8 @@ class Map:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
         screen.center_on_player(self.player.get_position())
-        self.player.draw(screen)
 
+        self.player.draw(screen, self.turn.is_day())
 
 
 class DayNightFSM:

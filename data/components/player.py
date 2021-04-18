@@ -7,7 +7,7 @@ import pygame
 import numpy as np
 from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d
 
-from ..utils import RandomEventGenerator
+from ..utils import RandomEventGenerator, rotate
 from . import player_state
 from .hud import Hud
 from .bag import Bag
@@ -49,6 +49,12 @@ class Player(Entity):
         self.text_expiration_time = 0
 
         self.bag = Bag(graphics_dict['items'], graphics_dict['bag'])
+
+        self.original_polygon_points = np.array([(-220,-220), (SCREEN_WIDTH, -220), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2), (SCREEN_WIDTH+220, SCREEN_HEIGHT+220), (-220, SCREEN_HEIGHT+220)])
+        self.polygon_points = (self.original_polygon_points)
+        self.mask = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA, 32).convert_alpha()
+        pygame.draw.polygon(self.mask, BLACK, self.polygon_points)
+        self.last_angle = 0
 
         self.bullets = {}
         for weapon_name in self.weapons:
@@ -151,7 +157,7 @@ class Player(Entity):
         """
         self.state.send_event(player_state.STOP_RUN_EVENT, time)
 
-    def update_direction(self):
+    def update_direction(self, is_night):
         """
         Updates the current player's direction.
         """
@@ -160,8 +166,17 @@ class Player(Entity):
         y_coordinate = mouse_y - (SCREEN_HEIGHT // 2)
         angle = int(np.degrees(np.arctan2(y_coordinate, x_coordinate)))
         self.direction = -angle
+
+        for i in range(len(self.original_polygon_points)):
+            self.polygon_points[i] = rotate((SCREEN_WIDTH/2, SCREEN_HEIGHT/2), self.original_polygon_points[i], (angle-self.last_angle))
+        self.mask = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA, 32).convert_alpha()
+
+        pygame.draw.polygon(self.mask, BLACK, self.polygon_points)
+
         self.update_sprite(self.current_weapon, -angle)
         self.projectiles.update()
+        self.last_angle = angle
+
 
     def shoot(self, time):
         """
@@ -192,14 +207,18 @@ class Player(Entity):
         for weapon_name in self.weapons:
             self.hud.set_ammo(self.weapons[weapon_name], self.bullets[weapon_name])
 
-    def draw(self, screen):
+    def draw(self, screen, is_day):
         """
         Draws the player's animation
         """
+        if not is_day:
+            screen.blit_rel(self.mask, (0, 0))
         super().draw(screen)
+
         if self.text is not None:
             screen.blit_rel(self.text[0], (SCREEN_WIDTH/2 - 20 - len(self.text[1]), SCREEN_HEIGHT/2 - 50))
         self.projectiles.draw(screen)
+
         self.hud.draw(screen)
         self.bag.draw(screen)
 
