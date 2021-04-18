@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_t
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_q
 from random import randint
 from opensimplex import OpenSimplex
 
@@ -193,7 +193,7 @@ class Map:
                 self.player.shoot(self.time)
         for event in events:
             if event.type == KEYDOWN:
-                if event.key == K_t:
+                if event.key == K_q:
                     self.player.bag.use(self.player, self.time)
 
             if event.type == KEYDOWN:
