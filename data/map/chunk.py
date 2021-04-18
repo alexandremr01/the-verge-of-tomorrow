@@ -286,6 +286,8 @@ class Chunk:
                 self.surface_night.blit(tiles.tilesdict[self.tilegrid[row + i][j]].sprite_night.get_image(),
                                   np.array([j, row + i]) * TILE_SIZE)
                 if self.structuregrid is not None and tiles.is_what(self.structuregrid[row + i][j], "ITEM"):
+                    self.surface.blit(tiles.tilesdict[self.structuregrid[row + i][j]].sprite.get_image(),
+                                            np.array([j, row + i]) * TILE_SIZE)
                     self.surface_night.blit(tiles.tilesdict[self.structuregrid[row + i][j]].sprite.get_image(),
                                       np.array([j, row + i]) * TILE_SIZE)
 
