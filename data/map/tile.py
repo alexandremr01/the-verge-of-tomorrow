@@ -7,8 +7,9 @@ class Tile:
     Individual tile with name, sprite and walkable flag.
     """
 
-    def __init__(self, sprite, collide=False, item=None):
+    def __init__(self, sprite, sprite_night=None, collide=False, item=None):
         self.sprite = sprite
+        self.sprite_night = sprite_night
         self.collide = collide
         self.item = item
 
@@ -28,16 +29,17 @@ class Tiles:
                      "GRASS_SHADOW_LEFT_2": 6,
                      "GRASS_SHADOW_LEFT_CORNER": 7,
                      "GRASS_SHADOW_TOP_LEFT": 8,
+                     "GRASS_SHADOW_TOP_LEFT_FULL": 9,
 
-                     "GRASS_DARKLEAFS_1": 9,
-                     "GRASS_DARKLEAFS_2": 10,
+                     "GRASS_DARKLEAFS_1": 10,
+                     "GRASS_DARKLEAFS_2": 11,
 
-                     "GRASS_BRIGHTLEAFS_1": 11,
-                     "GRASS_BRIGHTLEAFS_2": 12,
-                     "GRASS_BRIGHTLEAFS_3": 13,
-                     "GRASS_BRIGHTLEAFS_4": 14,
+                     "GRASS_BRIGHTLEAFS_1": 12,
+                     "GRASS_BRIGHTLEAFS_2": 13,
+                     "GRASS_BRIGHTLEAFS_3": 14,
+                     "GRASS_BRIGHTLEAFS_4": 15,
 
-                     "ROCK": 15,
+                     "ROCK": 16,
 
                      "ROAD_HORIZONTAL_PLAIN": 20,
                      "ROAD_HORIZONTAL_TOP": 21,
@@ -104,16 +106,17 @@ class Tiles:
             6: Tile(Sprite((0, 0), graphics_dict["map"].get_image(5, (50, 50)))),
             7: Tile(Sprite((0, 0), graphics_dict["map"].get_image(6, (50, 50)))),
             8: Tile(Sprite((0, 0), graphics_dict["map"].get_image(7, (50, 50)))),
+            9: Tile(Sprite((0, 0), graphics_dict["map"].get_image(55, (50, 50)))),
 
-            9: Tile(Sprite((0, 0), graphics_dict["map"].get_image(8, (50, 50)))),
-            10: Tile(Sprite((0, 0), graphics_dict["map"].get_image(9, (50, 50)))),
+            10: Tile(Sprite((0, 0), graphics_dict["map"].get_image(8, (50, 50)))),
+            11: Tile(Sprite((0, 0), graphics_dict["map"].get_image(9, (50, 50)))),
 
-            11: Tile(Sprite((0, 0), graphics_dict["map"].get_image(10, (50, 50)))),
-            12: Tile(Sprite((0, 0), graphics_dict["map"].get_image(11, (50, 50)))),
-            13: Tile(Sprite((0, 0), graphics_dict["map"].get_image(12, (50, 50)))),
-            14: Tile(Sprite((0, 0), graphics_dict["map"].get_image(13, (50, 50)))),
+            12: Tile(Sprite((0, 0), graphics_dict["map"].get_image(10, (50, 50)))),
+            13: Tile(Sprite((0, 0), graphics_dict["map"].get_image(11, (50, 50)))),
+            14: Tile(Sprite((0, 0), graphics_dict["map"].get_image(12, (50, 50)))),
+            15: Tile(Sprite((0, 0), graphics_dict["map"].get_image(13, (50, 50)))),
 
-            15: Tile(Sprite((0, 0), graphics_dict["map"].get_image(14, (50, 50))), collide=True),
+            16: Tile(Sprite((0, 0), graphics_dict["map"].get_image(14, (50, 50))), collide=True),
 
             20: Tile(Sprite((0, 0), graphics_dict["map"].get_image(49, (50, 50)))),
             21: Tile(Sprite((0, 0), graphics_dict["map"].get_image(57, (50, 50)))),
