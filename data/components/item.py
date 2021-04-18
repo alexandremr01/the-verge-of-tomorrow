@@ -97,7 +97,7 @@ class Ammo(Item):
         player.update_ammo()
 
         # Write in screen
-        text = str(gen_ammo) + '   ' + weapon.name
+        text = '+' + str(gen_ammo) + ' ' + weapon.name
         player.write(text, time, WEAPON_TEXT_DURATION)
 
 
