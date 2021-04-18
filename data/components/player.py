@@ -10,6 +10,7 @@ from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d
 from ..utils import RandomEventGenerator
 from . import player_state
 from .hud import Hud
+from .bag import Bag
 from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, BLACK
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY
 from ..constants import TIME_BETWEEN_COLLISIONS
@@ -46,6 +47,8 @@ class Player(Entity):
 
         self.text = None
         self.text_expiration_time = 0
+
+        self.bag = Bag(graphics_dict['items'])
 
         self.bullets = {}
         for weapon_name in self.weapons:
@@ -118,6 +121,7 @@ class Player(Entity):
     def update_state(self, time):
         if time > self.text_expiration_time:
             self.text = None
+        self.bag.update(time)
 
         if self.health <= 1 and time - self.last_heartbeat_time >= TIME_BETWEEN_HEARTBEAT:
             self.last_heartbeat_time = time
@@ -197,6 +201,7 @@ class Player(Entity):
             screen.blit_rel(self.text[0], (SCREEN_WIDTH/2 - 20 - len(self.text[1]), SCREEN_HEIGHT/2 - 50))
         self.projectiles.draw(screen)
         self.hud.draw(screen)
+        self.bag.draw(screen)
 
     def hurt(self, damage):
         """
