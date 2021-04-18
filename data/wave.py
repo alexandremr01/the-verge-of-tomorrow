@@ -10,47 +10,8 @@ import numpy as np
 from .utils import distance
 from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE, FRAMES_TO_ENEMIES_TURN
-from .constants import DAY_WAVE_DURATION, NIGHT_WAVE_DURATION
 from .components.enemies.zombie import Zombie
 from .components.enemies.bat import Bat
-
-
-class DayNightFSM:
-    def __init__(self):
-        self._state = Day()
-
-    def update(self):
-        next_state = self._state.update()
-        if next_state is not None:
-            self._state = next_state
-
-    def get_state(self):
-        return type(self._state)
-
-
-class Day:
-    def __init__(self):
-        self.duration = 0
-        # print("Day")
-
-    def update(self):
-        if self.duration == DAY_WAVE_DURATION:
-            return Night()
-        self.duration += 1
-        return None
-
-
-class Night:
-    def __init__(self):
-        self.duration = 0
-        # print("Night")
-
-    def update(self):
-        if self.duration == NIGHT_WAVE_DURATION:
-            return Day()
-        self.duration += 1
-        return None
-
 
 class Wave:
     """
@@ -71,7 +32,6 @@ class Wave:
         self.enemies = []
         self.wave_over = True
 
-        self.current_turn = DayNightFSM()
         self.new_wave()
 
     def new_wave(self):
@@ -84,13 +44,9 @@ class Wave:
         self.current_wave += 1
 
         # print("Wave " + str(self.current_wave))
-        self.current_turn.update()
         self.num_enemies_killed = 0
         self.current_wave_num_enemies = self.current_wave * ENEMIES_INCREMENT_PER_WAVE
         self.num_enemies_to_spawn = self.current_wave_num_enemies
-
-    def is_night(self):
-        return self.current_turn.get_state() == Night
 
     def generate_enemy(self, player_position):
         """
