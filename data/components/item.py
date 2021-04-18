@@ -91,11 +91,14 @@ class Ammo(Item):
             weapon_probs[weapon] = prob
         weapon = RandomEventGenerator(weapon_probs, null_event=player.weapons[player.current_weapon_name]).generate()
 
-        # Write in screen
-        player.write(weapon.name, time, WEAPON_TEXT_DURATION)
-
         # Generate ammo
-        new_ammo = player.bullets[weapon.name] + weapon.max_ammo / 5
-        player.bullets[weapon.name] = int(np.floor(min(weapon.max_ammo, new_ammo)))
+        gen_ammo = int(weapon.max_ammo / 5)
+        player.bullets[weapon.name] = min(weapon.max_ammo, player.bullets[weapon.name] + gen_ammo)
         player.update_ammo()
+
+        # Write in screen
+        text = str(gen_ammo) + '   ' + weapon.name
+        player.write(text, time, WEAPON_TEXT_DURATION)
+
+
 
