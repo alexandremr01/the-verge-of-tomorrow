@@ -84,7 +84,7 @@ class Ammo(Item):
     def get_sprite(self):
         return "ITEM_AMMO"
 
-    def apply_effect(self, player, time): # TODO: write weapon on screen
+    def apply_effect(self, player, time):
         weapon_probs = {}
         prob = 1.0 / len(player.weapons)
         for weapon in player.weapons.values():

@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import K_1, K_2, K_3
 from ..constants import BLACK
 from data.components.weapon import Uzi, Shotgun, AK47
 
