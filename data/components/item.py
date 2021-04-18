@@ -3,6 +3,7 @@ from data.utils import RandomEventGenerator
 import pygame
 from . import weapon
 import numpy as np
+from ..constants import PLAYER_INITIAL_HEALTH
 
 class ItemGenerator:
     def __init__(self):
@@ -53,7 +54,7 @@ class Health(Item):
         return "ITEM_HEALTH"
 
     def apply_effect(self, player, time):
-        player.health += 1
+        player.health = min(player.health + 1, PLAYER_INITIAL_HEALTH)
 
 
 class BluePotion(Item):
@@ -95,6 +96,6 @@ class Ammo(Item):
 
     def apply_effect(self, player, time): # TODO: write weapon on screen
         weapon = self.generator.generate()
-        player.bullets[weapon] = int(np.floor(min(weapon.get_max_ammo(), player.bullets[weapon] + weapon.get_max_ammo() / 5)))
+        player.bullets[weapon] = int(np.floor(min(weapon.max_ammo, player.bullets[weapon] + weapon.max_ammo / 5)))
         player.update_ammo()
 

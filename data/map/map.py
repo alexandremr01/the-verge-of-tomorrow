@@ -169,7 +169,8 @@ class Map:
             if self.is_valid_position(new_position):
                 self.player.move(walk_vector[0], walk_vector[1])
             if self.get_tile(new_position).item is not None:
-                print("use item")
+                item = self.get_tile(new_position).item()
+                item.apply_effect(self.player, self.time)
                 i, j = self.get_tile(new_position, True)
                 chunk.surface.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite.get_image(),
                                    np.array([j, i]) * TILE_SIZE)
