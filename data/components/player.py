@@ -11,7 +11,7 @@ from ..utils import RandomEventGenerator, rotate
 from . import player_state
 from .hud import Hud
 from .bag import Bag
-from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, BLACK
+from ..constants import SCREEN_WIDTH, SCREEN_HEIGHT, BLACK, WHITE
 from ..constants import PLAYER_INITIAL_HEALTH, PLAYER_INITIAL_VELOCITY
 from ..constants import TIME_BETWEEN_COLLISIONS
 from ..constants import TIME_BETWEEN_HEARTBEAT
@@ -44,6 +44,8 @@ class Player(Entity):
         self.last_heartbeat_time = 0
         self.weapons = {"Uzi": Uzi(),"AK47" : AK47(),"Shotgun" : Shotgun()}
         self.current_weapon_name = "Uzi"
+        self.small_font = pygame.font.Font('./resources/fonts/ARCADE_N.TTF', 20)
+
 
         self.text = None
         self.text_expiration_time = 0
@@ -140,10 +142,8 @@ class Player(Entity):
         self.hud.set_status(self.state.get_state_name())
 
     def write(self, text, time, duration):
-        small_font = pygame.font.Font('./resources/fonts/ARCADE_N.TTF', 20)
-        surface_text = small_font.render(text, False, BLACK)
         self.text_expiration_time = time + duration
-        self.text = (surface_text, text)
+        self.text = text
 
     def set_running(self, time):
         """
@@ -216,7 +216,13 @@ class Player(Entity):
         super().draw(screen)
 
         if self.text is not None:
-            screen.blit_rel(self.text[0], (SCREEN_WIDTH/2 - 20 - len(self.text[1]), SCREEN_HEIGHT/2 - 50))
+            if is_day:
+                surface_text = self.small_font.render(self.text, False, BLACK)
+                screen.blit_rel(surface_text, (SCREEN_WIDTH/2 - 20 - len(self.text), SCREEN_HEIGHT/2 - 50))
+            else:
+                surface_text = self.small_font.render(self.text, False, WHITE)
+                screen.blit_rel(surface_text, (SCREEN_WIDTH/2 - 20 - len(self.text), SCREEN_HEIGHT/2 - 50))
+
         self.projectiles.draw(screen)
 
         self.hud.draw(screen)
