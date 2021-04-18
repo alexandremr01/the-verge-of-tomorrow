@@ -102,6 +102,8 @@ class TiredState(State):
             return BleedingState(time)
         if event == SLOW_EVENT:
             return SlowState(time)
+        if event == STRONGER_EVENT:
+            return StrongState(time)
 
     def get_name(self):
         return "Tired"
@@ -114,6 +116,8 @@ class RunningState(State):
     def send_event(self, event, time):
         if event == STOP_RUN_EVENT:
             return TiredState(time)
+        if event == STRONGER_EVENT:
+            return StrongState(time)
 
     def update(self, time):
         if time - self.start_time > MAX_RUNNING_TIME:
@@ -134,6 +138,8 @@ class BleedingState(State):
     def send_event(self, event, time):
         if event == STOP_BLEEDING_EVENT:
             return NeutralState()
+        if event == STRONGER_EVENT:
+            return StrongState(time)
 
     def update(self, time):
         if time - self.start_time > MAX_BLEEDING_TIME:
@@ -151,6 +157,8 @@ class SlowState(State):
     def send_event(self, event, time):
         if event == STOP_SLOW_EVENT:
             return NeutralState()
+        if event == STRONGER_EVENT:
+            return StrongState(time)
 
     def update(self, time):
         if time - self.start_time > MAX_SLOW_TIME:
@@ -191,7 +199,7 @@ class StrongRunState(State):
 
     def send_event(self, event, time):
         if event == STOP_RUN_EVENT:
-            return StrongState(time)
+            return StrongState(self.start_strong_time)
 
     def update(self, time):
         if time - self.start_time > MAX_STRONG_RUNNING_TIME:

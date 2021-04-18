@@ -1,6 +1,5 @@
 from data.components import player_state
 from data.utils import RandomEventGenerator
-import pygame
 from . import weapon
 import numpy as np
 from ..constants import PLAYER_INITIAL_HEALTH
@@ -36,7 +35,6 @@ class Item:
 class Skull(Item):
     def __init__(self):
         super().__init__()
-        print("Gerado skull")
 
     def get_sprite(self):
         return "ITEM_SKULL"
@@ -48,7 +46,6 @@ class Skull(Item):
 class Health(Item):
     def __init__(self):
         super().__init__()
-        print("Gerado health")
 
     def get_sprite(self):
         return "ITEM_HEALTH"
@@ -60,7 +57,6 @@ class Health(Item):
 class BluePotion(Item):
     def __init__(self):
         super().__init__()
-        print("Gerado bp")
 
     def get_sprite(self):
         return "ITEM_BLUEPOTION"
@@ -72,7 +68,6 @@ class BluePotion(Item):
 class GreenPotion(Item):
     def __init__(self):
         super().__init__()
-        print("Gerado gp")
 
     def get_sprite(self):
         return "ITEM_GREENPOTION"
@@ -84,18 +79,18 @@ class GreenPotion(Item):
 class Ammo(Item):
     def __init__(self):
         super().__init__()
-        print("Gerado ammo")
-        weapon_probs = {
-            weapon.Uzi: 0.33,
-            weapon.AK47: 0.33
-        }
-        self.generator = RandomEventGenerator(weapon_probs, null_event=weapon.Shotgun)
 
     def get_sprite(self):
         return "ITEM_AMMO"
 
     def apply_effect(self, player, time): # TODO: write weapon on screen
-        weapon = self.generator.generate()
-        player.bullets[weapon] = int(np.floor(min(weapon.max_ammo, player.bullets[weapon] + weapon.max_ammo / 5)))
+        weapon_probs = {}
+        prob = 1 / len(player.weapons)
+        for weapon in player.weapons.values():
+            weapon_probs[weapon] = prob
+        weapon = RandomEventGenerator(weapon_probs, null_event=player.weapons[player.current_weapon_name]).generate()
+
+        new_ammo = player.bullets[weapon.name] + weapon.max_ammo / 5
+        player.bullets[weapon.name] = int(np.floor(min(weapon.max_ammo, new_ammo)))
         player.update_ammo()
 
