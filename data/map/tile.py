@@ -2,6 +2,7 @@ from ..components.item import Skull, Health, BluePotion, GreenPotion, Ammo
 from ..setup import graphics_dict
 from ..components.base.sprite import Sprite
 
+
 class Tile:
     """
     Individual tile with name, sprite and walkable flag.
@@ -98,10 +99,10 @@ class Tiles:
 
         self.tilesdict = {
             1: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))),
-                     Sprite((0, 0), graphics_dict["map_night"].get_image(0, (50, 50)))),
+                    Sprite((0, 0), graphics_dict["map_night"].get_image(0, (50, 50)))),
 
             2: Tile(Sprite((0, 0), graphics_dict["map"].get_image(1, (50, 50))),
-                     Sprite((0, 0), graphics_dict["map_night"].get_image(1, (50, 50)))),
+                    Sprite((0, 0), graphics_dict["map_night"].get_image(1, (50, 50)))),
             3: Tile(Sprite((0, 0), graphics_dict["map"].get_image(2, (50, 50))),
                     Sprite((0, 0), graphics_dict["map_night"].get_image(2, (50, 50)))),
             4: Tile(Sprite((0, 0), graphics_dict["map"].get_image(3, (50, 50))),
@@ -236,7 +237,8 @@ class Tiles:
         elif name == "STRUCTURE":
             return self.code["CHECKERED_PLAIN"] <= value <= self.code["WALL_BROKEN_FLOOR"]
         elif name == "FLOOR":
-            return (self.code["CHECKERED_PLAIN"] <= value <= self.code["CHECKERED_GRASS_3"]) or (value == self.code["WALL_BROKEN_FLOOR"])
+            return (self.code["CHECKERED_PLAIN"] <= value <= self.code["CHECKERED_GRASS_3"]) or (
+                        value == self.code["WALL_BROKEN_FLOOR"])
         elif name == "FLOOR_SHADOW":
             return self.code["CHECKERED_SHADOW_TOP"] <= value <= self.code["CHECKERED_SHADOW_TOP_LEFT_FULL"]
         elif name == "WALL":
@@ -245,5 +247,3 @@ class Tiles:
             return self.code["WALL_BOTTOM_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
         elif name == "ITEM":
             return self.code["ITEM_SKULL"] <= value <= self.code["ITEM_AMMO"]
-
-

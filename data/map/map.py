@@ -175,6 +175,8 @@ class Map:
                 chunk.structuregrid[i][j] = chunk.tilegrid[i][j]
                 chunk.surface.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite.get_image(),
                                    np.array([j, i]) * TILE_SIZE)
+                chunk.surface_night.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite_night.get_image(),
+                                   np.array([j, i]) * TILE_SIZE)
         else:
             self.player.move(walk_vector[0], walk_vector[1])
 
@@ -247,16 +249,16 @@ class Map:
         """
         Draws on the screen the player, enemies and objects in sight.
         """
-        for position in self.loaded_chunks:
-            screen.blit(self.chunks[position].surface, self.chunks[position].topleft)
-
+        if not self.wave.is_night():
+            for position in self.loaded_chunks:
+                screen.blit(self.chunks[position].surface, self.chunks[position].topleft)
+        else:
+            for position in self.loaded_chunks:
+                screen.blit(self.chunks[position].surface_night, self.chunks[position].topleft)
         for enemy in self.wave.enemies:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
         screen.center_on_player(self.player.get_position())
         self.player.draw(screen)
-
-        if self.wave.is_night(): #TODO: implement day/night logic
-            pass
 
 
