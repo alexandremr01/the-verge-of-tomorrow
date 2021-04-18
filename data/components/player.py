@@ -48,7 +48,7 @@ class Player(Entity):
         self.text = None
         self.text_expiration_time = 0
 
-        self.bag = Bag(graphics_dict['items'])
+        self.bag = Bag(graphics_dict['items'], graphics_dict['bag'])
 
         self.bullets = {}
         for weapon_name in self.weapons:
