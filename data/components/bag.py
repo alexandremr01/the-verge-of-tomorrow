@@ -1,5 +1,7 @@
 import pygame
 
+from ..setup import sound_dict
+
 DEFAULT_ITEM_DURATION = 1000 * 10
 class Bag:
     def __init__(self, items_graphics, bag_graphic):
@@ -17,6 +19,7 @@ class Bag:
     def set_item(self, item, start_time, duration=DEFAULT_ITEM_DURATION):
         self.expiration_time = start_time + duration
         self.item = item
+        sound_dict['item_sound'].play()
 
     def update(self, time):
         if time > self.expiration_time:

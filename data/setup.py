@@ -67,6 +67,11 @@ def load_sound():
     menu_select_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'menu_select.wav')
     monster_scream_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'monster_scream.wav')
     dying_zombie_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'dying.wav')
+    dying_bat_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'dying_bat.wav')
+    bat_wings_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'bat_wings.wav')
+    heal_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'heal.wav')
+    evil_laugh_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'evil_laugh.wav')
+    ammo_collect_sound = pygame.mixer.Sound(BASE_SOUND_EFFECT_DIR + 'ammo.wav')
     sound_dict['Uzi'] = uzi_sound
     sound_dict['AK47'] = ak47_sound
     sound_dict['Shotgun'] = winchester_sound
@@ -78,6 +83,11 @@ def load_sound():
     sound_dict['menu_select'] = menu_select_sound
     sound_dict['monster_scream'] = monster_scream_sound
     sound_dict['dying_zombie'] = dying_zombie_sound
+    sound_dict['dying_bat'] = dying_bat_sound
+    sound_dict['bat_wings'] = bat_wings_sound
+    sound_dict['heal'] = heal_sound
+    sound_dict['evil_laugh'] = evil_laugh_sound
+    sound_dict['ammo_collect'] = ammo_collect_sound
     sound_dict['Uzi'].set_volume(0.2)
     sound_dict['AK47'].set_volume(0.2)
     sound_dict['Shotgun'].set_volume(0.2)
@@ -86,6 +96,12 @@ def load_sound():
     sound_dict['heartbeat'].set_volume(1.0)
     sound_dict['menu_select'].set_volume(0.4)
     sound_dict['dying_zombie'].set_volume(0.4)
+    sound_dict['dying_bat'].set_volume(0.4)
+    sound_dict['bat_wings'].set_volume(0.3)
+    sound_dict['monster_scream'].set_volume(0.2)
+    sound_dict['heal'].set_volume(0.4)
+    sound_dict['item_sound'].set_volume(0.3)
+    sound_dict['ammo_collect'].set_volume(0.3)
 
 def load_menu_music():
     """

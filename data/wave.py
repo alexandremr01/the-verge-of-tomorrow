@@ -99,6 +99,9 @@ class Wave:
         if self.num_enemies_killed == self.current_wave_num_enemies:
             self.wave_over = True
 
+        for enemies in self.enemies:
+            enemies.play_noise(time, player.get_position())
+
     def get_zombies(self):
         """
         Returns all the zombies alive.

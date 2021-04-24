@@ -104,3 +104,10 @@ class Enemy(Entity):
         velocity_vector = self.estimate_velocity()
         if np.linalg.norm(velocity_vector):
             self.looking_angle = -np.degrees(np.arctan2(velocity_vector[1], velocity_vector[0]))
+
+    def play_noise(self, time, player_position):
+        """
+        Plays the enemy's noise sound effect.
+        This is an abstract method.
+        """
+        pass
