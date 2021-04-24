@@ -115,7 +115,8 @@ class Play(State):
                 pygame.mixer.music.stop()
                 pygame.mixer.music.unload()
 
-        self.map.handle_input(events)
+        if self.next is None:
+            self.map.handle_input(events)
 
     def reset(self):
         """
