@@ -17,6 +17,7 @@ def load_graphics():
     """
     player_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "player.png", (59, 45), 236, 45)
     zombie_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "zombie.png", (45, 45), 90, 45)
+    giant_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "giant.png", (135, 135), 270, 135)
     bat_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "bat.png", (64, 64), 256, 64)
     map_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "jawbreaker.png", (8, 8), 64, 72)
     bag_graphics = SpriteSheet(BASE_GRAPHICS_DIR + "bag.png", (102, 84), 102, 84)
@@ -39,6 +40,7 @@ def load_graphics():
 
     graphics_dict["player"] = player_graphics
     graphics_dict["zombie"] = zombie_graphics
+    graphics_dict["giant"] = giant_graphics
     graphics_dict["bat"] = bat_graphics
     graphics_dict["bag"] = bag_graphics
     graphics_dict["map"] = map_graphics

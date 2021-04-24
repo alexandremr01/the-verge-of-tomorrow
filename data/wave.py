@@ -12,6 +12,7 @@ from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE, FRAMES_TO_ENEMIES_TURN
 from .components.enemies.zombie import Zombie
 from .components.enemies.bat import Bat
+from .components.enemies.giant import Giant
 
 class Wave:
     """
@@ -43,7 +44,7 @@ class Wave:
         self.wave_over = False
         self.current_wave += 1
 
-        # print("Wave " + str(self.current_wave))
+        print("Wave " + str(self.current_wave))
         self.num_enemies_killed = 0
         self.current_wave_num_enemies = self.current_wave * ENEMIES_INCREMENT_PER_WAVE
         self.num_enemies_to_spawn = self.current_wave_num_enemies
@@ -56,8 +57,10 @@ class Wave:
         spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
         new_enemy_pos = player_position + spawn_vector
 
-        if self.num_enemies_to_spawn%2 == 1:
+        if self.num_enemies_to_spawn%3 == 0:
             self.enemies.append(Zombie(new_enemy_pos))
+        elif self.num_enemies_to_spawn%3 == 1:
+            self.enemies.append(Giant(new_enemy_pos))
         else:
             self.enemies.append(Bat(new_enemy_pos))
         self.num_enemies_to_spawn -= 1
