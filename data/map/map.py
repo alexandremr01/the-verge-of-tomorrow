@@ -232,7 +232,7 @@ class Map:
 
         return not collision
 
-    def update(self):
+    def update(self, loading):
         """
         Updates map object.
         """
@@ -241,7 +241,7 @@ class Map:
         self.update_positions()
         self.player.update_state(self.time)
         self.player.update_direction(not self.turn.is_day())
-        if self.wave.finished():
+        if not loading and self.wave.finished():
             self.wave.new_wave()
         self.update_chunks()
         self.wave.update_enemies(self.player, self.time, lambda pos : not self.get_tile(pos).collide)

@@ -33,8 +33,6 @@ class Wave:
         self.enemies = []
         self.wave_over = True
 
-        self.new_wave()
-
     def new_wave(self):
         """
         Creates a new wave, resetting its params.
