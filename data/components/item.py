@@ -1,9 +1,11 @@
+import pygame
+import numpy as np
+
 from data.components import player_state
 from data.utils import RandomEventGenerator
 from . import weapon
-import pygame
-import numpy as np
 from ..constants import PLAYER_INITIAL_HEALTH, BLACK
+from ..setup import sound_dict
 
 POTION_TEXT_DURATION = 500
 WEAPON_TEXT_DURATION = 1000
@@ -38,7 +40,6 @@ class Item:
     def apply_effect(self, player, time):
         pass
 
-
 class Skull(Item):
     def __init__(self):
         super().__init__()
@@ -48,6 +49,7 @@ class Skull(Item):
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STRONGER_EVENT, time)
+        sound_dict['evil_laugh'].play()
 
 
 class Health(Item):
@@ -65,6 +67,7 @@ class Health(Item):
         # Write in screen
         text = '+ HEALTH'
         player.write(text, time, WEAPON_TEXT_DURATION)
+        sound_dict['heal'].play()
 
 
 class BluePotion(Item):
@@ -82,6 +85,7 @@ class BluePotion(Item):
         # Write in screen
         text = 'STOP BLEEDING'
         player.write(text, time, WEAPON_TEXT_DURATION)
+        sound_dict['heal'].play()
 
 
 class GreenPotion(Item):
@@ -99,6 +103,7 @@ class GreenPotion(Item):
         # Write in screen
         text = 'STOP SLOW'
         player.write(text, time, WEAPON_TEXT_DURATION)
+        sound_dict['heal'].play()
 
 
 class Ammo(Item):
@@ -123,6 +128,7 @@ class Ammo(Item):
         # Write in screen
         text = '+' + str(gen_ammo) + ' ' + weapon.name
         player.write(text, time, WEAPON_TEXT_DURATION)
+        sound_dict['ammo_collect'].play()
 
 
 

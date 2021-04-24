@@ -5,8 +5,8 @@ Enemy most common in the game
 import numpy as np
 
 from .enemy import Enemy
-from ...constants import BAT_HEALTH, BAT_VELOCITY, BAT_DAMAGE, BAT_WING_FREQUENCY, BAT_SCORE
-from ...constants import FRAMES_TO_ENEMIES_TURN
+from ...constants import BAT_HEALTH, BAT_VELOCITY, BAT_DAMAGE, BAT_WING_FREQUENCY, BAT_SCORE, BAT_NOISE_INTERVAL
+from ...constants import FRAMES_TO_ENEMIES_TURN, PLAYER_HEAR_DISTANCE
 from ...setup import graphics_dict, sound_dict
 
 class Bat(Enemy):
@@ -22,6 +22,7 @@ class Bat(Enemy):
         self.damage = BAT_DAMAGE
         self.flying_pose = 0
         self.frame = 0
+        self.last_noise_time = 0
 
     def get_damage(self):
         """
@@ -36,6 +37,7 @@ class Bat(Enemy):
         self.health = self.health - damage
         if self.health < 0:
             self.health = 0
+            sound_dict['dying_bat'].play()
 
     def draw(self, screen):
         """
@@ -68,3 +70,12 @@ class Bat(Enemy):
         velocity_vector = self.estimate_velocity()
         if np.linalg.norm(velocity_vector):
             self.looking_angle = -np.degrees(np.arctan2(velocity_vector[1], velocity_vector[0]))
+
+    def play_noise(self, time, player_position):
+        """
+        Plays a bat's wings sfx
+        """
+        if np.linalg.norm(player_position - self.get_position()) < PLAYER_HEAR_DISTANCE:
+            if time - self.last_noise_time >= BAT_NOISE_INTERVAL:
+                self.last_noise_time = time
+                sound_dict['bat_wings'].play()

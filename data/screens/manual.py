@@ -40,7 +40,48 @@ class Keys(ManualPage):
         """
         Draws the keys' instructions on the screen
         """
-        screen.blit_rel(self.keys_surface, self.keys_rect)
+        #screen.blit_rel(self.keys_surface, self.keys_rect)
+
+        y = 80
+
+        name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 60)
+        x = name_font.render('OBJECTIVE', True, BLACK)
+        screen.blit_rel(x, ((800 - x.get_width())/2 , y))
+        
+        y+=80
+
+        name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 30)
+        objectiveText = ['The   goal   of   the   game   is   to   survive',
+                         'as   long   as   possible   running    away',
+                        'from   the    enemies   or    killing    them']
+        for phrase in objectiveText:
+            x = name_font.render(phrase, True, BLACK)
+            screen.blit_rel(x, ((800 - x.get_width())/2 , y))
+            y+=25
+        
+        y+=30
+
+        name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 60)
+        x = name_font.render('KEYS', True, BLACK)
+        screen.blit_rel(x, ((800 - x.get_width())/2 , y))
+
+        y+=80
+
+        name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 30)
+        keysText = ['W    to    move    UP',
+                    'S    to    move    DOWN',
+                    'A    to    move    LEFT',
+                    'D    to    move   RIGHT',
+                    'Hold   SHIFT    to   RUN',
+                    'LEFT   BUTTON   to   SHOOT',
+                    '1   2   3   to   switch   weapon',
+                    'Q  to   use   item   in   bag']
+        for phrase in keysText:
+            x = name_font.render(phrase, True, BLACK)
+            screen.blit_rel(x, ((800 - x.get_width())/2 , y))
+            y+=48
+        y+=15
+
 
 
 class Items(ManualPage):
@@ -58,7 +99,44 @@ class Items(ManualPage):
         """
         Draws items' informations 
         """
-        screen.blit_rel(self.items_surface, self.items_rect)
+        #screen.blit_rel(self.items_surface, self.items_rect)
+
+        y = 80
+        screen.blit_rel(graphics_dict['items'].get_image(2), (400,155))
+        screen.blit_rel(graphics_dict['items'].get_image(0), (425,265))
+        screen.blit_rel(graphics_dict['items'].get_image(1), (450,375))
+        screen.blit_rel(graphics_dict['items'].get_image(10), (280,485))
+        screen.blit_rel(graphics_dict['items'].get_image(3), (280,595))
+
+
+        name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 60)
+        x = name_font.render('Items', True, BLACK)
+        screen.blit_rel(x, ((800 - x.get_width())/2 , y))
+        
+        y+=70
+
+        name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 35)
+        item_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 45)
+
+        listItems = ['Red   Potion', 'Blue   Potion', 'Green   Potion', 'Chest', 'Skull']
+        descriptionItems = ['restores   one   heart',
+                            'removes   bleeding   status',
+                            'removes   slow   status',
+                            'gives   ammo   to   a   random   gun',
+                            'gives   the   strong   status']
+
+        i = 0
+        for phrase in descriptionItems:
+            z = item_font.render(listItems[i], True, BLACK)
+            screen.blit_rel(z, (150 , y))
+            y+= 50
+            
+            x = name_font.render(phrase, True, BLACK)
+            screen.blit_rel(x, (170 , y))
+            y+=60
+
+            i+= 1
+
 
 class Manual(State):
     """

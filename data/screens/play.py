@@ -97,6 +97,9 @@ class Play(State):
         """
         Responds to inputs given through keyboard
         """
+        if self.loading:
+            return
+
         self.pause_button_hover = 0
         self.quit_button_hover = 0
         if is_in_rect(self.pause_button_rect, pygame.mouse.get_pos()):
@@ -112,7 +115,8 @@ class Play(State):
                 pygame.mixer.music.stop()
                 pygame.mixer.music.unload()
 
-        self.map.handle_input(events)
+        if self.next is None:
+            self.map.handle_input(events)
 
     def reset(self):
         """
