@@ -9,8 +9,6 @@ class Chunk:
     def __init__(self, position):
         self.position = position
         self.topleft = position * CHUNK_SIZE - CHUNK_ARRAY / 2
-        self.itemgenerator = ItemGenerator()
-        self.items = []
         self.tilegrid = None
         self.structuregrid = None
         self.structures = None
@@ -19,7 +17,7 @@ class Chunk:
         self.surface_night = None
         self.is_rendering = True
         self.terrain_step = 0
-        self.terrain_steps = RENDER_STEPS
+        self.terrain_steps = RENDER_STEPS // 10
         self.structures_step = -1
         self.structures_steps = 0
         self.draw_step = 0
@@ -71,7 +69,7 @@ class Chunk:
         new_load = np.array([[(generator.noise2d((start_position[0] / TILE_SIZE + j) / 3,
                                                  -(start_position[1] / TILE_SIZE + i) / 3) + 1) / 2
                               for j in range(CHUNK_TILE_RATIO)]
-                             for i in range(CHUNK_TILE_RATIO_STEPS)])
+                             for i in range(CHUNK_TILE_RATIO // self.terrain_steps)])
         if self.terrain_step == 0:
             self.tilegrid = new_load
             self.surface = pygame.Surface(CHUNK_ARRAY)
@@ -287,7 +285,7 @@ class Chunk:
 
     def draw(self, tiles):
         row = CHUNK_TILE_RATIO_STEPS * self.draw_step
-        for i in range(CHUNK_TILE_RATIO_STEPS):
+        for i in range(CHUNK_TILE_RATIO // self.draw_steps):
             for j in range(CHUNK_TILE_RATIO):
                 self.decode(row + i, j, tiles)
                 self.surface.blit(tiles.tilesdict[self.tilegrid[row + i][j]].sprite.get_image(),
