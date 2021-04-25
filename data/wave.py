@@ -66,15 +66,19 @@ class Wave:
         self.show_wave = True
         self.show_wave_timer = time
         self.current_wave += 1
+        self.time_to_spawn *= 0.9
+        self.night_prob = min(self.night_prob*1.05, 1.)
+        self.day_prob = 1. - self.night_prob
+
         if self.bats_round:
             self.bats_round = False
             self.time_to_spawn *= 3
         self.bats_round = False
 
         if self.current_wave > 3: # after round 3, giants appear
-            self.zombie_prob = 0.5
-            self.bat_prob = 0.4
-            self.giant_prob = 0.1
+            self.zombie_prob = 0.4
+            self.bat_prob = 0.3
+            self.giant_prob = 0.2
 
         if self.current_wave > 1: # after round 1, night is possible
             if np.random.uniform(0, 1, 1) < self.night_prob:
