@@ -20,6 +20,7 @@ class Bat(Enemy):
         self.score = BAT_SCORE
         self.looking_angle = 0
         self.damage = BAT_DAMAGE
+        self.flying = True
         self.flying_pose = 0
         self.frame = 0
         self.last_noise_time = 0

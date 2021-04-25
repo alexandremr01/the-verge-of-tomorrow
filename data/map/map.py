@@ -227,7 +227,8 @@ class Map:
 
         collision = self.get_tile(new_posic).collide
         for enemy in self.wave.get_enemies():
-            collision = collision or is_in_rect(enemy.sprite.rect, new_posic)
+            if not enemy.flying:
+                collision = collision or is_in_rect(enemy.sprite.rect, new_posic)
 
         return not collision
 
@@ -242,7 +243,7 @@ class Map:
         if not loading and self.wave.finished():
             self.wave.new_wave(self.time)
         self.update_chunks()
-        self.wave.update_enemies(self.player, self.time, lambda pos : not self.get_tile(pos).collide)
+        self.wave.update_enemies(self.player, self.time, lambda pos : not self.is_valid_position(pos))
 
     def draw(self, screen):
         """
