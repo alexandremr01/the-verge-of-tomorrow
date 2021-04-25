@@ -15,6 +15,7 @@ from .constants import SHOW_WAVE_TIME, WHITE, SCREEN_WIDTH, SCREEN_HEIGHT
 from .constants import BATS_ROUND_PROBABILITY, NIGHT_PROBABILITY, NIGHT_SCHEDULE
 from .constants import TIME_TO_SPAWN_SCHEDULE, BATS_ROUND_TIME_TO_SPAWN_FACTOR
 from .constants import ZOMBIE_PROB, BAT_PROB, ZOMBIE_PROB_AFTER, BAT_PROB_AFTER
+from .constants import GIANTS_APPEAR_ROUND, NIGHTS_APPEAR_ROUND, BATS_ROUNDS_APPEAR
 from .components.enemies.zombie import Zombie
 from .components.enemies.bat import Bat
 from .components.enemies.giant import Giant
@@ -72,17 +73,17 @@ class Wave:
             self.time_to_spawn *= BATS_ROUND_TIME_TO_SPAWN_FACTOR
         self.bats_round = False
 
-        if self.current_wave > 3: # after round 3, giants appear
+        if self.current_wave >= GIANTS_APPEAR_ROUND:
             self.zombie_prob = ZOMBIE_PROB_AFTER
             self.bat_prob = BAT_PROB_AFTER
 
-        if self.current_wave > 1: # after round 1, night is possible
+        if self.current_wave >= NIGHTS_APPEAR_ROUND:
             if np.random.uniform(0, 1, 1) < self.night_prob:
                 self.day = False
             else:
                 self.day = True
 
-        if self.current_wave > 2: # after round 2, bat rounds are possible
+        if self.current_wave >= BATS_ROUNDS_APPEAR:
             if np.random.uniform(0, 1, 1) < BATS_ROUND_PROBABILITY:
                 self.bats_round = True
                 self.zombie_prob = 0.
