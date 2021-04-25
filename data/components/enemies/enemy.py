@@ -25,7 +25,6 @@ class Enemy(Entity):
         self.curr_pos = position
         self.looking_angle = 0
         step = -VALID_POS_SEARCH_STEP*pi/180
-        self.clock_rot_mat = np.array([[cos(step), -sin(step)], [sin(step), cos(step)]])
         self.counter_rot_mat = np.array([[cos(-step), -sin(-step)], [sin(-step), cos(-step)]])
 
     def estimate_velocity(self):
