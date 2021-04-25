@@ -5,10 +5,13 @@ programmed to stalk and hurt him
 
 from math import sin, cos, pi
 import numpy as np
+import pygame
 from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
 from ...constants import DEFAULT_ENEMY_DAMAGE, FRAMES_TO_ENEMIES_TURN
 from ...constants import FRAMES_PER_SECOND, PREDICTION_STEP, VALID_POS_SEARCH_STEP
+from ...constants import TILE_SIZE
+from ...utils import bfs
 
 class Enemy(Entity):
     """
@@ -26,6 +29,7 @@ class Enemy(Entity):
         self.looking_angle = 0
         step = -VALID_POS_SEARCH_STEP*pi/180
         self.counter_rot_mat = np.array([[cos(-step), -sin(-step)], [sin(-step), cos(-step)]])
+        self.obstacles = []
 
     def estimate_velocity(self):
         """
@@ -34,20 +38,34 @@ class Enemy(Entity):
         """
         return (np.array(self.curr_pos) - np.array(self.previous_pos))*FRAMES_PER_SECOND/FRAMES_TO_ENEMIES_TURN
 
-    def search_valid_direction(self, diff, validate_pos):
+    def search_valid_direction(self, diff, valid_pos):
         """
         Searches a direction to move to
         """
         iteration = 0
         max_iterations = 360/VALID_POS_SEARCH_STEP
-        while validate_pos(self.curr_pos + diff*(self.sprite.get_width()/2 + PREDICTION_STEP)) and iteration < max_iterations:
+        while not valid_pos(self.curr_pos + diff*(self.sprite.get_width()/2 + PREDICTION_STEP)) and iteration < max_iterations:
             diff = self.counter_rot_mat.dot(diff)
 
             iteration += 1
 
         return diff
 
-    def ai_move(self, target, validate_pos):
+    def search_obstacle(self, target, obstacle_pos):
+        """
+        Searches and returns the first obstacle encountered
+        in the line between itself and the target
+        """
+        pos = self.get_position()
+
+        while np.linalg.norm(target - pos) > TILE_SIZE:
+            pos = pos + (target - pos)/np.linalg.norm(target - pos)*TILE_SIZE
+            if obstacle_pos(pos):
+                return pos
+
+        return None
+
+    def ai_move(self, target, valid_pos, obstacle_pos):
         """
         Default trajectory planning for a enemy
         It stays in idle (random) movement if not near
@@ -60,7 +78,10 @@ class Enemy(Entity):
         diff = target - self.get_position()
         diff = diff/np.linalg.norm(diff)
 
-        diff = self.search_valid_direction(diff, validate_pos)
+        obst = self.search_obstacle(target, obstacle_pos)
+        if obst is not None:
+            self.obstacles = bfs(obst, obstacle_pos)
+        diff = self.search_valid_direction(diff, valid_pos)
         self.move(diff[0]*self.velocity, diff[1]*self.velocity)
 
         velocity_vector = self.estimate_velocity()

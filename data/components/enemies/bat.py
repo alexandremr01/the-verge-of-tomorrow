@@ -53,7 +53,7 @@ class Bat(Enemy):
         self.update_sprite(graphics_dict["bat"].get_image(self.flying_pose), self.looking_angle - 90)
         super().draw(screen)
 
-    def ai_move(self, target, validate_pos):
+    def ai_move(self, target, valid_pos, obstacle_pos):
         """
         Trajectory planner for bat
         It goes over structures, so it simply follows the

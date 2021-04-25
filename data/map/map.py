@@ -232,6 +232,12 @@ class Map:
 
         return not collision
 
+    def is_stone(self, pos):
+        """
+        Determines whether it's an obstacle in the map or not
+        """
+        return self.get_tile(pos).collide
+
     def update(self, loading):
         """
         Updates map object.
@@ -243,7 +249,7 @@ class Map:
         if not loading and self.wave.finished():
             self.wave.new_wave(self.time)
         self.update_chunks()
-        self.wave.update_enemies(self.player, self.time, lambda pos : not self.is_valid_position(pos))
+        self.wave.update_enemies(self.player, self.time, self.is_valid_position, self.is_stone)
 
     def draw(self, screen):
         """
