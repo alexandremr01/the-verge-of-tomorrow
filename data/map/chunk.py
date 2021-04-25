@@ -8,7 +8,7 @@ from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, RENDER_STEPS, CHU
 class Chunk:
     def __init__(self, position):
         self.position = position
-        self.topleft = position * CHUNK_SIZE - CHUNK_ARRAY / 2
+        self.topleft = position * CHUNK_SIZE - CHUNK_ARRAY/2
         self.tilegrid = None
         self.structuregrid = None
         self.structures = None
@@ -17,7 +17,7 @@ class Chunk:
         self.surface_night = None
         self.is_rendering = True
         self.terrain_step = 0
-        self.terrain_steps = RENDER_STEPS // 10
+        self.terrain_steps = RENDER_STEPS // 8
         self.structures_step = -1
         self.structures_steps = 0
         self.draw_step = 0
@@ -250,13 +250,12 @@ class Chunk:
                         self.structuregrid[corner[0]][corner[1] + 1] = tiles.code["GRASS_SHADOW_LEFT_1"]
                     self.structuregrid[corner[0] + 1][corner[1] + 1] = tiles.code["GRASS_SHADOW_TOP_LEFT"]
 
-
         # Generating items
         np.random.seed(self.seed)
         item_position = floor[np.random.randint(len(floor))]
 
         item = self.item_generator.generate_item()
-        self.structuregrid[item_position[0]][item_position[1]] = tiles.code[item.get_sprite()]  # Should generate random item
+        self.structuregrid[item_position[0]][item_position[1]] = tiles.code[item.get_sprite()]
 
     def render(self, generator, tiles):
         self.is_rendering = True
@@ -297,7 +296,6 @@ class Chunk:
                                             np.array([j, row + i]) * TILE_SIZE)
                     self.surface_night.blit(tiles.tilesdict[self.structuregrid[row + i][j]].sprite.get_image(),
                                       np.array([j, row + i]) * TILE_SIZE)
-
 
 
     def decode(self, i, j, tiles):

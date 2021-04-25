@@ -26,8 +26,8 @@ def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1
     if step == -1:
         return [center_position] + [center_position + vector for vector in vectors]
     initial = 0
-    for i in range(8):
-        if np.all(vectors[i] == initial_vector):
+    for i in range(len(vectors)):
+        if (vectors[i] == initial_vector).all():
             initial = i
             break
     selected = []
