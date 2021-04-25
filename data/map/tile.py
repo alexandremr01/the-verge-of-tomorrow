@@ -21,82 +21,6 @@ class Tiles:
     """
 
     def __init__(self):
-        self.code = {"GRASS_PLAIN": 1,
-
-                     "GRASS_SHADOW_TOP_1": 2,
-                     "GRASS_SHADOW_TOP_2": 3,
-                     "GRASS_SHADOW_TOP_CORNER": 4,
-                     "GRASS_SHADOW_LEFT_1": 5,
-                     "GRASS_SHADOW_LEFT_2": 6,
-                     "GRASS_SHADOW_LEFT_CORNER": 7,
-                     "GRASS_SHADOW_TOP_LEFT": 8,
-                     "GRASS_SHADOW_TOP_LEFT_FULL": 9,
-
-                     "GRASS_DARKLEAFS_1": 10,
-                     "GRASS_DARKLEAFS_2": 11,
-
-                     "GRASS_BRIGHTLEAFS_1": 12,
-                     "GRASS_BRIGHTLEAFS_2": 13,
-                     "GRASS_BRIGHTLEAFS_3": 14,
-                     "GRASS_BRIGHTLEAFS_4": 15,
-
-                     "ROCK": 16,
-
-                     "ROAD_HORIZONTAL_PLAIN": 20,
-                     "ROAD_HORIZONTAL_TOP": 21,
-                     "ROAD_HORIZONTAL_BOTTOM": 22,
-                     "ROAD_HORIZONTAL_BROKEN_LEFT": 23,
-                     "ROAD_HORIZONTAL_BROKEN_RIGHT": 24,
-                     "ROAD_VERTICAL_PLAIN": 25,
-                     "ROAD_VERTICAL_RIGHT": 26,
-                     "ROAD_VERTICAL_LEFT": 27,
-                     "ROAD_VERTICAL_BROKEN_TOP": 28,
-                     "ROAD_VERTICAL_BROKEN_BOTTOM": 29,
-
-                     "CHECKERED_PLAIN": 40,
-
-                     "CHECKERED_SHADOW_TOP": 41,
-                     "CHECKERED_SHADOW_TOP_CORNER": 42,
-                     "CHECKERED_SHADOW_LEFT": 43,
-                     "CHECKERED_SHADOW_LEFT_CORNER": 44,
-                     "CHECKERED_SHADOW_TOP_LEFT": 45,
-                     "CHECKERED_SHADOW_TOP_LEFT_FULL": 46,
-
-                     "CHECKERED_BROKEN_1": 47,
-                     "CHECKERED_BROKEN_2": 48,
-
-                     "CHECKERED_GRASS_1": 49,
-                     "CHECKERED_GRASS_2": 50,
-                     "CHECKERED_GRASS_3": 51,
-
-                     "WALL_LEFT_RIGHT": 60,
-                     "WALL_TOP_BOTTOM": 61,
-
-                     "WALL_BOTTOM_RIGHT": 62,
-                     "WALL_TOP_RIGHT": 63,
-                     "WALL_BOTTOM_LEFT": 64,
-                     "WALL_TOP_LEFT": 65,
-
-                     "WALL_TOP_CORNER": 66,
-                     "WALL_TOP_CORNER_BROKEN": 67,
-                     "WALL_BOTTOM_CORNER": 68,
-                     "WALL_BOTTOM_CORNER_BROKEN": 69,
-                     "WALL_LEFT_CORNER": 70,
-                     "WALL_LEFT_CORNER_BROKEN": 71,
-                     "WALL_RIGHT_CORNER": 72,
-                     "WALL_RIGHT_CORNER_BROKEN": 73,
-                     "WALL_PILLAR": 74,
-
-                     "WALL_BROKEN": 75,
-                     "WALL_BROKEN_GRASS": 76,
-                     "WALL_BROKEN_FLOOR": 77,
-
-                     "ITEM_SKULL": 90,
-                     "ITEM_HEALTH": 91,
-                     "ITEM_BLUEPOTION": 92,
-                     "ITEM_GREENPOTION": 93,
-                     "ITEM_AMMO": 94}
-
         self.tilesdict = {
             1: Tile(Sprite((0, 0), graphics_dict["map"].get_image(0, (50, 50))),
                     Sprite((0, 0), graphics_dict["map_night"].get_image(0, (50, 50)))),
@@ -224,29 +148,44 @@ class Tiles:
             77: Tile(Sprite((0, 0), graphics_dict["map"].get_image(54, (50, 50))),
                      Sprite((0, 0), graphics_dict["map_night"].get_image(54, (50, 50)))),
 
-            90: Tile(Sprite((0, 0), graphics_dict["items"].get_image(3, (50, 50)).convert_alpha()), item=Skull),
-            91: Tile(Sprite((0, 0), graphics_dict["items"].get_image(2, (50, 50)).convert_alpha()), item=Health),
-            92: Tile(Sprite((0, 0), graphics_dict["items"].get_image(0, (50, 50)).convert_alpha()), item=BluePotion),
-            93: Tile(Sprite((0, 0), graphics_dict["items"].get_image(1, (50, 50)).convert_alpha()), item=GreenPotion),
-            94: Tile(Sprite((0, 0), graphics_dict["items"].get_image(10, (50, 50)).convert_alpha()), item=Ammo)
+            90: Tile(Sprite((0, 0), graphics_dict["items"].get_image(3, (50, 50)).convert_alpha()),
+                     Sprite((0, 0), graphics_dict["items"].get_image(3, (50, 50)).convert_alpha()), item=Skull),
+            91: Tile(Sprite((0, 0), graphics_dict["items"].get_image(2, (50, 50)).convert_alpha()),
+                     Sprite((0, 0), graphics_dict["items"].get_image(2, (50, 50)).convert_alpha()), item=Health),
+            92: Tile(Sprite((0, 0), graphics_dict["items"].get_image(0, (50, 50)).convert_alpha()),
+                     Sprite((0, 0), graphics_dict["items"].get_image(0, (50, 50)).convert_alpha()), item=BluePotion),
+            93: Tile(Sprite((0, 0), graphics_dict["items"].get_image(1, (50, 50)).convert_alpha()),
+                     Sprite((0, 0), graphics_dict["items"].get_image(1, (50, 50)).convert_alpha()), item=GreenPotion),
+            94: Tile(Sprite((0, 0), graphics_dict["items"].get_image(10, (50, 50)).convert_alpha()),
+                     Sprite((0, 0), graphics_dict["items"].get_image(10, (50, 50)).convert_alpha()), item=Ammo)
         }
 
-    def is_what(self, value, name):
-        if name == "TERRAIN":
-            return value == 0 or self.code["GRASS_PLAIN"] <= value <= self.code["ROCK"]
-        elif name == "STRUCTURE":
-            return self.code["CHECKERED_PLAIN"] <= value <= self.code["WALL_BROKEN_FLOOR"]
-        elif name == "FLOOR":
-            return (self.code["CHECKERED_PLAIN"] <= value <= self.code["CHECKERED_GRASS_3"]) or (
-                        value == self.code["WALL_BROKEN_FLOOR"])
-        elif name == "FLOOR_SHADOW":
-            return self.code["CHECKERED_SHADOW_TOP"] <= value <= self.code["CHECKERED_SHADOW_TOP_LEFT_FULL"]
-        elif name == "WALL":
-            return self.code["WALL_LEFT_RIGHT"] <= value <= self.code["WALL_PILLAR"]
-        elif name == "CORNER":
-            return self.code["WALL_BOTTOM_RIGHT"] <= value <= self.code["WALL_TOP_LEFT"]
-        elif name == "ITEM":
-            return self.code["ITEM_SKULL"] <= value <= self.code["ITEM_AMMO"]
+
+def is_what(value, tile_type):
+    if tile_type == TERRAIN:
+        return value == 0 or GRASS_PLAIN <= value <= ROCK
+    elif tile_type == STRUCTURE:
+        return CHECKERED_PLAIN <= value <= WALL_BROKEN_FLOOR
+    elif tile_type == FLOOR:
+        return (CHECKERED_PLAIN <= value <= CHECKERED_GRASS_3) or (value == WALL_BROKEN_FLOOR)
+    elif tile_type == FLOOR_SHADOW:
+        return CHECKERED_SHADOW_TOP <= value <= CHECKERED_SHADOW_TOP_LEFT_FULL
+    elif tile_type == WALL:
+        return WALL_LEFT_RIGHT <= value <= WALL_PILLAR
+    elif tile_type == CORNER:
+        return WALL_BOTTOM_RIGHT <= value <= WALL_TOP_LEFT
+    elif tile_type == ITEM:
+        return ITEM_SKULL <= value <= ITEM_AMMO
+
+
+TERRAIN = -1
+STRUCTURE = -2
+FLOOR = -3
+FLOOR_SHADOW = -4
+WALL = -5
+CORNER = -6
+ITEM = -7
+
 
 GRASS_PLAIN = 1
 

@@ -9,7 +9,7 @@ from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
-from .tile import Tiles
+from .tile import Tiles, ITEM, is_what
 from data.utils import get_grid_positions
 from data.utils import is_in_rect
 
@@ -102,8 +102,7 @@ class Map:
         """
         tile_position = self.get_tile_position(position)
         current_chunk = self.chunks[tuple(self.get_chunk_position(position))]
-        if current_chunk.structuregrid is not None and \
-                self.tiles.is_what(current_chunk.structuregrid[tile_position], "ITEM"):
+        if current_chunk.structuregrid is not None and is_what(current_chunk.structuregrid[tile_position], ITEM):
             return self.tiles.tilesdict[current_chunk.structuregrid[tile_position]]
         return self.tiles.tilesdict[current_chunk.tilegrid[tile_position]]
 
@@ -116,7 +115,7 @@ class Map:
         """
         for position in chunk_positions:
             if self.chunks.get(position) is not None:
-                if self.chunks[position].is_rendered():
+                if not self.chunks[position].is_unloaded():
                     continue
             else:
                 self.chunks[position] = Chunk(np.array(position))
@@ -132,7 +131,7 @@ class Map:
         """
         for position in unload_positions:
             if self.chunks.get(position) is not None:
-                if self.chunks[position].is_rendered():
+                if not self.chunks[position].is_unloaded():
                     self.chunks[position].de_render()
                     self.loaded_chunks.remove(position)
 
@@ -145,7 +144,7 @@ class Map:
         if self.rendering_chunks:
             for position in self.rendering_chunks:
                 self.chunks[position].render(self.generator, self.tiles)
-                if not self.chunks[position].is_rendering:
+                if self.chunks[position].is_rendered():
                     self.rendering_chunks.remove(position)
                     self.loaded_chunks.append(position)
 
@@ -182,7 +181,7 @@ class Map:
 
         new_position = self.player.get_position() + walk_vector
         new_chunk = self.chunks[tuple(self.get_chunk_position(new_position))]
-        if not new_chunk.is_rendering:
+        if new_chunk.is_rendered():
             if self.is_valid_position(new_position):
                 self.player.move(walk_vector[0], walk_vector[1])
             if self.get_tile(new_position).item is not None:
