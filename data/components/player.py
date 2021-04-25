@@ -247,16 +247,16 @@ class Player(Entity):
         if debuf == player_state.BLEED_EVENT:
             self.last_bleeding_time = time
 
-    def handle_collision(self, zombie, time):
+    def handle_collision(self, enemy, time):
         """
-        Handle collisions between player and zombie.
+        Handle collisions between player and enemy.
         """
         if time - self.last_collision_time < TIME_BETWEEN_COLLISIONS:
             return
-        collide = pygame.sprite.collide_rect(self.get_sprite(), zombie.get_sprite())
+        collide = pygame.sprite.collide_rect(self.get_sprite(), enemy.get_sprite())
         if collide:
             self.apply_random_debuff(time)
-            self.hurt(zombie.get_damage())
+            self.hurt(enemy.get_damage())
             self.hud.set_health(self.health)
             self.hud.set_status(self.state.get_state_name())
             self.last_collision_time = time

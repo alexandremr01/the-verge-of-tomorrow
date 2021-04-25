@@ -1,5 +1,5 @@
 """
-Enemy most common in the game
+Fast, flying enemy
 """
 
 import numpy as np
@@ -11,7 +11,7 @@ from ...setup import graphics_dict, sound_dict
 
 class Bat(Enemy):
     """
-    Common enemy, with common atributes
+    Enemy, with low damage, but is fast and bypasses obstacles
     """
     def __init__(self, position):
         super().__init__(position, graphics_dict["bat"].get_image(0))
@@ -41,7 +41,7 @@ class Bat(Enemy):
 
     def draw(self, screen):
         """
-        Draws the zombie sprite in a dynamic way
+        Draws the bat's sprite in a dynamic way
         in order to create animation
         """
         self.frame += 1

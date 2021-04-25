@@ -1,5 +1,5 @@
 """
-Enemy most common in the game
+Strongest enemy
 """
 
 import numpy as np

@@ -119,9 +119,9 @@ class Wave:
         for enemies in self.enemies:
             enemies.play_noise(time, player.get_position())
 
-    def get_zombies(self):
+    def get_enemies(self):
         """
-        Returns all the zombies alive.
+        Returns all the enemies alive.
         """
         return self.enemies
 

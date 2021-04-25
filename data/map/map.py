@@ -215,9 +215,9 @@ class Map:
         """
         Handles colisions between map objects.
         """
-        for zombie in self.wave.get_zombies():
-            self.player.handle_collision(zombie, self.time)
-            self.player.get_projectiles().handle_collision(zombie)
+        for enemy in self.wave.get_enemies():
+            self.player.handle_collision(enemy, self.time)
+            self.player.get_projectiles().handle_collision(enemy)
 
     def is_valid_position(self, new_posic):
         """
@@ -226,8 +226,8 @@ class Map:
         """
 
         collision = self.get_tile(new_posic).collide
-        for zombie in self.wave.get_zombies():
-            collision = collision or is_in_rect(zombie.sprite.rect, new_posic)
+        for enemy in self.wave.get_enemies():
+            collision = collision or is_in_rect(enemy.sprite.rect, new_posic)
 
         return not collision
 
