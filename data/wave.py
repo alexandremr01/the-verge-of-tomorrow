@@ -4,7 +4,7 @@ the enemies of the game, as well as creating
 them.
 """
 
-from math import sin, cos
+from math import sin, cos, pi
 import numpy as np
 import pygame
 
@@ -31,15 +31,22 @@ class Wave:
         self.num_enemies_to_spawn = 0
         self.total_enemies_killed = 0
         self.spawn_timer = time
+        self.time_to_spawn = TIME_TO_SPAWN
 
         self.zombie_prob = 0.6
         self.bat_prob = 0.4
         self.giant_prob = 0.
 
+        self.day_prob = 0.6
+        self.night_prob = 0.4
+
+        self.bats_round_prob = 0.2
+
         self.enemies = []
         self.despawned_enemies = []
         self.wave_over = True
         self.day = True
+        self.bats_round = False
 
         self.show_wave = False
         self.show_wave_timer = 0
@@ -47,6 +54,7 @@ class Wave:
         self.wave_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/3)
         self.daynight_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 20)
         self.daynight_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/3 + 50)
+        self.batsround_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/3 + 100)
 
     def new_wave(self, time):
         """
@@ -58,16 +66,30 @@ class Wave:
         self.show_wave = True
         self.show_wave_timer = time
         self.current_wave += 1
+        if self.bats_round:
+            self.bats_round = False
+            self.time_to_spawn *= 3
+        self.bats_round = False
 
-        if self.current_wave > 3: # after round 4, giants appear
+        if self.current_wave > 3: # after round 3, giants appear
             self.zombie_prob = 0.5
             self.bat_prob = 0.4
             self.giant_prob = 0.1
 
-        if np.random.uniform(0, 1, 1)[0] > 0.5 and self.current_wave != 1:
-            self.day = False
-        else:
-            self.day = True
+        if self.current_wave > 1: # after round 1, night is possible
+            if np.random.uniform(0, 1, 1) < self.night_prob:
+                self.day = False
+            else:
+                self.day = True
+
+        if self.current_wave > 2: # after round 2, bat rounds are possible
+            if np.random.uniform(0, 1, 1) < self.bats_round_prob:
+                self.bats_round = True
+                self.zombie_prob = 0.
+                self.bat_prob = 1.
+                self.giant_prob = 0.
+
+                self.time_to_spawn /= 3
 
         self.num_enemies_killed = 0
         self.current_wave_num_enemies = self.current_wave * ENEMIES_INCREMENT_PER_WAVE
@@ -77,7 +99,7 @@ class Wave:
         """
         Creates an enemy located on pos
         """
-        theta = np.random.rand()
+        theta = np.random.uniform(0, 2*pi, 1)
         spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
         new_enemy_pos = player_position + spawn_vector
 
@@ -128,7 +150,7 @@ class Wave:
             self.enemiesTurn = 0
 
         self.update_alive_enemies(player.get_position(), player.get_hud())
-        if time - self.spawn_timer > TIME_TO_SPAWN and self.num_enemies_to_spawn > 0:
+        if time - self.spawn_timer > self.time_to_spawn and self.num_enemies_to_spawn > 0:
             self.generate_enemy(player.get_position())
             self.spawn_timer = time
 
@@ -177,3 +199,10 @@ class Wave:
 
             screen.blit_rel(daynight_surface, daynight_rect)
             screen.blit_rel(wave_surface, wave_rect)
+
+            if self.bats_round:
+                batsround_surface = self.daynight_font.render(('bats round!'), False, WHITE)
+                batsround_rect = batsround_surface.get_rect(center=self.batsround_center)
+                batsround_surface.set_alpha(255*(SHOW_WAVE_TIME - time_passed)/SHOW_WAVE_TIME)
+
+                screen.blit_rel(batsround_surface, batsround_rect)
