@@ -34,11 +34,14 @@ class Wave:
 
         self.enemies = []
         self.wave_over = True
+        self.day = True
 
         self.show_wave = False
         self.show_wave_timer = 0
         self.wave_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 50)
         self.wave_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/3)
+        self.daynight_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 20)
+        self.daynight_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/3 + 50)
 
     def new_wave(self, time):
         """
@@ -50,6 +53,11 @@ class Wave:
         self.show_wave = True
         self.show_wave_timer = time
         self.current_wave += 1
+
+        if np.random.uniform(0, 1, 1)[0] > 0.5 and self.current_wave != 1:
+            self.day = False
+        else:
+            self.day = True
 
         self.num_enemies_killed = 0
         self.current_wave_num_enemies = self.current_wave * ENEMIES_INCREMENT_PER_WAVE
@@ -117,6 +125,12 @@ class Wave:
         """
         return self.enemies
 
+    def is_day(self):
+        """
+        Returns whether it's day or night
+        """
+        return self.day
+
     def finished(self):
         """
         Query to whether current wave is over or not
@@ -133,4 +147,14 @@ class Wave:
             wave_surface = self.wave_font.render(('Wave ' + str(self.current_wave)), False, WHITE)
             wave_surface.set_alpha(255*(SHOW_WAVE_TIME - time_passed)/SHOW_WAVE_TIME)
             wave_rect = wave_surface.get_rect(center=self.wave_center)
+
+            daynight_surface = None
+            if self.day:
+                daynight_surface = self.daynight_font.render(('day'), False, WHITE)
+            else:
+                daynight_surface = self.daynight_font.render(('night'), False, WHITE)
+            daynight_rect = daynight_surface.get_rect(center=self.daynight_center)
+            daynight_surface.set_alpha(255*(SHOW_WAVE_TIME - time_passed)/SHOW_WAVE_TIME)
+
+            screen.blit_rel(daynight_surface, daynight_rect)
             screen.blit_rel(wave_surface, wave_rect)

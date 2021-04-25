@@ -36,7 +36,6 @@ class Map:
         self.loaded_chunks = []
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
-        self.turn = DayNightFSM(0)
 
     def get_player(self):
         """
@@ -237,10 +236,9 @@ class Map:
         Updates map object.
         """
         self.time = pygame.time.get_ticks()
-        self.turn.update(self.time)
         self.update_positions()
         self.player.update_state(self.time)
-        self.player.update_direction(not self.turn.is_day())
+        self.player.update_direction(not self.wave.is_day())
         if not loading and self.wave.finished():
             self.wave.new_wave(self.time)
         self.update_chunks()
@@ -250,7 +248,7 @@ class Map:
         """
         Draws on the screen the player, enemies and objects in sight.
         """
-        if self.turn.is_day():
+        if self.wave.is_day():
             for position in self.loaded_chunks:
                 screen.blit(self.chunks[position].surface, self.chunks[position].topleft)
         else:
@@ -261,40 +259,6 @@ class Map:
                 enemy.draw(screen)
         screen.center_on_player(self.player.get_position())
 
-        self.player.draw(screen, self.turn.is_day())
+        self.player.draw(screen, self.wave.is_day())
         self.wave.draw(screen, self.time)
-
-
-class DayNightFSM:
-    def __init__(self, time):
-        self._state = Day(time)
-
-    def update(self, time):
-        next_state = self._state.update(time)
-        if next_state is not None:
-            self._state = next_state
-
-    def is_day(self):
-        return type(self._state) == Day
-
-
-class Day:
-    def __init__(self, time):
-        self.expiration_time = time + DAY_WAVE_DURATION
-
-    def update(self, time):
-        if time > self.expiration_time:
-            return Night(time)
-        return None
-
-
-class Night:
-    def __init__(self, time):
-        self.expiration_time = time + NIGHT_WAVE_DURATION
-
-    def update(self, time):
-        if time > self.expiration_time:
-            return Day(time)
-        return None
-
 
