@@ -12,6 +12,9 @@ from .utils import distance
 from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN, BASE_FONT_DIR
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE, FRAMES_TO_ENEMIES_TURN
 from .constants import SHOW_WAVE_TIME, WHITE, SCREEN_WIDTH, SCREEN_HEIGHT
+from .constants import BATS_ROUND_PROBABILITY, NIGHT_PROBABILITY, NIGHT_SCHEDULE
+from .constants import TIME_TO_SPAWN_SCHEDULE, BATS_ROUND_TIME_TO_SPAWN_FACTOR
+from .constants import ZOMBIE_PROB, BAT_PROB, ZOMBIE_PROB_AFTER, BAT_PROB_AFTER
 from .components.enemies.zombie import Zombie
 from .components.enemies.bat import Bat
 from .components.enemies.giant import Giant
@@ -33,14 +36,9 @@ class Wave:
         self.spawn_timer = time
         self.time_to_spawn = TIME_TO_SPAWN
 
-        self.zombie_prob = 0.6
-        self.bat_prob = 0.4
-        self.giant_prob = 0.
-
-        self.day_prob = 0.6
-        self.night_prob = 0.4
-
-        self.bats_round_prob = 0.2
+        self.zombie_prob = ZOMBIE_PROB
+        self.bat_prob = BAT_PROB
+        self.night_prob = NIGHT_PROBABILITY
 
         self.enemies = []
         self.despawned_enemies = []
@@ -66,19 +64,17 @@ class Wave:
         self.show_wave = True
         self.show_wave_timer = time
         self.current_wave += 1
-        self.time_to_spawn *= 0.9
-        self.night_prob = min(self.night_prob*1.05, 1.)
-        self.day_prob = 1. - self.night_prob
+        self.time_to_spawn *= TIME_TO_SPAWN_SCHEDULE
+        self.night_prob = min(self.night_prob*NIGHT_SCHEDULE, 1.)
 
         if self.bats_round:
             self.bats_round = False
-            self.time_to_spawn *= 3
+            self.time_to_spawn *= BATS_ROUND_TIME_TO_SPAWN_FACTOR
         self.bats_round = False
 
         if self.current_wave > 3: # after round 3, giants appear
-            self.zombie_prob = 0.4
-            self.bat_prob = 0.3
-            self.giant_prob = 0.2
+            self.zombie_prob = ZOMBIE_PROB_AFTER
+            self.bat_prob = BAT_PROB_AFTER
 
         if self.current_wave > 1: # after round 1, night is possible
             if np.random.uniform(0, 1, 1) < self.night_prob:
@@ -87,13 +83,12 @@ class Wave:
                 self.day = True
 
         if self.current_wave > 2: # after round 2, bat rounds are possible
-            if np.random.uniform(0, 1, 1) < self.bats_round_prob:
+            if np.random.uniform(0, 1, 1) < BATS_ROUND_PROBABILITY:
                 self.bats_round = True
                 self.zombie_prob = 0.
                 self.bat_prob = 1.
-                self.giant_prob = 0.
 
-                self.time_to_spawn /= 3
+                self.time_to_spawn /= BATS_ROUND_TIME_TO_SPAWN_FACTOR
 
         self.num_enemies_killed = 0
         self.current_wave_num_enemies = self.current_wave * ENEMIES_INCREMENT_PER_WAVE
