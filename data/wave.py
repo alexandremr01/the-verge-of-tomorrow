@@ -32,7 +32,12 @@ class Wave:
         self.total_enemies_killed = 0
         self.spawn_timer = time
 
+        self.zombie_prob = 0.6
+        self.bat_prob = 0.4
+        self.giant_prob = 0.
+
         self.enemies = []
+        self.despawned_enemies = []
         self.wave_over = True
         self.day = True
 
@@ -54,6 +59,11 @@ class Wave:
         self.show_wave_timer = time
         self.current_wave += 1
 
+        if self.current_wave > 3: # after round 4, giants appear
+            self.zombie_prob = 0.5
+            self.bat_prob = 0.4
+            self.giant_prob = 0.1
+
         if np.random.uniform(0, 1, 1)[0] > 0.5 and self.current_wave != 1:
             self.day = False
         else:
@@ -71,12 +81,20 @@ class Wave:
         spawn_vector = np.array([cos(theta), sin(theta)]) * SPAWN_DISTANCE
         new_enemy_pos = player_position + spawn_vector
 
-        if self.num_enemies_to_spawn%3 == 0:
-            self.enemies.append(Zombie(new_enemy_pos))
-        elif self.num_enemies_to_spawn%3 == 1:
-            self.enemies.append(Giant(new_enemy_pos))
+        if len(self.despawned_enemies) > 0:
+            respawned = self.despawned_enemies.pop()
+            move_vector = new_enemy_pos - respawned.get_position()
+            respawned.move(move_vector[0], move_vector[1])
+            self.enemies.append(respawned)
         else:
-            self.enemies.append(Bat(new_enemy_pos))
+            coin_flip = np.random.uniform(0, 1, 1)
+            if coin_flip < self.zombie_prob:
+                self.enemies.append(Zombie(new_enemy_pos))
+            elif coin_flip < self.zombie_prob + self.bat_prob:
+                self.enemies.append(Bat(new_enemy_pos))
+            else:
+                self.enemies.append(Giant(new_enemy_pos))
+
         self.num_enemies_to_spawn -= 1
 
     def update_alive_enemies(self, player_position, hud):
@@ -92,6 +110,7 @@ class Wave:
                 hud.increase_score(enemy.score)
             elif distance(enemy.get_position(), player_position) > DESPAWN_DISTANCE:
                 self.num_enemies_to_spawn += 1
+                self.despawned_enemies.append(enemy)
             else:
                 live_enemies.append(enemy)
         self.enemies = live_enemies
