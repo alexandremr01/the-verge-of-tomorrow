@@ -242,7 +242,7 @@ class Map:
         self.player.update_state(self.time)
         self.player.update_direction(not self.turn.is_day())
         if not loading and self.wave.finished():
-            self.wave.new_wave()
+            self.wave.new_wave(self.time)
         self.update_chunks()
         self.wave.update_enemies(self.player, self.time, lambda pos : not self.get_tile(pos).collide)
 
@@ -262,6 +262,7 @@ class Map:
         screen.center_on_player(self.player.get_position())
 
         self.player.draw(screen, self.turn.is_day())
+        self.wave.draw(screen, self.time)
 
 
 class DayNightFSM:

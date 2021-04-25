@@ -6,10 +6,12 @@ them.
 
 from math import sin, cos
 import numpy as np
+import pygame
 
 from .utils import distance
-from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN
+from .constants import ENEMIES_INCREMENT_PER_WAVE, TIME_TO_SPAWN, BASE_FONT_DIR
 from .constants import SPAWN_DISTANCE, DESPAWN_DISTANCE, FRAMES_TO_ENEMIES_TURN
+from .constants import SHOW_WAVE_TIME, WHITE, SCREEN_WIDTH, SCREEN_HEIGHT
 from .components.enemies.zombie import Zombie
 from .components.enemies.bat import Bat
 from .components.enemies.giant import Giant
@@ -33,16 +35,22 @@ class Wave:
         self.enemies = []
         self.wave_over = True
 
-    def new_wave(self):
+        self.show_wave = False
+        self.show_wave_timer = 0
+        self.wave_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 50)
+        self.wave_center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/3)
+
+    def new_wave(self, time):
         """
         Creates a new wave, resetting its params.
         The number of players increases by 5 as each
         wave passes
         """
         self.wave_over = False
+        self.show_wave = True
+        self.show_wave_timer = time
         self.current_wave += 1
 
-        print("Wave " + str(self.current_wave))
         self.num_enemies_killed = 0
         self.current_wave_num_enemies = self.current_wave * ENEMIES_INCREMENT_PER_WAVE
         self.num_enemies_to_spawn = self.current_wave_num_enemies
@@ -114,3 +122,15 @@ class Wave:
         Query to whether current wave is over or not
         """
         return self.wave_over
+
+    def draw(self, screen, time):
+        """
+        Draws on player's screen number of enemies left and notifies
+        player whether there is a new wave or not
+        """
+        time_passed = time - self.show_wave_timer
+        if time - self.show_wave_timer < SHOW_WAVE_TIME:
+            wave_surface = self.wave_font.render(('Wave ' + str(self.current_wave)), False, WHITE)
+            wave_surface.set_alpha(255*(SHOW_WAVE_TIME - time_passed)/SHOW_WAVE_TIME)
+            wave_rect = wave_surface.get_rect(center=self.wave_center)
+            screen.blit_rel(wave_surface, wave_rect)
