@@ -22,7 +22,7 @@ class Chunk:
         self.surface_night = None
         self.is_rendering = True
         self.terrain_step = 0
-        self.terrain_steps = RENDER_STEPS // 8
+        self.terrain_steps = 8
         self.structures_step = -1
         self.structures_steps = 0
         self.draw_step = 0
