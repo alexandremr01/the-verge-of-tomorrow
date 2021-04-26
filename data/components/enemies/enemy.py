@@ -10,7 +10,7 @@ from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
 from ...constants import DEFAULT_ENEMY_DAMAGE, FRAMES_TO_ENEMIES_TURN
 from ...constants import FRAMES_PER_SECOND, PREDICTION_STEP, VALID_POS_SEARCH_STEP
-from ...constants import TILE_SIZE
+from ...constants import TILE_SIZE, ATTRACTION_FACTOR, REPULSION_FACTOR
 from ...utils import bfs
 
 class Enemy(Entity):
@@ -29,6 +29,7 @@ class Enemy(Entity):
         self.looking_angle = 0
         step = -VALID_POS_SEARCH_STEP*pi/180
         self.counter_rot_mat = np.array([[cos(-step), -sin(-step)], [sin(-step), cos(-step)]])
+        self.nothing_detected = 0
         self.obstacles = []
 
     def estimate_velocity(self):
@@ -38,18 +39,18 @@ class Enemy(Entity):
         """
         return (np.array(self.curr_pos) - np.array(self.previous_pos))*FRAMES_PER_SECOND/FRAMES_TO_ENEMIES_TURN
 
-    def search_valid_direction(self, diff, valid_pos):
+    def search_valid_direction(self, next_angle, valid_pos):
         """
         Searches a direction to move to
         """
         iteration = 0
         max_iterations = 360/VALID_POS_SEARCH_STEP
-        while not valid_pos(self.curr_pos + diff*(self.sprite.get_width()/2 + PREDICTION_STEP)) and iteration < max_iterations:
-            diff = self.counter_rot_mat.dot(diff)
+        while not valid_pos(self.curr_pos + next_angle*(self.sprite.get_width()/2 + PREDICTION_STEP)) and iteration < max_iterations:
+            next_angle = self.counter_rot_mat.dot(next_angle)
 
             iteration += 1
 
-        return diff
+        return next_angle
 
     def search_obstacle(self, target, obstacle_pos):
         """
@@ -65,25 +66,41 @@ class Enemy(Entity):
 
         return None
 
+    def potential_fields_path_planning(self, target):
+        """
+        Given a target and obstacles between itself and the target,
+        computes what its next angle should be based on the potential
+        fields path planning
+        """
+        next_angle = np.zeros(2)
+
+        diff = target - self.get_position()
+        next_angle += diff*ATTRACTION_FACTOR/(diff[0]**2 + diff[1]**2)
+        for obstacle in self.obstacles:
+            diff = self.get_position() - obstacle
+            next_angle += diff*REPULSION_FACTOR/(diff[0]**2 + diff[1]**2)
+
+        return next_angle/np.linalg.norm(next_angle)
+
     def ai_move(self, target, valid_pos, obstacle_pos):
         """
         Default trajectory planning for a enemy
-        It stays in idle (random) movement if not near
-        the player. Otherwise, it follows a greedy
-        path planning algorithm
         """
         self.previous_pos = self.curr_pos
         self.curr_pos = self.get_position()
 
-        diff = target - self.get_position()
-        diff = diff/np.linalg.norm(diff)
-
         obst = self.search_obstacle(target, obstacle_pos)
         if obst is not None:
             self.obstacles = bfs(obst, obstacle_pos)
-        diff = self.search_valid_direction(diff, valid_pos)
-        self.move(diff[0]*self.velocity, diff[1]*self.velocity)
+        else:
+            self.nothing_detected += 1
+        if self.nothing_detected == 10:
+            self.obstacles.clear()
+            self.nothing_detected = 0
+        next_angle = self.potential_fields_path_planning(target)
+        next_angle = self.search_valid_direction(next_angle, valid_pos)
 
+        self.move(next_angle[0]*self.velocity, next_angle[1]*self.velocity)
         velocity_vector = self.estimate_velocity()
         if np.linalg.norm(velocity_vector):
             self.looking_angle = -np.degrees(np.arctan2(velocity_vector[1], velocity_vector[0]))
