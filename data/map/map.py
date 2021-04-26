@@ -3,7 +3,7 @@ import numpy as np
 from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_q
 from random import randint
 from opensimplex import OpenSimplex
-from data.constants import DAY_WAVE_DURATION, NIGHT_WAVE_DURATION, TILE_NUMBER
+from data.constants import DAY_WAVE_DURATION, NIGHT_WAVE_DURATION
 
 from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE
 from data.wave import Wave
@@ -192,10 +192,7 @@ class Map:
                     item.apply_effect(self.player, self.time)
                 i, j = self.get_tile_position(new_position)
                 new_chunk.structuregrid[i][j] = new_chunk.tilegrid[i][j]
-                new_chunk.surface.blit(self.tiles.tilesdict[new_chunk.tilegrid[i][j]].sprite.get_image(),
-                                       np.array([j, i]) * TILE_SIZE)
-                new_chunk.surface_night.blit(self.tiles.tilesdict[new_chunk.tilegrid[i][j]].sprite_night.get_image(),
-                                             np.array([j, i]) * TILE_SIZE)
+                new_chunk.blit(i, j, self.tiles, new_chunk.tilegrid)
         else:
             self.player.move(walk_vector[0], walk_vector[1])
 

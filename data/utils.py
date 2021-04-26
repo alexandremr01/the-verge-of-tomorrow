@@ -6,6 +6,7 @@ import numpy as np
 import random
 import math
 
+
 def is_in_rect(rect, pos):
     """
     Determines if tuple pos is inside pygame rect
@@ -47,6 +48,7 @@ def compare(noise_value, starting_value, interval_percentage, slices, percentage
             return s[1]
         carry += percentages[s[0]] * interval_percentage
 
+
 def rotate(origin, point, angle):
     """
     Rotate a point counterclockwise by a given angle around a given origin.
@@ -61,6 +63,7 @@ def rotate(origin, point, angle):
     qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
     qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
     return qx, qy
+
 
 class RandomEventGenerator:
     """
@@ -89,4 +92,3 @@ class RandomEventGenerator:
             total_prob += prob
         if total_prob > 1.0:
             raise Exception("RandomEventGenerator invalid probabilities: sum(p_i)>1")
-

@@ -299,17 +299,9 @@ class Chunk:
                 if self.structuregrid is not None and is_what(self.structuregrid[row + i][j], ITEM):
                     self.blit(row + i, j, tiles, self.structuregrid)
 
-    # def do_all(self, i, j, tiles):
-    #     self.decode(i, j, tiles)
-    #     self.blit(i, j, tiles, self.tilegrid)
-    #     if self.structuregrid is not None and is_what(self.structuregrid[i][j], ITEM):
-    #         self.blit(i, j, tiles, self.structuregrid)
-
     def decode(self, i, j):
         if self.structuregrid is None or self.structuregrid[i][j] == 0:
             terrain_noise = self.tilegrid[i][j]
-            # if self.structuregrid is not None:
-            #     terrain_noise = terrain_noise + np.power(terrain_noise, 3) * (0.68 - terrain_noise)
             if 0 <= terrain_noise - 0.1 < 0.15:
                 self.tilegrid[i][j] = compare(noise_value=terrain_noise, starting_value=0.1, interval_percentage=0.15,
                                               slices=[GRASS_DARKLEAFS_1,
