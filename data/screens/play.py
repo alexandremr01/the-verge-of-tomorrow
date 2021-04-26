@@ -51,7 +51,7 @@ class Play(State):
         Updates the game
         """
         if self.next is None:
-            self.map.update()
+            self.map.update(self.loading)
 
         if self.loading:
             self.time = pygame.time.get_ticks()

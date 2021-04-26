@@ -36,7 +36,6 @@ class Map:
         self.loaded_chunks = []
         self.chunk_position = self.get_chunk_position()
         self.chunk_quadrant = self.get_chunk_quadrant()
-        self.turn = DayNightFSM(0)
 
     def get_player(self):
         """
@@ -216,9 +215,9 @@ class Map:
         """
         Handles colisions between map objects.
         """
-        for zombie in self.wave.get_zombies():
-            self.player.handle_collision(zombie, self.time)
-            self.player.get_projectiles().handle_collision(zombie)
+        for enemy in self.wave.get_enemies():
+            self.player.handle_collision(enemy, self.time)
+            self.player.get_projectiles().handle_collision(enemy)
 
     def is_valid_position(self, new_posic):
         """
@@ -227,30 +226,36 @@ class Map:
         """
 
         collision = self.get_tile(new_posic).collide
-        for zombie in self.wave.get_zombies():
-            collision = collision or is_in_rect(zombie.sprite.rect, new_posic)
+        for enemy in self.wave.get_enemies():
+            if not enemy.flying:
+                collision = collision or is_in_rect(enemy.sprite.rect, new_posic)
 
         return not collision
 
-    def update(self):
+    def is_stone(self, pos):
+        """
+        Determines whether it's an obstacle in the map or not
+        """
+        return self.get_tile(pos).collide
+
+    def update(self, loading):
         """
         Updates map object.
         """
         self.time = pygame.time.get_ticks()
-        self.turn.update(self.time)
         self.update_positions()
         self.player.update_state(self.time)
-        self.player.update_direction(not self.turn.is_day())
-        if self.wave.finished():
-            self.wave.new_wave()
+        self.player.update_direction(not self.wave.is_day())
+        if not loading and self.wave.finished():
+            self.wave.new_wave(self.time)
         self.update_chunks()
-        self.wave.update_enemies(self.player, self.time, lambda pos : not self.get_tile(pos).collide)
+        self.wave.update_enemies(self.player, self.time, self.is_valid_position, self.is_stone)
 
     def draw(self, screen):
         """
         Draws on the screen the player, enemies and objects in sight.
         """
-        if self.turn.is_day():
+        if self.wave.is_day():
             for position in self.loaded_chunks:
                 screen.blit(self.chunks[position].surface, self.chunks[position].topleft)
         else:
@@ -261,39 +266,6 @@ class Map:
                 enemy.draw(screen)
         screen.center_on_player(self.player.get_position())
 
-        self.player.draw(screen, self.turn.is_day())
-
-
-class DayNightFSM:
-    def __init__(self, time):
-        self._state = Day(time)
-
-    def update(self, time):
-        next_state = self._state.update(time)
-        if next_state is not None:
-            self._state = next_state
-
-    def is_day(self):
-        return type(self._state) == Day
-
-
-class Day:
-    def __init__(self, time):
-        self.expiration_time = time + DAY_WAVE_DURATION
-
-    def update(self, time):
-        if time > self.expiration_time:
-            return Night(time)
-        return None
-
-
-class Night:
-    def __init__(self, time):
-        self.expiration_time = time + NIGHT_WAVE_DURATION
-
-    def update(self, time):
-        if time > self.expiration_time:
-            return Day(time)
-        return None
-
+        self.player.draw(screen, self.wave.is_day())
+        self.wave.draw(screen, self.time)
 

@@ -88,9 +88,9 @@ class Projectiles:
             for bullet in self.projectiles[key]:
                 bullet.draw(screen)
 
-    def handle_collision(self, zombie):
+    def handle_collision(self, enemy):
         """
-        Handles collisions between zombie and any projectile.
+        Handles collisions between enemy and any projectile.
         """
         for key in self.projectiles.keys():
             num_bullets = len(self.projectiles[key])
@@ -98,10 +98,10 @@ class Projectiles:
                 continue
             collided_bullets = [bullet for bullet in self.projectiles[key]
                                 if pygame.sprite.collide_rect(
-                    bullet.get_sprite(), zombie.get_sprite())]
+                    bullet.get_sprite(), enemy.get_sprite())]
             damage = np.sum([bullet.damage for bullet in collided_bullets])
-            zombie.hurt(damage)
+            enemy.hurt(damage)
             self.projectiles[key] = [bullet for bullet in self.projectiles[key]
                                      if not pygame.sprite.collide_rect(
-                                     bullet.get_sprite(), zombie.get_sprite())]
+                                     bullet.get_sprite(), enemy.get_sprite())]
 

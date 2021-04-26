@@ -1,5 +1,5 @@
 """
-Enemy most common in the game
+Fast, flying enemy
 """
 
 import numpy as np
@@ -11,7 +11,7 @@ from ...setup import graphics_dict, sound_dict
 
 class Bat(Enemy):
     """
-    Common enemy, with common atributes
+    Enemy, with low damage, but is fast and bypasses obstacles
     """
     def __init__(self, position):
         super().__init__(position, graphics_dict["bat"].get_image(0))
@@ -20,6 +20,7 @@ class Bat(Enemy):
         self.score = BAT_SCORE
         self.looking_angle = 0
         self.damage = BAT_DAMAGE
+        self.flying = True
         self.flying_pose = 0
         self.frame = 0
         self.last_noise_time = 0
@@ -41,7 +42,7 @@ class Bat(Enemy):
 
     def draw(self, screen):
         """
-        Draws the zombie sprite in a dynamic way
+        Draws the bat's sprite in a dynamic way
         in order to create animation
         """
         self.frame += 1
@@ -52,7 +53,7 @@ class Bat(Enemy):
         self.update_sprite(graphics_dict["bat"].get_image(self.flying_pose), self.looking_angle - 90)
         super().draw(screen)
 
-    def ai_move(self, target, validate_pos):
+    def ai_move(self, target, valid_pos, obstacle_pos):
         """
         Trajectory planner for bat
         It goes over structures, so it simply follows the
