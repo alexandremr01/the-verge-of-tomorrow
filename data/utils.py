@@ -8,6 +8,7 @@ import math
 from collections import deque
 from .constants import TILE_SIZE
 
+
 def is_in_rect(rect, pos):
     """
     Determines if tuple pos is inside pygame rect
@@ -48,8 +49,8 @@ def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1
     if step == -1:
         return [center_position] + [center_position + vector for vector in vectors]
     initial = 0
-    for i in range(8):
-        if np.all(vectors[i] == initial_vector):
+    for i in range(len(vectors)):
+        if (vectors[i] == initial_vector).all():
             initial = i
             break
     selected = []
@@ -69,6 +70,7 @@ def compare(noise_value, starting_value, interval_percentage, slices, percentage
             return s[1]
         carry += percentages[s[0]] * interval_percentage
 
+
 def rotate(origin, point, angle):
     """
     Rotate a point counterclockwise by a given angle around a given origin.
@@ -83,6 +85,7 @@ def rotate(origin, point, angle):
     qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
     qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
     return qx, qy
+
 
 class RandomEventGenerator:
     """
@@ -111,4 +114,3 @@ class RandomEventGenerator:
             total_prob += prob
         if total_prob > 1.0:
             raise Exception("RandomEventGenerator invalid probabilities: sum(p_i)>1")
-

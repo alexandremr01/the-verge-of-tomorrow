@@ -10,6 +10,7 @@ from ..setup import sound_dict
 POTION_TEXT_DURATION = 500
 WEAPON_TEXT_DURATION = 1000
 
+
 class ItemGenerator:
     def __init__(self):
         item_probs = {
@@ -40,12 +41,13 @@ class Item:
     def apply_effect(self, player, time):
         pass
 
+
 class Skull(Item):
     def __init__(self):
         super().__init__()
 
     def get_sprite(self):
-        return "ITEM_SKULL"
+        return ITEM_SKULL
 
     def apply_effect(self, player, time):
         player.state.send_event(player_state.STRONGER_EVENT, time)
@@ -57,7 +59,7 @@ class Health(Item):
         super().__init__()
 
     def get_sprite(self):
-        return "ITEM_HEALTH"
+        return ITEM_HEALTH
 
     def is_potion(self):
         return True
@@ -75,7 +77,7 @@ class BluePotion(Item):
         super().__init__()
 
     def get_sprite(self):
-        return "ITEM_BLUEPOTION"
+        return ITEM_BLUEPOTION
 
     def is_potion(self):
         return True
@@ -93,7 +95,7 @@ class GreenPotion(Item):
         super().__init__()
 
     def get_sprite(self):
-        return "ITEM_GREENPOTION"
+        return ITEM_GREENPOTION
 
     def is_potion(self):
         return True
@@ -111,7 +113,7 @@ class Ammo(Item):
         super().__init__()
 
     def get_sprite(self):
-        return "ITEM_AMMO"
+        return ITEM_AMMO
 
     def apply_effect(self, player, time):
         weapon_probs = {}
@@ -132,3 +134,8 @@ class Ammo(Item):
 
 
 
+ITEM_SKULL = 90
+ITEM_HEALTH = 91
+ITEM_BLUEPOTION = 92
+ITEM_GREENPOTION = 93
+ITEM_AMMO = 94

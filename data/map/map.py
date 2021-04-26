@@ -5,16 +5,14 @@ from random import randint
 from opensimplex import OpenSimplex
 from data.constants import DAY_WAVE_DURATION, NIGHT_WAVE_DURATION
 
-from data.constants import CHUNK_SIZE, CHUNK_RECT, CHUNK_ARRAY, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT, \
-    CHUNK_TILE_RATIO, TILE_SIZE
+from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE
 from data.wave import Wave
 from data.components.player import Player
 from .chunk import Chunk
-from .tile import Tiles
+from .tile import Tiles, ITEM, is_what
 from data.utils import get_grid_positions
 from data.utils import is_in_rect
-from ..setup import graphics_dict
-from data.components.item import ItemGenerator
+
 
 class Map:
     """
@@ -27,15 +25,14 @@ class Map:
         self.player_can_shoot = True
         self.is_moving = {K_a: False, K_d: False, K_w: False, K_s: False}
         self.wave = Wave(self.time)
-
         self.tiles = Tiles()
         self.generator = OpenSimplex(randint(0, 10000))
         self.chunks = {(0, 0): Chunk(np.array([0, 0]))}
         self.chunks[(0, 0)].render(self.generator, self.tiles)
         self.rendering_chunks = [(0, 0)]
         self.loaded_chunks = []
-        self.chunk_position = self.get_chunk_position()
-        self.chunk_quadrant = self.get_chunk_quadrant()
+        self.previous_chunk = self.get_chunk_position()
+        self.previous_square = self.get_chunk_square()
 
     def get_player(self):
         """
@@ -45,55 +42,68 @@ class Map:
 
     def get_chunk_position(self, position=None):
         """
-        Returns the current chunk position on the grid e.g. the primary chunk position is [0, 0]
+        Returns the chunk position corresponding to position or to player's current position
+        e.g. the primary chunk position is [0, 0]
         its right neighbor is [1, 0] and its bottom neighbor is [0, 1].
 
-        :return: current chunk position on the grid
+        :param position: position to evaluate
+        :type position: numpy array
+        :return: chunk position on the grid
         :rtype: numpy array
         """
         if position is None:
-            player_position = self.player.get_position()
+            rel_pos = self.player.get_position() + CHUNK_ARRAY / 2
         else:
-            player_position = position
-        if CHUNK_RECT.collidepoint(player_position):
-            return np.array([0, 0])
-        return (np.floor((np.abs(player_position) + CHUNK_ARRAY / 2) / CHUNK_SIZE) *
-                np.sign(player_position)).astype(int)
+            rel_pos = position + CHUNK_ARRAY / 2
+        return rel_pos // CHUNK_ARRAY
 
-    def get_chunk_quadrant(self):
+    def get_chunk_square(self, position=None):
         """
-        Returns vector indicating the quadrant the player is standing on i.e. top, botttom, left, right
-        or two of them at a time.
+        Returns vector pointing to one of the 9 squares of the chunk corresponding to position or
+        to player's current position.
 
-        :return: vector indicating which quadrant the player is on
+        :param position: position to evaluate
+        :type position: numpy array
+        :return: vector indicating the square in chunk
         :rtype: numpy array
         """
-        dif = self.player.get_position() - CHUNK_SIZE * self.get_chunk_position()
-        quadrant = np.array([0, 0, 0, 0])
-        quadrant[0] = TOP_RECT.collidepoint(dif)
-        if not quadrant[0]:
-            quadrant[1] = BOTTOM_RECT.collidepoint(dif)
-        quadrant[2] = LEFT_RECT.collidepoint(dif)
-        if not quadrant[2]:
-            quadrant[3] = RIGHT_RECT.collidepoint(dif)
-        return (np.array([quadrant[3] - quadrant[2], quadrant[1] - quadrant[0]])).astype(int)
-
-    def get_tile(self, position=None, getposition=False):
         if position is None:
-            player_position = self.player.get_position()
+            rel_pos = self.player.get_position() + CHUNK_ARRAY / 6 - CHUNK_SIZE * self.get_chunk_position()
         else:
-            player_position = position
-        chunk_position = self.get_chunk_position(position)
-        position_in_chunk = player_position - (chunk_position * CHUNK_SIZE - CHUNK_ARRAY / 2)
-        j, i = position_in_chunk // TILE_SIZE
-        i = int(i - i // CHUNK_TILE_RATIO)
-        j = int(j - j // CHUNK_TILE_RATIO)
-        if getposition:
-            return i, j
-        if self.chunks[tuple(chunk_position)].structuregrid is not None:
-            if self.tiles.is_what(self.chunks[tuple(chunk_position)].structuregrid[i][j], "ITEM"):
-                return self.tiles.tilesdict[self.chunks[tuple(chunk_position)].structuregrid[i][j]]
-        return self.tiles.tilesdict[self.chunks[tuple(chunk_position)].tilegrid[i][j]]
+            rel_pos = position + CHUNK_ARRAY / 6 - CHUNK_SIZE * self.get_chunk_position()
+        return rel_pos // (CHUNK_ARRAY / 3)
+
+    def get_tile_position(self, position=None):
+        """
+        Returns tile position on chunk's tilegrid corresponding to position or to player's current position.
+
+        :param position: position to evaluate
+        :type position: numpy array
+        :return: tile position on chunk's tilegrid
+        :rtype: tuple
+        """
+        if position is None:
+            rel_pos = self.player.get_position() + CHUNK_ARRAY / 2 - CHUNK_SIZE * self.get_chunk_position(position)
+        else:
+            rel_pos = position + CHUNK_ARRAY / 2 - CHUNK_SIZE * self.get_chunk_position(position)
+        grid_pos = rel_pos // TILE_SIZE - rel_pos // CHUNK_SIZE  # Clamping end of chunk
+        j, i = grid_pos.astype(int)
+        return i, j
+
+    def get_tile(self, position=None):
+        """
+        Returns tile on chunk's tilegrid corresponding to position or to player's current position.
+
+        :param position: position to evaluate
+        :type position: numpy array
+        :return: tile on chunk's tilegrid
+        :rtype: Tile object
+        """
+        tile_position = self.get_tile_position(position)
+        current_chunk = self.chunks[tuple(self.get_chunk_position(position))]
+        if current_chunk.structuregrid is not None and is_what(current_chunk.structuregrid[tile_position], ITEM):
+            return self.tiles.tilesdict[current_chunk.structuregrid[tile_position]]
+        return self.tiles.tilesdict[current_chunk.tilegrid[tile_position]]
 
     def gen_chunks(self, chunk_positions):
         """
@@ -102,72 +112,75 @@ class Map:
         :param chunk_positions: the positions at which to generate chunks
         :type chunk_positions: array of tuples
         """
-        for chunk_position in chunk_positions:
-            if self.chunks.get(chunk_position) is not None:
-                if self.chunks[chunk_position].is_rendered():
+        for position in chunk_positions:
+            if self.chunks.get(position) is not None:
+                if not self.chunks[position].is_unloaded():
                     continue
             else:
-                self.chunks[chunk_position] = Chunk(np.array(chunk_position))
-            self.chunks[chunk_position].render(self.generator, self.tiles)
-            self.rendering_chunks.append(chunk_position)
+                self.chunks[position] = Chunk(np.array(position))
+            self.chunks[position].render(self.generator, self.tiles)
+            self.rendering_chunks.append(position)
 
-    def unload_chunks(self, chunk_positions):
+    def unload_chunks(self, unload_positions):
         """
-        Unloads chunks at chunk_positions if already generated and rendered.
+        Unloads chunks at unload_positions if already generated and rendered.
 
-        :param chunk_positions: the positions to unload chunks
-        :type chunk_positions: array of tuples
+        :param unload_positions: the positions to unload chunks
+        :type unload_positions: array of tuples
         """
-        for unload_position in chunk_positions:
-            if self.chunks.get(unload_position) is not None:
-                if self.chunks[unload_position].is_rendered():
-                    self.chunks[unload_position].de_render()
-                    self.loaded_chunks.remove(unload_position)
+        for position in unload_positions:
+            if self.chunks.get(position) is not None:
+                if not self.chunks[position].is_unloaded():
+                    self.chunks[position].de_render()
+                    self.loaded_chunks.remove(position)
 
     def update_chunks(self):
         """
-        Updates chunks by creating new ones, rendering already created ones and unloading distant ones.
-        A chunk is created/rendered when the player moves to a new quadrant which is not [0, 0].
-        A chunk is unloaded when the player moves to a new chunk.
+        Updates chunks by creating, rendering and unloading chunks.
+        A chunk is created/rendered when the player moves to a not visited square which is not the center one.
+        A chunk is unloaded when the chunk is not neighbor to the player's current chunk.
         """
-        if len(self.rendering_chunks) > 0:
+        if self.rendering_chunks:
             for position in self.rendering_chunks:
                 self.chunks[position].render(self.generator, self.tiles)
-                if not self.chunks[position].is_rendering:
+                if self.chunks[position].is_rendered():
                     self.rendering_chunks.remove(position)
                     self.loaded_chunks.append(position)
 
-        chunk_position = self.get_chunk_position()
-        if np.all(chunk_position == self.chunk_position):
-            chunk_quadrant = self.get_chunk_quadrant()
-            if np.any(chunk_quadrant != self.chunk_quadrant):
-                self.chunk_quadrant = chunk_quadrant
-                if np.linalg.norm(chunk_quadrant) > 0:
-                    self.gen_chunks(get_grid_positions(chunk_position, chunk_quadrant,
-                                                       np.linalg.norm(chunk_quadrant) > 1))
+        current_chunk = self.get_chunk_position()
+        if (current_chunk == self.previous_chunk).all():
+            current_square = self.get_chunk_square()
+            if (current_square != self.previous_square).any():
+                if (current_square != [0, 0]).any():
+                    self.gen_chunks(get_grid_positions(current_chunk, current_square,
+                                                       np.linalg.norm(current_square) > 1))
+                self.previous_square = current_square
         else:
-            unload_direction = self.chunk_position - chunk_position
-            self.unload_chunks(get_grid_positions(self.chunk_position, unload_direction,
+            unload_direction = self.previous_chunk - current_chunk
+            self.unload_chunks(get_grid_positions(self.previous_chunk, unload_direction,
                                                   1 + np.linalg.norm(unload_direction) > 1))
-            self.chunk_position = chunk_position
+            self.previous_chunk = current_chunk
 
     def update_positions(self):
         """
         Updates positions of player and enemies.
         """
         self.handle_collision()
+
         walk_vector = np.array([0, 0])
         if self.is_moving[K_a]:
-            walk_vector[0] -= self.player.get_velocity()
+            walk_vector[0] -= 1
         if self.is_moving[K_d]:
-            walk_vector[0] += self.player.get_velocity()
+            walk_vector[0] += 1
         if self.is_moving[K_s]:
-            walk_vector[1] += self.player.get_velocity()
+            walk_vector[1] += 1
         if self.is_moving[K_w]:
-            walk_vector[1] -= self.player.get_velocity()
+            walk_vector[1] -= 1
+        walk_vector = walk_vector * self.player.get_velocity()
+
         new_position = self.player.get_position() + walk_vector
-        chunk = self.chunks[tuple(self.get_chunk_position(new_position))]
-        if not chunk.is_rendering:
+        new_chunk = self.chunks[tuple(self.get_chunk_position(new_position))]
+        if new_chunk.is_rendered():
             if self.is_valid_position(new_position):
                 self.player.move(walk_vector[0], walk_vector[1])
             if self.get_tile(new_position).item is not None:
@@ -176,12 +189,9 @@ class Map:
                     self.player.bag.set_item(item, self.time)
                 else:
                     item.apply_effect(self.player, self.time)
-                i, j = self.get_tile(new_position, True)
-                chunk.structuregrid[i][j] = chunk.tilegrid[i][j]
-                chunk.surface.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite.get_image(),
-                                   np.array([j, i]) * TILE_SIZE)
-                chunk.surface_night.blit(self.tiles.tilesdict[chunk.tilegrid[i][j]].sprite_night.get_image(),
-                                   np.array([j, i]) * TILE_SIZE)
+                i, j = self.get_tile_position(new_position)
+                new_chunk.structuregrid[i][j] = new_chunk.tilegrid[i][j]
+                new_chunk.blit(i, j, self.tiles, new_chunk.tilegrid)
         else:
             self.player.move(walk_vector[0], walk_vector[1])
 
@@ -221,15 +231,12 @@ class Map:
 
     def is_valid_position(self, new_posic):
         """
-        Determines whether the new position is occupied
-        or not
+        Determines whether the new position is occupied or not.
         """
-
         collision = self.get_tile(new_posic).collide
         for enemy in self.wave.get_enemies():
             if not enemy.flying:
                 collision = collision or is_in_rect(enemy.sprite.rect, new_posic)
-
         return not collision
 
     def is_stone(self, pos):
@@ -251,6 +258,7 @@ class Map:
         self.update_chunks()
         self.wave.update_enemies(self.player, self.time, self.is_valid_position, self.is_stone)
 
+
     def draw(self, screen):
         """
         Draws on the screen the player, enemies and objects in sight.
@@ -261,6 +269,7 @@ class Map:
         else:
             for position in self.loaded_chunks:
                 screen.blit(self.chunks[position].surface_night, self.chunks[position].topleft)
+
         for enemy in self.wave.enemies:
             if screen.screen_rect.colliderect(enemy.sprite.rect):
                 enemy.draw(screen)
@@ -268,4 +277,3 @@ class Map:
 
         self.player.draw(screen, self.wave.is_day())
         self.wave.draw(screen, self.time)
-

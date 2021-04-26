@@ -1,5 +1,5 @@
 import pygame
-
+from data.map.tile import ITEM_SKULL, ITEM_HEALTH, ITEM_BLUEPOTION, ITEM_GREENPOTION, ITEM_AMMO
 from ..setup import sound_dict
 
 DEFAULT_ITEM_DURATION = 1000 * 10
@@ -8,11 +8,11 @@ class Bag:
         self.item = None
         self.expiration_time = 40000
         self.sprites = {
-            "ITEM_SKULL": items_graphics.get_image(3, (50, 50)).convert_alpha(),
-            "ITEM_HEALTH": items_graphics.get_image(2, (50, 50)).convert_alpha(),
-            "ITEM_BLUEPOTION": items_graphics.get_image(0, (50, 50)).convert_alpha(),
-            "ITEM_GREENPOTION": items_graphics.get_image(1, (50, 50)).convert_alpha(),
-            "ITEM_AMMO": items_graphics.get_image(10, (50, 50)).convert_alpha()
+            ITEM_SKULL: items_graphics.get_image(3, (50, 50)).convert_alpha(),
+            ITEM_HEALTH: items_graphics.get_image(2, (50, 50)).convert_alpha(),
+            ITEM_BLUEPOTION: items_graphics.get_image(0, (50, 50)).convert_alpha(),
+            ITEM_GREENPOTION: items_graphics.get_image(1, (50, 50)).convert_alpha(),
+            ITEM_AMMO: items_graphics.get_image(10, (50, 50)).convert_alpha()
         }
         self.bag_sprite = bag_graphic.get_image(0, (102, 84))
 
