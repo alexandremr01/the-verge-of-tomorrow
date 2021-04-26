@@ -55,7 +55,7 @@ class Chunk:
             structure_seed = self.seed + position[2]
             np.random.seed(structure_seed)
             number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.2, 0.1])
-            number_of_directions = 4
+            # number_of_directions = 4
             np.random.seed(structure_seed)
             directions = np.take([[1, 1, 11], [-1, 1, 12], [-1, -1, 13], [1, -1, 14]],
                                  np.random.choice(np.array([0, 1, 2, 3]), size=number_of_directions, replace=False),
@@ -264,7 +264,7 @@ class Chunk:
         if self.structures_step == -1:
             np.random.seed(self.seed)
             number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.6, 0.2, 0.1, 0.05, 0.05]))
-            number_of_structures = 4
+            # number_of_structures = 4
             if number_of_structures != 0:
                 self.generate_structure_variables(number_of_structures)
             self.structures_steps = number_of_structures
