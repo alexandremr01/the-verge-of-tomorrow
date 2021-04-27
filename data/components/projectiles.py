@@ -69,6 +69,12 @@ class Projectiles:
         self.projectiles[weapon.get_name()].append(Bullet(initial_position, weapon_position, 
                                                     direction, weapon, damage))
 
+    def get_bullets(self):
+        """
+        Returns all bullets
+        """
+        return self.projectiles
+
     def update(self):
         """
         Updates the position of all projectiles

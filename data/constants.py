@@ -20,7 +20,7 @@ MANUAL_SCREEN_INPUT_LAG = 1*350  # milliseconds
 # Colors (RGB format)
 ORANGE = (250, 157, 0)
 RED = (255, 0, 0)
-BUTTON_RED = (215, 15, 15)
+BUTTON_RED = (170, 15, 15)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)

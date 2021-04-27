@@ -230,6 +230,10 @@ class Map:
         for enemy in self.wave.get_enemies():
             self.player.handle_collision(enemy, self.time)
             self.player.get_projectiles().handle_collision(enemy)
+        bullets = self.player.get_projectiles().get_bullets()
+        for weapon_name in ["Uzi", "AK47", "Shotgun"]:
+            bullets[weapon_name] = [bullet for bullet in bullets[weapon_name]
+                                    if self.is_valid_position(bullet.get_position())]
 
     def is_valid_position(self, new_posic):
         """
