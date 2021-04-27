@@ -5,7 +5,7 @@ The player being controlled by the user.
 
 import pygame
 import numpy as np
-from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d
+from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
 
 from ..utils import RandomEventGenerator, rotate
 from . import player_state
@@ -113,7 +113,7 @@ class Player(Entity):
         """
         if key in [K_1, K_2, K_3]:
             self.set_weapon(key)
-        elif key in [K_w, K_a, K_s, K_d]:
+        elif key is K_LSHIFT:
             self.current_weapon = self.states[3]
             self.update_sprite(self.states[3])
         else:

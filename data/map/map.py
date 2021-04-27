@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_q
+from pygame.locals import K_w, K_a, K_s, K_d, KEYDOWN, KEYUP, K_LSHIFT, K_r, K_q, K_1, K_2, K_3
 from random import randint
 from opensimplex import OpenSimplex
 from data.constants import DAY_WAVE_DURATION, NIGHT_WAVE_DURATION
@@ -211,15 +211,17 @@ class Map:
             if event.type == KEYDOWN:
                 if event.key == K_LSHIFT:
                     self.player.set_running(self.time)
+                    self.player_can_shoot = False
+                    self.player.update(K_LSHIFT)
                 self.is_moving[event.key] = True
-                self.player_can_shoot = False
-                self.player.update(event.key)
+                if event.key in [K_1, K_2, K_3]:
+                    self.player.update(event.key)
             if event.type == KEYUP:
                 if event.key == K_LSHIFT:
                     self.player.stop_running(self.time)
+                    self.player.update()
                 self.is_moving[event.key] = False
                 self.player_can_shoot = True
-                self.player.update(self.time)
 
     def handle_collision(self):
         """
