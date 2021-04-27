@@ -48,8 +48,8 @@ Run the main file after all packages were successfully installed.
     python3 main.py
 
 ## Screenshots
-![Title screen](../the-verge-of-tomorrow/screenshots/title.png?raw=true "Title screen")
+![Title screen](/screenshots/title.png?raw=true "Title screen")
 
-![Day](../the-verge-of-tomorrow/screenshots/day.png?raw=true "Day")
+![Day](/screenshots/day.png?raw=true "Day")
 
-![Night](../the-verge-of-tomorrow/screenshots/night.png?raw=true "Night")
+![Night](/screenshots/night.png?raw=true "Night")
