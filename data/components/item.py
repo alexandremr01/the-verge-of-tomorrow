@@ -15,10 +15,10 @@ class ItemGenerator:
     def __init__(self):
         item_probs = {
             Skull: 0.1,
-            Health: 0.1,
-            BluePotion: 0.30,
-            GreenPotion: 0.30,
-            Ammo: 0.2
+            Health: 0.2,
+            BluePotion: 0.10,
+            GreenPotion: 0.10,
+            Ammo: 0.50
         }
         self.debuf_generator = RandomEventGenerator(item_probs, null_event=Ammo)
 

@@ -63,10 +63,10 @@ class Uzi(Weapon):
     The submachine used by main character.
     """
     def __init__(self):
-        self.damage = 20
-        self.delay = 150
+        self.damage = 25
+        self.delay = 120
         self.initial_ammo = 150
-        self.max_ammo = 150
+        self.max_ammo = 200
         self.name = "Uzi"
         self.bullet_image_index = 32
         self.image_index = 7
@@ -77,10 +77,10 @@ class AK47(Weapon):
     The rifle used by the main character.
     """
     def __init__(self):
-        self.damage = 30
-        self.delay = 300
-        self.initial_ammo = 30
-        self.max_ammo = 40
+        self.damage = 40
+        self.delay = 200
+        self.initial_ammo = 50
+        self.max_ammo = 100
         self.name = "AK47"
         self.bullet_image_index = 39
         self.image_index = 6
@@ -91,10 +91,10 @@ class Shotgun(Weapon):
     The shotgun used by the main character.
     """
     def __init__(self):
-        self.damage = 40
-        self.delay = 550
+        self.damage = 70
+        self.delay = 1000
         self.initial_ammo = 10
-        self.max_ammo = 20
+        self.max_ammo = 40
         self.name = "Shotgun"
         self.bullet_image_index = 48
         self.image_index = 8
