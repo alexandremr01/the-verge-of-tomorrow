@@ -6,12 +6,12 @@ programmed to stalk and hurt him
 from math import sin, cos, pi
 import numpy as np
 import pygame
+from collections import deque
 from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
 from ...constants import DEFAULT_ENEMY_DAMAGE, FRAMES_TO_ENEMIES_TURN
 from ...constants import FRAMES_PER_SECOND, PREDICTION_STEP, VALID_POS_SEARCH_STEP
-from ...constants import TILE_SIZE, ATTRACTION_FACTOR, REPULSION_FACTOR
-from ...utils import bfs
+from ...constants import TILE_SIZE, ATTRACTION_FACTOR, REPULSION_FACTOR, ENEMY_VISION_RANGE
 
 class Enemy(Entity):
     """
@@ -82,6 +82,24 @@ class Enemy(Entity):
 
         return next_angle/np.linalg.norm(next_angle)
 
+
+    def enemy_bfs(self, root, validate_func):
+        """
+        Searches breadth first for other obstacles
+        that start with root, at maximum 10
+        """
+        possible_dirs = [np.array([TILE_SIZE, 0]), np.array([0, TILE_SIZE]), np.array([0, -TILE_SIZE]), np.array([-TILE_SIZE, 0])]
+        self.obstacles = []
+
+        q = deque()
+        q.append((root, None))
+        while len(q) > 0 and len(self.obstacles) < ENEMY_VISION_RANGE:
+            front = q.popleft()
+            self.obstacles.append(front[0])
+            for i in range(len(possible_dirs)):
+                if not np.all(front[1] == possible_dirs[i]) and validate_func(front[0] + possible_dirs[i]):
+                    q.append((front[0] + possible_dirs[i], possible_dirs[len(possible_dirs) - i - 1]))
+
     def ai_move(self, target, valid_pos, obstacle_pos):
         """
         Default trajectory planning for a enemy
@@ -91,7 +109,7 @@ class Enemy(Entity):
 
         obst = self.search_obstacle(target, obstacle_pos)
         if obst is not None:
-            self.obstacles = bfs(obst, obstacle_pos)
+            self.enemy_bfs(obst, obstacle_pos)
         else:
             self.nothing_detected += 1
         if self.nothing_detected == 10:

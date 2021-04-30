@@ -5,8 +5,6 @@ in many classes
 import numpy as np
 import random
 import math
-from collections import deque
-from .constants import TILE_SIZE
 
 
 def is_in_rect(rect, pos):
@@ -21,26 +19,6 @@ def is_in_rect(rect, pos):
 
 def distance(first_pos, second_pos):
     return np.sqrt(np.sum(np.power(np.array(second_pos) - np.array(first_pos), 2)))
-
-
-def bfs(root, validate_func):
-    """
-    Searches breadth first for other obstacles
-    that start with root
-    """
-    possible_dirs = [np.array([TILE_SIZE, 0]), np.array([0, TILE_SIZE]), np.array([0, -TILE_SIZE]), np.array([-TILE_SIZE, 0])]
-    nodes_found = []
-
-    q = deque()
-    q.append((root, None))
-    while len(q) > 0:
-        front = q.popleft()
-        nodes_found.append(front[0])
-        for i in range(len(possible_dirs)):
-            if not np.all(front[1] == possible_dirs[i]) and validate_func(front[0] + possible_dirs[i]):
-                q.append((front[0] + possible_dirs[i], possible_dirs[len(possible_dirs) - i - 1]))
-
-    return nodes_found
 
 
 def get_grid_positions(center_position, initial_vector=np.array([1, 0]), step=-1):
