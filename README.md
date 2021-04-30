@@ -13,6 +13,11 @@ pixel artist and sound producer which made their art available to use.
 [Sprite](https://miontomaru.itch.io/mountain-range-parallax-background) <br/>
 [Pixel Artist - Miontomaru Magnusson](https://miontomaru.itch.io/)
 
+* **Player and enemies** <br/>
+[Sprite - Player/Zombie](https://www.kenney.nl/assets/topdown-shooter) <br/>
+[Sprite - Bat](https://opengameart.org/content/2d-bat-sprites) <br/>
+[Pixel Artist - Bat - Unknown_Chan](https://opengameart.org/content/2d-bat-sprites) 
+
 * **Map** <br/>
 [Sprite](https://adamatomic.itch.io/jawbreaker) <br/>
 [Pixel Artist - Adam Saltsman](https://adamatomic.itch.io/)
@@ -30,11 +35,17 @@ pixel artist and sound producer which made their art available to use.
 [Pixel Artist - blackdragon1727](https://blackdragon1727.itch.io/)
 
 * **Buttons** <br/>
+[Sprite](https://opengameart.org/content/simple-menu-icons) <br/>
+[Pixel Artist - Nightsurfer23](https://opengameart.org/users/nightsurfer23) <br/>
 [Sprite](https://adwitr.itch.io/button-asset-pack) <br/>
 [Pixel Artist - adwitr](https://adwitr.itch.io/)
 
-* **Sound** <br/>
-All sound effects and soundtracks are under Creative Commons License. <br/>
+* **Soundtracks** <br/>
+All soundtracks are under [CC BY-SA 3.0 License](https://creativecommons.org/licenses/by-sa/3.0/). <br/>
+[Dark Ambience Loop - Iwan Gabovitch](https://opengameart.org/content/dark-ambience-loop)<br/>
+[Horror Game Menu - Eric Matyas Soundimage.org](https://opengameart.org/content/horror-game-menu) <br/>
+* **Sound effects** <br/>
+All sound effects are under [CC0 License](https://creativecommons.org/share-your-work/public-domain/cc0/). <br/>
 [Freesound](https://freesound.org/) <br/>
 [OpenGameArt](https://opengameart.org/)
 
