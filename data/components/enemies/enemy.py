@@ -11,7 +11,8 @@ from ..base.entity import Entity
 from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
 from ...constants import DEFAULT_ENEMY_DAMAGE, FRAMES_TO_ENEMIES_TURN
 from ...constants import FRAMES_PER_SECOND, PREDICTION_STEP, VALID_POS_SEARCH_STEP
-from ...constants import TILE_SIZE, ATTRACTION_FACTOR, REPULSION_FACTOR, ENEMY_VISION_RANGE
+from ...constants import TILE_SIZE, ATTRACTION_FACTOR, REPULSION_FACTOR
+from ...constants import ENEMY_VISION_RANGE, VORTICE_FACTOR
 
 class Enemy(Entity):
     """
@@ -28,9 +29,13 @@ class Enemy(Entity):
         self.curr_pos = position
         self.looking_angle = 0
         step = -VALID_POS_SEARCH_STEP*pi/180
+        self.rot_mat = np.array([[cos(step), -sin(step)], [sin(step), cos(step)]])
         self.counter_rot_mat = np.array([[cos(-step), -sin(-step)], [sin(-step), cos(-step)]])
         self.nothing_detected = 0
         self.obstacles = []
+        self.first_side = []
+        self.second_side = []
+        self.rotational = -1
 
     def estimate_velocity(self):
         """
@@ -46,7 +51,10 @@ class Enemy(Entity):
         iteration = 0
         max_iterations = 360/VALID_POS_SEARCH_STEP
         while not valid_pos(self.curr_pos + next_angle*(self.sprite.get_width()/2 + PREDICTION_STEP)) and iteration < max_iterations:
-            next_angle = self.counter_rot_mat.dot(next_angle)
+            if self.rotational == -1:
+                next_angle = self.counter_rot_mat.dot(next_angle)
+            else:
+                next_angle = self.rot_mat.dot(next_angle)
 
             iteration += 1
 
@@ -74,14 +82,43 @@ class Enemy(Entity):
         """
         next_angle = np.zeros(2)
 
+        if len(self.first_side) == len(self.second_side):
+            vector_product_sign = 1
+        else:
+            me_to_center_obstacle = self.obstacles[0] - self.get_position()
+            if len(self.first_side) > len(self.second_side):
+                center_to_extremity = self.first_side[-1] - self.obstacles[0]
+            else:
+                center_to_extremity = self.second_side[-1] - self.obstacles[0]
+            vector_product_sign = np.sign(me_to_center_obstacle[0]*center_to_extremity[1] - me_to_center_obstacle[1]*center_to_extremity[0])
+        if vector_product_sign != 0:
+            self.rotational  = vector_product_sign
+
         diff = target - self.get_position()
         next_angle += diff*ATTRACTION_FACTOR/(diff[0]**2 + diff[1]**2)
         for obstacle in self.obstacles:
-            diff = self.get_position() - obstacle
-            next_angle += diff*REPULSION_FACTOR/(diff[0]**2 + diff[1]**2)
+            next_angle += self.obstacle_vortex(obstacle, -vector_product_sign)
 
         return next_angle/np.linalg.norm(next_angle)
 
+    def obstacle_repulsion(self, obstacle):
+        """
+        Computes the obstacle as a source in the
+        potential fields path planning
+        """
+        diff = self.get_position() - obstacle
+        return diff*REPULSION_FACTOR/(diff[0]**2 + diff[1]**2)
+
+    def obstacle_vortex(self, obstacle, sign):
+        """
+        Computes the obstacle as a vortex in the
+        potential fields path planning
+        """
+        if sign == 0:
+            return 0
+        diff = self.get_position() - obstacle
+        diff[0], diff[1] = sign*diff[1], -sign*diff[0]
+        return diff*VORTICE_FACTOR/(diff[0]**2 + diff[1]**2)
 
     def enemy_bfs(self, root, validate_func):
         """
@@ -89,15 +126,21 @@ class Enemy(Entity):
         that start with root, at maximum 10
         """
         possible_dirs = [np.array([TILE_SIZE, 0]), np.array([0, TILE_SIZE]), np.array([0, -TILE_SIZE]), np.array([-TILE_SIZE, 0])]
-        self.obstacles = []
+        self.obstacles, self.first_side, self.second_side = [], [], []
 
         q = deque()
         q.append((root, None))
+        self.first_side.append(root)
+        self.second_side.append(root)
         while len(q) > 0 and len(self.obstacles) < ENEMY_VISION_RANGE:
             front = q.popleft()
             self.obstacles.append(front[0])
             for i in range(len(possible_dirs)):
                 if not np.all(front[1] == possible_dirs[i]) and validate_func(front[0] + possible_dirs[i]):
+                    if np.all(front[0] == self.first_side[-1]):
+                        self.first_side.append(front[0] + possible_dirs[i])
+                    if np.all(front[0] == self.second_side[-1]):
+                        self.second_side.append(front[0] + possible_dirs[i])
                     q.append((front[0] + possible_dirs[i], possible_dirs[len(possible_dirs) - i - 1]))
 
     def ai_move(self, target, valid_pos, obstacle_pos):
