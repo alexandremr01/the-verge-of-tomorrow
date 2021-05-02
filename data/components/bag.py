@@ -2,7 +2,7 @@ import pygame
 from data.map.tile import ITEM_SKULL, ITEM_HEALTH, ITEM_BLUEPOTION, ITEM_GREENPOTION, ITEM_AMMO
 from ..setup import sound_dict
 
-DEFAULT_ITEM_DURATION = 1000 * 10
+DEFAULT_ITEM_DURATION = 1000 * 40
 class Bag:
     def __init__(self, items_graphics, bag_graphic):
         self.item = None
