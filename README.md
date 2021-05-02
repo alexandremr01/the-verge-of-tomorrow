@@ -19,41 +19,32 @@ A survival game inspired by classic arcade games. This project was a assignment 
 This project used several free resources. We would like to thank every
 pixel artist and sound producer which made their art available to use.
 
-* **Screen** <br/>
-[Sprite](https://miontomaru.itch.io/mountain-range-parallax-background) <br/>
-[Pixel Artist - Miontomaru Magnusson](https://miontomaru.itch.io/)
+### Sprites
 
-* **Player and enemies** <br/>
-[Sprite - Player/Zombie](https://www.kenney.nl/assets/topdown-shooter) <br/>
-[Sprite - Bat](https://opengameart.org/content/2d-bat-sprites) <br/>
-[Pixel Artist - Bat - Unknown_Chan](https://opengameart.org/content/2d-bat-sprites) 
+* [**Screen Background by Miontomaru Magnusson**](https://miontomaru.itch.io/mountain-range-parallax-background) <br/>
 
-* **Map** <br/>
-[Sprite](https://adamatomic.itch.io/jawbreaker) <br/>
-[Pixel Artist - Adam Saltsman](https://adamatomic.itch.io/)
+* [**Player and Zombie by Kenney**](https://www.kenney.nl/assets/topdown-shooter) <br/>
 
-* **Firearms** <br/>
-[Sprite](https://ma9ici4n.itch.io/ma9ici4nweaponpack) <br/>
-[Pixel Artist - ma9ici4n](https://ma9ici4n.itch.io/)
+* [**Bat by Unkown_Chan**](https://opengameart.org/content/2d-bat-sprites) <br/>
 
-* **Items** <br/>
-[Sprite](https://kickpixel.itch.io/50fantasyicons) <br/>
-[Pixel Artist - Kickpixel](https://kickpixel.itch.io/)
+* [**Map by Adam Saltsman**](https://adamatomic.itch.io/jawbreaker) <br/>
 
-* **Bullets** <br/>
-[Sprite](https://blackdragon1727.itch.io/pixel-bullet-16x16) <br/>
-[Pixel Artist - blackdragon1727](https://blackdragon1727.itch.io/)
+* [**Firearms by ma9ici4n**](https://ma9ici4n.itch.io/ma9ici4nweaponpack) <br/>
 
-* **Buttons** <br/>
-[Sprite](https://opengameart.org/content/simple-menu-icons) <br/>
-[Pixel Artist - Nightsurfer23](https://opengameart.org/users/nightsurfer23) <br/>
-[Sprite](https://adwitr.itch.io/button-asset-pack) <br/>
-[Pixel Artist - adwitr](https://adwitr.itch.io/)
+* [**Items by Kickpixel**](https://kickpixel.itch.io/50fantasyicons) <br/>
+
+* [**Bullets by blackdragon1727**](https://blackdragon1727.itch.io/pixel-bullet-16x16) <br/>
+
+* [**Menu Buttons by adwitr**](https://adwitr.itch.io/button-asset-pack) <br/>
+
+* [**In-game Buttons by Nightsurfer23**](https://opengameart.org/content/simple-menu-icons)
+
+### Sound
 
 * **Soundtracks** <br/>
 All soundtracks are under [CC BY-SA 3.0 License](https://creativecommons.org/licenses/by-sa/3.0/). <br/>
-[Dark Ambience Loop - Iwan Gabovitch](https://opengameart.org/content/dark-ambience-loop)<br/>
-[Horror Game Menu - Eric Matyas Soundimage.org](https://opengameart.org/content/horror-game-menu) <br/>
+[Dark Ambience Loop by Iwan Gabovitch](https://opengameart.org/content/dark-ambience-loop)<br/>
+[Horror Game Menu by Eric Matyas Soundimage.org](https://opengameart.org/content/horror-game-menu) <br/>
 * **Sound effects** <br/>
 All sound effects are under [CC0 License](https://creativecommons.org/share-your-work/public-domain/cc0/). <br/>
 [Freesound](https://freesound.org/) <br/>
