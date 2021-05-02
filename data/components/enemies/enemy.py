@@ -12,7 +12,7 @@ from ...constants import DEFAULT_ENEMY_VELOCITY, DEFAULT_ENEMY_HEALTH
 from ...constants import DEFAULT_ENEMY_DAMAGE, FRAMES_TO_ENEMIES_TURN
 from ...constants import FRAMES_PER_SECOND, PREDICTION_STEP, VALID_POS_SEARCH_STEP
 from ...constants import TILE_SIZE, ATTRACTION_FACTOR, REPULSION_FACTOR
-from ...constants import ENEMY_VISION_RANGE, VORTICE_FACTOR, OBSTACLE_CENTER_THRESHOLD
+from ...constants import ENEMY_VISION_RANGE, VORTICE_FACTOR
 
 class Enemy(Entity):
     """
@@ -96,7 +96,9 @@ class Enemy(Entity):
 
             center_to_me = self.get_position() - center_mass
             center_to_target = target - center_mass
-            if np.abs(np.cross(center_to_me, center_to_target)) > OBSTACLE_CENTER_THRESHOLD:
+            triangle_area = np.abs(np.cross(center_to_me, center_to_target))/2
+            obstacle_disruptance = triangle_area/np.linalg.norm(self.get_position() - target)
+            if obstacle_disruptance > 2*TILE_SIZE/3:
                 if self.num_of_obstacles_in_line < 4:
                     vector_product_sign = np.sign(np.cross(center_to_me, center_to_target))
         self.rotational = vector_product_sign
