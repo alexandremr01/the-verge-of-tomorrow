@@ -15,7 +15,6 @@ class Hud:
         self.heart_sprites = [items_graphics.get_image(5), items_graphics.get_image(9), items_graphics.get_image(4)]
         self.heart_positions = [(10 + 35 * i, 745) for i in range(max_health)]
 
-
         self.current_weapon_name = "Uzi"
         self.weapon_position = (385, 715)
 
@@ -36,7 +35,7 @@ class Hud:
             self.ammo_surface[weapon.get_name()] = self.small_font.render(weapon_ammo, False, BLACK)
             self.ammo_current_position[weapon.get_name()] = self.ammo_position[len(weapon_ammo)]
             self.weapon_sprites[weapon.get_name()] = pygame.transform.scale(items_graphics.get_image(
-                                                                 weapon.get_image_index()), (90, 90))
+                weapon.get_image_index()), (90, 90))
 
         self.score_num_surface = self.font.render('0', False, BLACK)
         self.score_num_rect = self.score_num_surface.get_rect(center=(685, 755))

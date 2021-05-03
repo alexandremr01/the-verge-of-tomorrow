@@ -40,12 +40,9 @@ class PlayerStateFSM:
         return self._state.get_velocity()
 
     def send_event(self, event, time):
-        # print(" Recebi "+str(event))
         next_state = self._state.send_event(event, time)
-        # print(" Indo para "+str(next_state))
 
         if next_state != None:
-            # print(" Indo para " + str(next_state.get_name()))
             self._state = next_state
 
     def update(self, time):
