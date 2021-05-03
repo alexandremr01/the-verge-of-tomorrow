@@ -54,7 +54,7 @@ class Chunk:
         for position in positions:
             structure_seed = self.seed + position[2]
             np.random.seed(structure_seed)
-            number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.2, 0.1])
+            number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.55, 0.39, 0.05, 0.01])
             # number_of_directions = 4
             np.random.seed(structure_seed)
             directions = np.take([[1, 1, 11], [-1, 1, 12], [-1, -1, 13], [1, -1, 14]],
@@ -131,6 +131,8 @@ class Chunk:
                         corners.append([i, j])
                         horizontal_walls.remove([i, j])
                     elif not is_what(self.structuregrid[i][j], FLOOR):
+                        if is_what(self.structuregrid[i][j], CORNER):
+                            corners.remove([i, j])
                         self.structuregrid[i][j] = WALL_LEFT_RIGHT
                         vertical_walls.append([i, j])
 
@@ -144,6 +146,8 @@ class Chunk:
                         corners.append([i, j])
                         vertical_walls.remove([i, j])
                     elif not is_what(self.structuregrid[i][j], FLOOR):
+                        if is_what(self.structuregrid[i][j], CORNER):
+                            corners.remove([i, j])
                         self.structuregrid[i][j] = WALL_TOP_BOTTOM
                         horizontal_walls.append([i, j])
 
@@ -253,17 +257,19 @@ class Chunk:
                     self.structuregrid[corner[0] + 1][corner[1] + 1] = GRASS_SHADOW_TOP_LEFT
 
         # Generating items
+        number_of_items = len(self.structures[position])
         np.random.seed(self.seed)
-        item_position = floor[np.random.randint(len(floor))]
-
-        item = self.item_generator.generate_item()
-        self.structuregrid[item_position[0]][item_position[1]] = item.get_sprite()
+        indices = np.random.choice(list(range(len(floor))), size=number_of_items, replace=False)
+        item_positions = np.take(floor, indices=indices, axis=0)
+        for item_pos in item_positions:
+            item = self.item_generator.generate_item()
+            self.structuregrid[item_pos[0]][item_pos[1]] = item.get_sprite()
 
     def render(self, generator, tiles):
         self.is_rendering = True
         if self.structures_step == -1:
             np.random.seed(self.seed)
-            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.6, 0.2, 0.1, 0.05, 0.05]))
+            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.25, 0.45, 0.2, 0.05, 0.05]))
             # number_of_structures = 4
             if number_of_structures != 0:
                 self.generate_structure_variables(number_of_structures)

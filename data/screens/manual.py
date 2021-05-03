@@ -52,8 +52,8 @@ class Keys(ManualPage):
 
         name_font = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 30)
         objectiveText = ['The   goal   of   the   game   is   to   survive',
-                         'as   long   as   possible   running    away',
-                        'from   the    enemies   or    killing    them']
+                         'and   kill   as   many   enemies   as   the',
+                        'the   player   can']
         for phrase in objectiveText:
             x = name_font.render(phrase, True, BLACK)
             screen.blit_rel(x, ((800 - x.get_width())/2 , y))
@@ -73,9 +73,9 @@ class Keys(ManualPage):
                     'A    to    move    LEFT',
                     'D    to    move   RIGHT',
                     'Hold   SHIFT    to   RUN',
-                    'LEFT   BUTTON   to   SHOOT',
-                    '1   2   3   to   switch   weapon',
-                    'Q  to   use   item   in   bag']
+                    'LEFT   MOUSE   to   SHOOT',
+                    '1   2   3   to   switch   weapons',
+                    'Q  to   use   the   item   in   bag']
         for phrase in keysText:
             x = name_font.render(phrase, True, BLACK)
             screen.blit_rel(x, ((800 - x.get_width())/2 , y))
@@ -120,10 +120,10 @@ class Items(ManualPage):
 
         listItems = ['Red   Potion', 'Blue   Potion', 'Green   Potion', 'Chest', 'Skull']
         descriptionItems = ['restores   one   heart',
-                            'removes   bleeding   status',
-                            'removes   slow   status',
+                            'removes   bleeding   debuff',
+                            'removes   slow   debuff',
                             'gives   ammo   to   a   random   gun',
-                            'gives   the   strong   status']
+                            'gives   strong   buff']
 
         i = 0
         for phrase in descriptionItems:

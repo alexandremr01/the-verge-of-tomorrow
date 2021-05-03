@@ -50,8 +50,8 @@ class About(State):
         font_40 = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 40)
         font_60 = pygame.font.Font(BASE_FONT_DIR + 'ARCADECLASSIC.TTF', 60)
 
-        paragraph_1 = ['This   game   was   a   assigment   for',
-                       'CES 22   course   at   ITA']
+        paragraph_1 = ['This   game   was   made   as   a   project',
+                       'for   CES 22   course   at   ITA']
 
         names = ['Alexandre   Maranhao',
                  'Alvaro   Tedeschi',
