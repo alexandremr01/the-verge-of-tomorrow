@@ -186,7 +186,7 @@ class Map:
             if self.get_tile(new_position).item is not None:
                 item = self.get_tile(new_position).item()
                 if item.is_potion():
-                    self.player.bag.set_item(item, self.time)
+                    self.player.bag.set_item(item)
                 else:
                     item.apply_effect(self.player, self.time)
                 i, j = self.get_tile_position(new_position)
@@ -258,7 +258,7 @@ class Map:
         self.time = pygame.time.get_ticks()
         self.update_positions()
         self.player.update_state(self.time)
-        self.player.update_direction(not self.wave.is_day())
+        self.player.update_direction()
         if not loading and self.wave.finished():
             self.wave.new_wave(self.time)
         self.update_chunks()

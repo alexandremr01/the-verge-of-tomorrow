@@ -5,7 +5,7 @@ The player being controlled by the user.
 
 import pygame
 import numpy as np
-from pygame.locals import  K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
+from pygame.locals import K_1, K_2, K_3, K_w, K_a, K_s, K_d, K_LSHIFT
 
 from ..utils import RandomEventGenerator, rotate
 from . import player_state
@@ -22,10 +22,12 @@ from .player_state import PlayerStateFSM
 from ..setup import sound_dict
 from data.components.weapon import Uzi, Shotgun, AK47
 
+
 class Player(Entity):
     """
     Main character class
     """
+
     def __init__(self):
         super().__init__(np.array([0, 0]), graphics_dict['player'].get_image(0, (50, 50)))
         self.health = PLAYER_INITIAL_HEALTH
@@ -42,18 +44,19 @@ class Player(Entity):
         self.last_bleeding_time = 0
         self.last_shoot_time = [0, 0, 0]
         self.last_heartbeat_time = 0
-        self.weapons = {"Uzi": Uzi(),"AK47" : AK47(),"Shotgun" : Shotgun()}
+        self.weapons = {"Uzi": Uzi(), "AK47": AK47(), "Shotgun": Shotgun()}
         self.current_weapon_name = "Uzi"
         self.small_font = pygame.font.Font('./resources/fonts/ARCADE_N.TTF', 20)
-
 
         self.text = None
         self.text_expiration_time = 0
 
         self.bag = Bag(graphics_dict['items'], graphics_dict['bag'])
 
-        self.original_polygon_points = np.array([(-220,-220), (SCREEN_WIDTH, -220), (SCREEN_WIDTH/2, SCREEN_HEIGHT/2), (SCREEN_WIDTH+220, SCREEN_HEIGHT+220), (-220, SCREEN_HEIGHT+220)])
-        self.polygon_points = (self.original_polygon_points)
+        self.original_polygon_points = np.array(
+            [(-220, -220), (SCREEN_WIDTH, -220), (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
+             (SCREEN_WIDTH + 220, SCREEN_HEIGHT + 220), (-220, SCREEN_HEIGHT + 220)])
+        self.polygon_points = self.original_polygon_points
         self.mask = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA, 32).convert_alpha()
         pygame.draw.polygon(self.mask, BLACK, self.polygon_points)
         self.last_angle = 0
@@ -67,7 +70,6 @@ class Player(Entity):
             player_state.BLEED_EVENT: 0.1
         }
         self.debuf_generator = RandomEventGenerator(debuf_probs, null_event=None)
-
 
     def get_hud(self):
         """
@@ -129,12 +131,11 @@ class Player(Entity):
     def update_state(self, time):
         if time > self.text_expiration_time:
             self.text = None
-        self.bag.update(time)
 
         if self.health <= 1 and time - self.last_heartbeat_time >= TIME_BETWEEN_HEARTBEAT:
             self.last_heartbeat_time = time
             sound_dict['heartbeat'].play()
-        if self.state.get_state() == player_state.BleedingState and time - self.last_bleeding_time > player_state.BLEEDING_INTERVAL :
+        if self.state.get_state() == player_state.BleedingState and time - self.last_bleeding_time > player_state.BLEEDING_INTERVAL:
             self.hurt(player_state.BLEEDING_DAMAGE)
             self.last_bleeding_time = time
         self.state.update(time)
@@ -157,7 +158,7 @@ class Player(Entity):
         """
         self.state.send_event(player_state.STOP_RUN_EVENT, time)
 
-    def update_direction(self, is_night):
+    def update_direction(self):
         """
         Updates the current player's direction.
         """
@@ -168,7 +169,8 @@ class Player(Entity):
         self.direction = -angle
 
         for i in range(len(self.original_polygon_points)):
-            self.polygon_points[i] = rotate((SCREEN_WIDTH/2, SCREEN_HEIGHT/2), self.original_polygon_points[i], (angle-self.last_angle))
+            self.polygon_points[i] = rotate((SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), self.original_polygon_points[i],
+                                            (angle - self.last_angle))
         self.mask = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA, 32).convert_alpha()
 
         pygame.draw.polygon(self.mask, BLACK, self.polygon_points)
@@ -176,7 +178,6 @@ class Player(Entity):
         self.update_sprite(self.current_weapon, -angle)
         self.projectiles.update()
         self.last_angle = angle
-
 
     def shoot(self, time):
         """
@@ -192,12 +193,12 @@ class Player(Entity):
                 sound_dict[self.current_weapon_name].play()
 
         if can_shoot:
-            weapon_position = (30 * np.cos(np.radians(-self.direction+20)), 
-                               25 * np.sin(np.radians(-self.direction+20)))
+            weapon_position = (30 * np.cos(np.radians(-self.direction + 20)),
+                               25 * np.sin(np.radians(-self.direction + 20)))
             damage = self.state.get_damage(self.weapons[self.current_weapon_name].get_damage())
             self.projectiles.add_bullet(self.get_position() + weapon_position,
                                         weapon_position,
-                                        -self.direction, 
+                                        -self.direction,
                                         self.weapons[self.current_weapon_name], damage)
 
     def update_ammo(self):
@@ -218,10 +219,10 @@ class Player(Entity):
         if self.text is not None:
             if is_day:
                 surface_text = self.small_font.render(self.text, False, BLACK)
-                screen.blit_rel(surface_text, (SCREEN_WIDTH/2 - 20 - len(self.text), SCREEN_HEIGHT/2 - 50))
+                screen.blit_rel(surface_text, (SCREEN_WIDTH / 2 - 20 - len(self.text), SCREEN_HEIGHT / 2 - 50))
             else:
                 surface_text = self.small_font.render(self.text, False, WHITE)
-                screen.blit_rel(surface_text, (SCREEN_WIDTH/2 - 20 - len(self.text), SCREEN_HEIGHT/2 - 50))
+                screen.blit_rel(surface_text, (SCREEN_WIDTH / 2 - 20 - len(self.text), SCREEN_HEIGHT / 2 - 50))
 
         self.projectiles.draw(screen)
 
@@ -242,9 +243,9 @@ class Player(Entity):
         return self.health > 0
 
     def apply_random_debuff(self, time):
-        debuf = self.debuf_generator.generate()
-        self.state.send_event(debuf, time)
-        if debuf == player_state.BLEED_EVENT:
+        debuff = self.debuf_generator.generate()
+        self.state.send_event(debuff, time)
+        if debuff == player_state.BLEED_EVENT:
             self.last_bleeding_time = time
 
     def handle_collision(self, enemy, time):
@@ -261,4 +262,3 @@ class Player(Entity):
             self.hud.set_status(self.state.get_state_name())
             self.last_collision_time = time
             self.update_state(time)
-

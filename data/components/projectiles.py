@@ -4,20 +4,23 @@ import numpy as np
 from .base.entity import Entity
 from ..setup import graphics_dict
 from ..constants import (BULLET_VELOCITY, SCREEN_WIDTH, SCREEN_HEIGHT)
-from data.components.weapon import Uzi, Shotgun, AK47
+
+
 class Bullet(Entity):
     """
     A game's projectile
     """
+
     def __init__(self, initial_position, weapon_position, direction, weapon, damage=None):
-        super().__init__(initial_position, graphics_dict["bullets"].get_image(weapon.get_bullet_image_index()), direction)
+        super().__init__(initial_position, graphics_dict["bullets"].get_image(weapon.get_bullet_image_index()),
+                         direction)
         if damage is None:
             self.damage = weapon.get_damage()
         else:
             self.damage = damage
         self.velocity = BULLET_VELOCITY
         self.direction = direction
-        self.screen_position = [SCREEN_WIDTH // 2 + int(weapon_position[0]), 
+        self.screen_position = [SCREEN_WIDTH // 2 + int(weapon_position[0]),
                                 SCREEN_HEIGHT // 2 + int(weapon_position[1])]
 
     def get_damage(self):
@@ -57,6 +60,7 @@ class Projectiles:
     """
     Collection of all current player's bullets in the screen.
     """
+
     def __init__(self):
         self.projectiles = dict()
         for weapon_name in ["Uzi", "Shotgun", "AK47"]:
@@ -66,8 +70,8 @@ class Projectiles:
         """
         Adds a new bullet into projectiles
         """
-        self.projectiles[weapon.get_name()].append(Bullet(initial_position, weapon_position, 
-                                                    direction, weapon, damage))
+        self.projectiles[weapon.get_name()].append(Bullet(initial_position, weapon_position,
+                                                          direction, weapon, damage))
 
     def get_bullets(self):
         """
@@ -80,12 +84,12 @@ class Projectiles:
         Updates the position of all projectiles
         """
         for key in self.projectiles.keys():
-            self.projectiles[key] = [bullet for bullet in self.projectiles[key] 
+            self.projectiles[key] = [bullet for bullet in self.projectiles[key]
                                      if bullet.is_visible()]
         for key in self.projectiles.keys():
             for bullet in self.projectiles[key]:
                 bullet.update()
-        
+
     def draw(self, screen):
         """
         Draws all visible projectiles
@@ -109,5 +113,4 @@ class Projectiles:
             enemy.hurt(damage)
             self.projectiles[key] = [bullet for bullet in self.projectiles[key]
                                      if not pygame.sprite.collide_rect(
-                                     bullet.get_sprite(), enemy.get_sprite())]
-
+                    bullet.get_sprite(), enemy.get_sprite())]

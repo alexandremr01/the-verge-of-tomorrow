@@ -1,10 +1,6 @@
-import pygame
-import numpy as np
-
 from data.components import player_state
 from data.utils import RandomEventGenerator
-from . import weapon
-from ..constants import PLAYER_INITIAL_HEALTH, BLACK
+from ..constants import PLAYER_INITIAL_HEALTH
 from ..setup import sound_dict
 
 POTION_TEXT_DURATION = 500
@@ -131,7 +127,6 @@ class Ammo(Item):
         text = '+' + str(gen_ammo) + ' ' + weapon.name
         player.write(text, time, WEAPON_TEXT_DURATION)
         sound_dict['ammo_collect'].play()
-
 
 
 ITEM_SKULL = 90

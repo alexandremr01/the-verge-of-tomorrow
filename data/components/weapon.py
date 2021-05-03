@@ -2,10 +2,12 @@
 Module that contains weapons' characteristics
 """
 
+
 class Weapon:
     """
     The base class for a weapon
     """
+
     def __init__(self):
         self.damage = None
         self.delay = None
@@ -62,6 +64,7 @@ class Uzi(Weapon):
     """
     The submachine used by main character.
     """
+
     def __init__(self):
         self.damage = 25
         self.delay = 120
@@ -76,6 +79,7 @@ class AK47(Weapon):
     """
     The rifle used by the main character.
     """
+
     def __init__(self):
         self.damage = 40
         self.delay = 200
@@ -90,6 +94,7 @@ class Shotgun(Weapon):
     """
     The shotgun used by the main character.
     """
+
     def __init__(self):
         self.damage = 70
         self.delay = 1000
