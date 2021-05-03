@@ -83,18 +83,6 @@ class Chunk:
         else:
             self.tilegrid = np.concatenate((self.tilegrid, new_load), axis=0)
 
-    def check_wall_intersection(self, i, j):
-        if is_what(self.structuregrid[i][j + 1], FLOOR):
-            if is_what(self.structuregrid[i + 1][j], FLOOR):
-                self.structuregrid[i][j] = WALL_BOTTOM_RIGHT
-            else:
-                self.structuregrid[i][j] = WALL_TOP_RIGHT
-        else:
-            if is_what(self.structuregrid[i + 1][j], FLOOR):
-                self.structuregrid[i][j] = WALL_BOTTOM_LEFT
-            else:
-                self.structuregrid[i][j] = WALL_TOP_LEFT
-
     def generate_structure(self):
         position = [*self.structures][self.structures_step]  # Gets next structure position to generate
 
@@ -107,11 +95,53 @@ class Chunk:
             i_direction, j_direction = direction
             width, height = length
 
+            def resolve_intersection(i, j):
+                if is_what(self.structuregrid[i][j + 1], FLOOR):
+                    if is_what(self.structuregrid[i + 1][j], FLOOR):
+                        self.structuregrid[i][j] = WALL_BOTTOM_RIGHT
+                    else:
+                        self.structuregrid[i][j] = WALL_TOP_RIGHT
+                else:
+                    if is_what(self.structuregrid[i + 1][j], FLOOR):
+                        self.structuregrid[i][j] = WALL_BOTTOM_LEFT
+                    else:
+                        self.structuregrid[i][j] = WALL_TOP_LEFT
+
+            def get_grid_indexes(x_value, y_value):
+                return position[0] + i_direction * y_value, position[1] + j_direction * x_value
+
+            def set_walls(width, height):
+                build_vertical_wall(-2, height, WALL_LEFT_RIGHT, vertical_walls, WALL_TOP_BOTTOM, horizontal_walls)
+                build_vertical_wall(width, height, WALL_LEFT_RIGHT, vertical_walls, WALL_TOP_BOTTOM, horizontal_walls)
+                build_horizontal_wall(-2, width, WALL_TOP_BOTTOM, horizontal_walls, WALL_LEFT_RIGHT, vertical_walls)
+                build_horizontal_wall(height, width, WALL_TOP_BOTTOM, horizontal_walls, WALL_LEFT_RIGHT, vertical_walls)
+
+            def build_horizontal_wall(axis, size, wall, wall_list, intersecting_wall, intersecting_wall_list):
+                for x in range(-1, size):
+                    build_wall(x, axis,
+                               wall, wall_list,
+                               intersecting_wall, intersecting_wall_list)
+
+            def build_vertical_wall(axis, size, wall, wall_list, intersecting_wall, intersecting_wall_list):
+                for y in range(-1, size):
+                    build_wall(axis, y,
+                               wall, wall_list,
+                               intersecting_wall, intersecting_wall_list)
+
+            def build_wall(x, y, wall, wall_list, intersecting_wall, intersecting_wall_list):
+                i, j = get_grid_indexes(x, y)
+                if self.structuregrid[i][j] == intersecting_wall:
+                    resolve_intersection(i, j)
+                    corners.append([i, j])
+                    intersecting_wall_list.remove([i, j])
+                elif not is_what(self.structuregrid[i][j], FLOOR):
+                    self.structuregrid[i][j] = wall
+                    wall_list.append([i, j])
+
             # Set floor
             for x in range(-1, width):
                 for y in range(-1, height):
-                    i = position[0] + i_direction * y
-                    j = position[1] + j_direction * x
+                    i, j = get_grid_indexes(x, y)
                     self.structuregrid[i][j] = CHECKERED_PLAIN
                     floor.append([i, j])
                     if [i, j] in horizontal_walls:
@@ -121,37 +151,36 @@ class Chunk:
                     elif [i, j] in corners:
                         corners.remove([i, j])
 
-            # Set left and right walls
-            for x in [-2, width]:
-                for y in range(-1, height):
-                    i = position[0] + i_direction * y
-                    j = position[1] + j_direction * x
-                    if self.structuregrid[i][j] == WALL_TOP_BOTTOM:
-                        self.check_wall_intersection(i, j)
-                        corners.append([i, j])
-                        horizontal_walls.remove([i, j])
-                    elif not is_what(self.structuregrid[i][j], FLOOR):
-                        self.structuregrid[i][j] = WALL_LEFT_RIGHT
-                        vertical_walls.append([i, j])
+            set_walls(width, height)
 
-            # Set top and bottom walls
-            for y in [-2, height]:
-                for x in range(-1, width):
-                    i = position[0] + i_direction * y
-                    j = position[1] + j_direction * x
-                    if self.structuregrid[i][j] == WALL_LEFT_RIGHT:
-                        self.check_wall_intersection(i, j)
-                        corners.append([i, j])
-                        vertical_walls.remove([i, j])
-                    elif not is_what(self.structuregrid[i][j], FLOOR):
-                        self.structuregrid[i][j] = WALL_TOP_BOTTOM
-                        horizontal_walls.append([i, j])
+            # # Set left and right walls
+            # for x in [-2, width]:
+            #     for y in range(-1, height):
+            #         i, j = get_grid_indexes(x, y)
+            #         if self.structuregrid[i][j] == WALL_TOP_BOTTOM:
+            #             self.resolve_intersection(i, j)
+            #             corners.append([i, j])
+            #             horizontal_walls.remove([i, j])
+            #         elif not is_what(self.structuregrid[i][j], FLOOR):
+            #             self.structuregrid[i][j] = WALL_LEFT_RIGHT
+            #             vertical_walls.append([i, j])
+            #
+            # # Set top and bottom walls
+            # for y in [-2, height]:
+            #     for x in range(-1, width):
+            #         i, j = get_grid_indexes(x, y)
+            #         if self.structuregrid[i][j] == WALL_LEFT_RIGHT:
+            #             self.resolve_intersection(i, j)
+            #             corners.append([i, j])
+            #             vertical_walls.remove([i, j])
+            #         elif not is_what(self.structuregrid[i][j], FLOOR):
+            #             self.structuregrid[i][j] = WALL_TOP_BOTTOM
+            #             horizontal_walls.append([i, j])
 
             # Set Corners
             for x in [-2, width]:
                 for y in [-2, height]:
-                    i = position[0] + i_direction * y
-                    j = position[1] + j_direction * x
+                    i, j = get_grid_indexes(x, y)
                     if is_what(self.structuregrid[i][j], TERRAIN):
                         corners.append([i, j])
                         if is_what(self.structuregrid[i][j + 1], WALL):
@@ -172,7 +201,7 @@ class Chunk:
             if f[1] == s[1]:
                 if not is_what(self.structuregrid[f[0] + 1][f[1]], CORNER) and \
                         not is_what(self.structuregrid[f[0] - 1][f[1]], CORNER):
-                    if not is_what(self.structuregrid[s[0] + 1][s[1]], CORNER) and\
+                    if not is_what(self.structuregrid[s[0] + 1][s[1]], CORNER) and \
                             not is_what(self.structuregrid[s[0] - 1][s[1]], CORNER):
                         vertical_walls.remove(f)
                         vertical_walls.remove(s)
@@ -191,9 +220,9 @@ class Chunk:
             f = horizontal_walls[i]
             s = horizontal_walls[i + 1]
             if f[0] == s[0]:
-                if not is_what(self.structuregrid[f[0]][f[1] + 1], CORNER) and\
+                if not is_what(self.structuregrid[f[0]][f[1] + 1], CORNER) and \
                         not is_what(self.structuregrid[f[0]][f[1] - 1], CORNER):
-                    if not is_what(self.structuregrid[s[0]][s[1] + 1], CORNER) and\
+                    if not is_what(self.structuregrid[s[0]][s[1] + 1], CORNER) and \
                             not is_what(self.structuregrid[s[0]][s[1] - 1], CORNER):
                         horizontal_walls.remove(f)
                         horizontal_walls.remove(s)
