@@ -99,8 +99,12 @@ class Map:
         :return: tile on chunk's tilegrid
         :rtype: Tile object
         """
-        tile_position = self.get_tile_position(position)
-        current_chunk = self.chunks[tuple(self.get_chunk_position(position))]
+        if position is None:
+            rel_pos = self.player.get_position()
+        else:
+            rel_pos = position
+        tile_position = self.get_tile_position(rel_pos)
+        current_chunk = self.chunks[tuple(self.get_chunk_position(rel_pos))]
         if current_chunk.structuregrid is not None and is_what(current_chunk.structuregrid[tile_position], ITEM):
             return self.tiles.tilesdict[current_chunk.structuregrid[tile_position]]
         return self.tiles.tilesdict[current_chunk.tilegrid[tile_position]]

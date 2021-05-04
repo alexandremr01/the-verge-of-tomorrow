@@ -66,8 +66,8 @@ class Player(Entity):
             self.bullets[weapon_name] = self.weapons[weapon_name].get_initial_ammo()
 
         debuf_probs = {
-            player_state.SLOW_EVENT: 0.1,
-            player_state.BLEED_EVENT: 0.1
+            player_state.SLOW_EVENT: 0.25,
+            player_state.BLEED_EVENT: 0.2
         }
         self.debuf_generator = RandomEventGenerator(debuf_probs, null_event=None)
 

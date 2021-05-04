@@ -269,7 +269,7 @@ class Chunk:
         self.is_rendering = True
         if self.structures_step == -1:
             np.random.seed(self.seed)
-            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.25, 0.45, 0.2, 0.05, 0.05]))
+            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.20, 0.40, 0.3, 0.08, 0.02]))
             # number_of_structures = 4
             if number_of_structures != 0:
                 self.generate_structure_variables(number_of_structures)
