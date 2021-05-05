@@ -69,14 +69,8 @@ class Chunk:
 
         build_floor(self.structuregrid, self.structures, position, interior_floor, border_floor)
         build_walls(self.structuregrid, border_floor, horizontal_walls, vertical_walls, corner_walls)
-        cast_shadows(self.structuregrid, horizontal_walls, vertical_walls, corner_walls)
-
-        # Generating items
-        np.random.seed(self.seed)
-        item_position = interior_floor[np.random.randint(len(interior_floor))]
-
-        item = self.item_generator.generate_item()
-        self.structuregrid[item_position[0]][item_position[1]] = item.get_sprite()
+        cast_shadows(self.seed, self.structuregrid, horizontal_walls, vertical_walls, corner_walls)
+        generate_items(self.seed, self.structuregrid, self.structures, position, interior_floor)
 
     def render(self, generator, tiles):
         self.is_rendering = True

@@ -183,6 +183,8 @@ def is_what(value, tile_type):
         return WALL_BOTTOM_RIGHT <= value <= WALL_TOP_LEFT
     elif tile_type == ITEM:
         return ITEM_SKULL <= value <= ITEM_AMMO
+    else:
+        return value == tile_type
 
 
 TERRAIN = -1
