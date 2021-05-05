@@ -47,42 +47,16 @@ class Chunk:
 
     def generate_structure_variables(self, number_of_structures):
         self.structuregrid = np.zeros((TILE_NUMBER, TILE_NUMBER))
-        positions = np.array([[0.25, 0.25], [0.75, 0.75], [0.25, 0.75], [0.75, 0.25]]) * TILE_NUMBER
-        positions = np.concatenate((positions.astype(int), [[1], [2], [3], [4]]), axis=1)
-        np.random.seed(self.seed)
-        positions = np.take(positions, np.random.choice([0, 1, 2, 3], size=number_of_structures, replace=False), axis=0)
-        self.structures = {}
-        for position in positions:
-            structure_seed = self.seed + position[2]
-            np.random.seed(structure_seed)
-            number_of_directions = np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.2, 0.1])
-            number_of_directions = 4
-            np.random.seed(structure_seed)
-            directions = np.take([[1, 1, 11], [-1, 1, 12], [-1, -1, 13], [1, -1, 14]],
-                                 np.random.choice(np.array([0, 1, 2, 3]), size=number_of_directions, replace=False),
-                                 axis=0)
-            generation_variables = []
-            for direction in directions:
-                direction_seed = structure_seed + direction[2]
-                np.random.seed(direction_seed)
-                width = np.random.randint(6, TILE_NUMBER / 4 - 1)
-                np.random.seed(direction_seed + 5)
-                height = np.random.randint(6, TILE_NUMBER / 4 - 1)
-                generation_variables.append([direction[:2], [width, height]])
-            self.structures[tuple(position[:2])] = generation_variables
+        self.structures = gen_structure_info(self.seed, number_of_structures)
 
     def generate_terrain(self, generator):
-        start_position = (self.topleft +
-                          np.array([0, CHUNK_SIZE // self.terrain_steps * self.terrain_step])) / TILE_SIZE
-        new_load = np.array([[(generator.noise2d((start_position[0] + j) / 3, -(start_position[1] + i) / 3) + 1) / 2
-                              for j in range(TILE_NUMBER)]
-                             for i in range(TILE_NUMBER // self.terrain_steps)])
+        load = gen_terrain_load(generator, self.topleft, self.terrain_step)
         if self.terrain_step == 0:
-            self.tilegrid = new_load
+            self.tilegrid = load
             self.surface = pygame.Surface(CHUNK_ARRAY)
             self.surface_night = pygame.Surface(CHUNK_ARRAY)
         else:
-            self.tilegrid = np.concatenate((self.tilegrid, new_load), axis=0)
+            self.tilegrid = np.concatenate((self.tilegrid, load), axis=0)
 
     def generate_structure(self):
         position = [*self.structures][self.structures_step]  # Gets next structure position to generate

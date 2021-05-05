@@ -50,7 +50,7 @@ def gen_structure_info(seed, structures_number):
             width = randint(seed=direction_seed,
                             low=6,
                             high=TILE_NUMBER / 4 - 1)
-            height = randint(seed=direction_seed + 1,
+            height = randint(seed=direction_seed + 5,
                              low=6,
                              high=TILE_NUMBER / 4 - 1)
             generation_variables.append((direction, (width, height)))
@@ -58,7 +58,9 @@ def gen_structure_info(seed, structures_number):
     return structures
 
 
-def gen_terrain_load(generator, starting_position):
+def gen_terrain_load(generator, topleft, terrain_step):
+    starting_position = (topleft +
+                         np.array([0, CHUNK_SIZE // TERRAIN_STEPS * terrain_step])) / TILE_SIZE
     load = np.array([[(generator.noise2d((starting_position[0] + j) / 3,
                                          -(starting_position[1] + i) / 3) + 1) / 2
                       for j in range(TILE_NUMBER)]
@@ -160,7 +162,6 @@ def cast_side_shadow(structures_array, shadow_pos, floor_shadow_type, terrain_sh
         structures_array[shadow_pos] = floor_shadow_type
     else:
         structures_array[shadow_pos] = terrain_shadow_type
-
 
 # def cast_corner_shadow(structures_array, side_shadow_pos, corner_shadow_pos,
 #                        floor_side_shadow_type, terrain_side_shadow_type,
