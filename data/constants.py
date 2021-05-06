@@ -2,7 +2,6 @@
 This module contains constant variables used throughout all
 code
 """
-import pygame
 import numpy as np
 
 # Screen
@@ -31,13 +30,13 @@ TITLE_FRAMERATE = 150
 TITLE_MESSAGE_FRAMERATE = 500
 
 # Map
-RENDER_STEPS = 48
+DRAW_RENDER_STEPS = 48
+TERRAIN_BUILD_STEPS = 8
 TILE_SIZE = 50
 TILE_ARRAY = np.array([TILE_SIZE, TILE_SIZE])
 TILE_NUMBER = 6 * 8  # Needs to be multiple of 6
 CHUNK_SIZE = TILE_SIZE * TILE_NUMBER
 CHUNK_ARRAY = np.array([CHUNK_SIZE, CHUNK_SIZE])
-CHUNK_TILE_RATIO_STEPS = CHUNK_SIZE // TILE_SIZE // RENDER_STEPS
 
 
 # Waves
