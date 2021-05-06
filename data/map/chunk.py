@@ -1,9 +1,5 @@
 import pygame
-import numpy as np
-from data.components.item import ItemGenerator
-from data.utils import compare
-from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, DRAW_RENDER_STEPS, TERRAIN_BUILD_STEPS, TILE_NUMBER
-from data.map.tile import *
+from data.constants import CHUNK_ARRAY, DRAW_RENDER_STEPS
 from data.map.chunk_generator import *
 
 
@@ -21,14 +17,11 @@ class Chunk:
         self.seed = np.random.randint(0, 10000)
         self.surface = None
         self.surface_night = None
-        self.is_rendering = True
-        self.terrain_step = 0
+        self.is_rendering = False
+        self.terrain_step = self.structures_step = self.draw_step = 0
         self.terrain_steps = TERRAIN_BUILD_STEPS
-        self.structures_step = -1
         self.structures_steps = 0
-        self.draw_step = 0
         self.draw_steps = DRAW_RENDER_STEPS
-        self.item_generator = ItemGenerator()
 
     def is_unloaded(self):
         return self.tilegrid is None
@@ -42,7 +35,28 @@ class Chunk:
         self.surface = None
         self.surface_night = None
         self.structures = None
-        self.structures_step = -1
+
+    def render(self, generator, tiles):
+        if not self.is_rendering:
+            self.is_rendering = True
+            self.initialize_chunk_variables()
+        else:
+            self.render_next_step(generator, tiles)
+
+    def render_next_step(self, generator, tiles):
+        if self.terrain_step is not self.terrain_steps:
+            self.generate_terrain(generator)
+            self.terrain_step += 1
+        else:
+            if self.structures_step is not self.structures_steps:
+                self.generate_structure()
+                self.structures_step += 1
+            else:
+                if self.draw_step is not self.draw_steps:
+                    self.draw(tiles)
+                    self.draw_step += 1
+                else:
+                    self.is_rendering = False
 
     def initialize_chunk_variables(self):
         self.surface = pygame.Surface(CHUNK_ARRAY)
@@ -52,7 +66,9 @@ class Chunk:
         if number_of_structures > 0:
             self.structuregrid = np.zeros((TILE_NUMBER, TILE_NUMBER))
             self.structures = gen_structure_info(self.seed, number_of_structures)
+
         self.structures_steps = number_of_structures
+        self.structures_step = 0
         self.terrain_step = 0
         self.draw_step = 0
 
@@ -88,26 +104,6 @@ class Chunk:
                      horizontal_opening_walls, vertical_opening_walls)
 
         generate_items(self.seed, self.structuregrid, self.structures, position, interior_floor)
-
-    def render(self, generator, tiles):
-        self.is_rendering = True
-        if self.structures_step == -1:
-            self.initialize_chunk_variables()
-            self.structures_step += 1
-        else:
-            if self.terrain_step is not self.terrain_steps:
-                self.generate_terrain(generator)
-                self.terrain_step += 1
-            else:
-                if self.structures_step is not self.structures_steps:
-                    self.generate_structure()
-                    self.structures_step += 1
-                else:
-                    if self.draw_step is not self.draw_steps:
-                        self.draw(tiles)
-                        self.draw_step += 1
-                    else:
-                        self.is_rendering = False
 
     def blit(self, i, j, tiles, grid):
         self.surface.blit(tiles.tilesdict[grid[i][j]].sprite.get_image(),

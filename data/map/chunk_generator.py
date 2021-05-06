@@ -1,8 +1,7 @@
-import pygame
 import numpy as np
 from data.components.item import ItemGenerator
 from data.utils import compare
-from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, DRAW_RENDER_STEPS, TERRAIN_BUILD_STEPS, TILE_NUMBER
+from data.constants import CHUNK_SIZE, TILE_SIZE, TERRAIN_BUILD_STEPS, TILE_NUMBER
 from data.map.tile import *
 
 STRUCTURES_SEED = {(TILE_NUMBER * 1 // 4, TILE_NUMBER * 1 // 4): 1, (TILE_NUMBER * 3 // 4, TILE_NUMBER * 3 // 4): 2,
@@ -36,7 +35,6 @@ def gen_structure_info(seed, number_of_structures):
         number_of_directions = randchoice(seed=structure_seed,
                                           array=[1, 2, 3, 4],
                                           p=[0.35, 0.35, 0.2, 0.1])
-        number_of_directions = 4
         build_directions = randrowchoice(seed=structure_seed, array=DIRECTIONS, size=number_of_directions,
                                          replace=False)
         generation_variables = []

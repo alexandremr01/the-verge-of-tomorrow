@@ -190,7 +190,7 @@ class Map:
                 else:
                     item.apply_effect(self.player, self.time)
                 i, j = self.get_tile_position(new_position)
-                new_chunk.structuregrid[i][j] = new_chunk.tilegrid[i][j]
+                new_chunk.structuregrid[i, j] = new_chunk.tilegrid[i, j]
                 new_chunk.blit(i, j, self.tiles, new_chunk.tilegrid)
         else:
             self.player.move(walk_vector[0], walk_vector[1])
@@ -263,7 +263,6 @@ class Map:
             self.wave.new_wave(self.time)
         self.update_chunks()
         self.wave.update_enemies(self.player, self.time, self.is_valid_position, self.is_stone)
-
 
     def draw(self, screen):
         """
