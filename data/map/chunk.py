@@ -70,6 +70,11 @@ class Chunk:
         build_floor(self.structuregrid, self.structures, position, interior_floor, border_floor)
         build_walls(self.structuregrid, border_floor, horizontal_walls, vertical_walls, corner_walls)
         cast_shadows(self.seed, self.structuregrid, horizontal_walls, vertical_walls, corner_walls)
+
+        horizontal_walls.sort(key=lambda element: (element[0], element[1]))
+        vertical_walls.sort(key=lambda element: (element[1], element[0]))
+
+        create_openings(self.structuregrid, self.structuregrid, self.structures, horizontal_walls, vertical_walls)
         generate_items(self.seed, self.structuregrid, self.structures, position, interior_floor)
 
     def render(self, generator, tiles):

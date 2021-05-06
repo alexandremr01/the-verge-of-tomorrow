@@ -177,6 +177,8 @@ def is_what(value, tile_type):
         return (CHECKERED_PLAIN <= value <= CHECKERED_GRASS_3) or (value == WALL_BROKEN_FLOOR)
     elif tile_type == FLOOR_SHADOW:
         return CHECKERED_SHADOW_TOP <= value <= CHECKERED_SHADOW_TOP_LEFT_FULL
+    elif tile_type == GRASS_SHADOW:
+        return GRASS_SHADOW_TOP_1 <= value <= GRASS_SHADOW_TOP_LEFT_FULL
     elif tile_type == WALL:
         return WALL_LEFT_RIGHT <= value <= WALL_PILLAR
     elif tile_type == CORNER:
@@ -191,9 +193,10 @@ TERRAIN = -1
 STRUCTURE = -2
 FLOOR = -3
 FLOOR_SHADOW = -4
-WALL = -5
-CORNER = -6
-ITEM = -7
+GRASS_SHADOW = -5
+WALL = -6
+CORNER = -7
+ITEM = -8
 
 GRASS_PLAIN = 1
 

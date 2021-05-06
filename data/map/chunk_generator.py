@@ -38,6 +38,7 @@ def gen_structure_info(seed, structures_number):
         directions_number = randchoice(seed=structure_seed,
                                        array=[1, 2, 3, 4],
                                        p=[0.35, 0.35, 0.2, 0.1])
+        directions_number = 4
         build_directions = np.take(a=DIRECTIONS,
                                    indices=randchoice(seed=structure_seed,
                                                       array=[0, 1, 2, 3],
@@ -162,6 +163,14 @@ def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corne
             shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
             cast_normal_corner_shadow(structures_array, shadow_pos,
                                       CHECKERED_SHADOW_TOP_LEFT_FULL, GRASS_SHADOW_TOP_LEFT_FULL)
+        elif is_what(structures_array[wall_pos], WALL_BOTTOM_LEFT):
+            shadow_pos = (wall_pos[0] + 1, wall_pos[1])
+            cast_normal_corner_shadow(structures_array, shadow_pos,
+                                      CHECKERED_SHADOW_TOP_CORNER, GRASS_SHADOW_TOP_CORNER)
+        elif is_what(structures_array[wall_pos], WALL_TOP_RIGHT):
+            shadow_pos = (wall_pos[0], wall_pos[1] + 1)
+            cast_normal_corner_shadow(structures_array, shadow_pos,
+                                      CHECKERED_SHADOW_LEFT_CORNER, GRASS_SHADOW_LEFT_CORNER)
         elif is_what(structures_array[wall_pos], WALL_BOTTOM_RIGHT):
             corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
             left_shadow_pos = (wall_pos[0], wall_pos[1] + 1)
@@ -170,21 +179,13 @@ def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corne
                                          CHECKERED_SHADOW_TOP_LEFT, GRASS_SHADOW_TOP_LEFT,
                                          CHECKERED_SHADOW_LEFT, GRASS_SHADOW_LEFT_1, GRASS_SHADOW_LEFT_2,
                                          CHECKERED_SHADOW_TOP, GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
-        elif is_what(structures_array[wall_pos], WALL_TOP_RIGHT):
-            shadow_pos = (wall_pos[0], wall_pos[1] + 1)
-            cast_normal_corner_shadow(structures_array, shadow_pos,
-                                      CHECKERED_SHADOW_LEFT_CORNER, GRASS_SHADOW_LEFT_CORNER)
-        elif is_what(structures_array[wall_pos], WALL_BOTTOM_LEFT):
-            shadow_pos = (wall_pos[0] + 1, wall_pos[1])
-            cast_normal_corner_shadow(structures_array, shadow_pos,
-                                      CHECKERED_SHADOW_TOP_CORNER, GRASS_SHADOW_TOP_CORNER)
 
 
 def cast_side_shadow(seed, structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type1, terrain_shadow_type2):
     if is_what(structures_array[shadow_pos], FLOOR):
         structures_array[shadow_pos] = floor_shadow_type
     else:
-        structures_array[shadow_pos] = randchoice(seed + shadow_pos[1],
+        structures_array[shadow_pos] = randchoice(seed + shadow_pos[0] + shadow_pos[1],
                                                   [terrain_shadow_type1, terrain_shadow_type2])
 
 
@@ -201,14 +202,66 @@ def cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left
                                  floor_top_shadow_type, terrain_top_shadow_type1, terrain_top_shadow_type2):
     if is_what(structures_array[corner_shadow_pos], FLOOR):
         structures_array[corner_shadow_pos] = floor_corner_shadow_type
-        structures_array[left_shadow_pos] = floor_left_shadow_type
-        structures_array[top_shadow_pos] = floor_top_shadow_type
+        if not is_what(structures_array[left_shadow_pos], FLOOR_SHADOW):
+            structures_array[left_shadow_pos] = floor_left_shadow_type
+        if not is_what(structures_array[top_shadow_pos], FLOOR_SHADOW):
+            structures_array[top_shadow_pos] = floor_top_shadow_type
     elif is_what(structures_array[corner_shadow_pos], TERRAIN):
         structures_array[corner_shadow_pos] = terrain_corner_shadow_type
-        structures_array[left_shadow_pos] = randchoice(seed + left_shadow_pos[1],
+        if not is_what(structures_array[left_shadow_pos], GRASS_SHADOW):
+            structures_array[left_shadow_pos] = randchoice(seed + left_shadow_pos[0] + left_shadow_pos[1],
                                                        [terrain_left_shadow_type1, terrain_left_shadow_type2])
-        structures_array[top_shadow_pos] = randchoice(seed + top_shadow_pos[0],
+        if not is_what(structures_array[top_shadow_pos], GRASS_SHADOW):
+            structures_array[top_shadow_pos] = randchoice(seed + top_shadow_pos[0] + top_shadow_pos[1],
                                                       [terrain_top_shadow_type1, terrain_top_shadow_type2])
+
+
+def create_openings(structures_array, structures_info, position, horizontal_walls, vertical_walls):
+    # number_of_openings = len(structures_info[position])
+    horizontal_openings = get_openings(horizontal_walls, 0, 1)
+    for opening in horizontal_openings:
+        for pos in opening:
+            structures_array[pos] = CHECKERED_PLAIN
+    vertical_openings = get_openings(vertical_walls, 1, 0)
+    for opening in vertical_openings:
+        for pos in opening:
+            structures_array[pos] = CHECKERED_PLAIN
+    print("done")
+
+
+def get_groups(walls_list, defining_index, secondary_index):
+    groups = []
+    group = []
+    current_group_position = walls_list[0][defining_index]
+    consecutive_position = walls_list[0][secondary_index]
+    for wall_pos in walls_list:
+        primary_position = wall_pos[defining_index]
+        secondary_position = wall_pos[secondary_index]
+        if primary_position != current_group_position or secondary_position != consecutive_position:
+            groups.append(group)
+            group = []
+            consecutive_position = wall_pos[secondary_index]
+        group.append(wall_pos)
+        current_group_position = primary_position
+        consecutive_position += 1
+    groups.append(group)
+    return groups
+
+
+def get_openings(walls_list, defining_index, secondary_index):
+    openings = []
+    groups = get_groups(walls_list, defining_index, secondary_index)
+    for group in groups:
+        opening = []
+        group_length = len(group)
+        if group_length >= 4:
+            opening.append(group[group_length // 2 - 1])
+            opening.append(group[group_length // 2])
+            if group_length % 2 != 0:
+                opening.append(group[group_length // 2 + 1])
+        if opening:
+            openings.append(opening)
+    return openings
 
 
 def generate_items(seed, structures_array, structures_info, position, interior_floor):
