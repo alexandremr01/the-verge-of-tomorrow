@@ -2,10 +2,8 @@ import pygame
 import numpy as np
 from data.components.item import ItemGenerator
 from data.utils import compare
-from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, RENDER_STEPS, TILE_NUMBER
+from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, DRAW_RENDER_STEPS, TERRAIN_BUILD_STEPS, TILE_NUMBER
 from data.map.tile import *
-
-TERRAIN_STEPS = 8
 
 STRUCTURES_SEED = {(TILE_NUMBER * 1 // 4, TILE_NUMBER * 1 // 4): 1, (TILE_NUMBER * 3 // 4, TILE_NUMBER * 3 // 4): 2,
                    (TILE_NUMBER * 1 // 4, TILE_NUMBER * 3 // 4): 3, (TILE_NUMBER * 3 // 4, TILE_NUMBER * 1 // 4): 4}
@@ -26,19 +24,21 @@ def randint(seed, low, high=None, size=None, dtype=int):
 
 
 def randrowchoice(seed, array, size=None, replace=True, p=None):
-    return np.take(np.array(array, dtype=object), indices=randchoice(seed=seed, array=len(array), size=size, replace=replace, p=p), axis=0)
+    return np.take(np.array(array, dtype=object),
+                   indices=randchoice(seed=seed, array=len(array), size=size, replace=replace, p=p), axis=0)
 
 
-def gen_structure_info(seed, structures_number):
-    structure_spawns = randrowchoice(seed=seed, array=STRUCTURES, size=structures_number, replace=False)
+def gen_structure_info(seed, number_of_structures):
+    structure_spawns = randrowchoice(seed=seed, array=STRUCTURES, size=number_of_structures, replace=False)
     structures = {}
     for position in structure_spawns:
         structure_seed = seed + STRUCTURES_SEED[tuple(position)]
-        directions_number = randchoice(seed=structure_seed,
-                                       array=[1, 2, 3, 4],
-                                       p=[0.35, 0.35, 0.2, 0.1])
-        directions_number = 4
-        build_directions = randrowchoice(seed=structure_seed, array=DIRECTIONS, size=directions_number, replace=False)
+        number_of_directions = randchoice(seed=structure_seed,
+                                          array=[1, 2, 3, 4],
+                                          p=[0.35, 0.35, 0.2, 0.1])
+        number_of_directions = 4
+        build_directions = randrowchoice(seed=structure_seed, array=DIRECTIONS, size=number_of_directions,
+                                         replace=False)
         generation_variables = []
         for direction in build_directions:
             direction_seed = structure_seed + DIRECTIONS_SEED[tuple(direction)]
@@ -55,11 +55,11 @@ def gen_structure_info(seed, structures_number):
 
 def gen_terrain_load(generator, topleft, terrain_step):
     starting_position = (topleft +
-                         np.array([0, CHUNK_SIZE // TERRAIN_STEPS * terrain_step])) / TILE_SIZE
+                         np.array([0, CHUNK_SIZE // TERRAIN_BUILD_STEPS * terrain_step])) / TILE_SIZE
     load = np.array([[(generator.noise2d((starting_position[0] + j) / 3,
                                          -(starting_position[1] + i) / 3) + 1) / 2
                       for j in range(TILE_NUMBER)]
-                     for i in range(TILE_NUMBER // TERRAIN_STEPS)])
+                     for i in range(TILE_NUMBER // TERRAIN_BUILD_STEPS)])
     return load
 
 
@@ -146,11 +146,13 @@ def create_openings(seed, structures_array, structures_info, position, horizonta
     structure_size = len(structures_info[position])
     number_of_openings = structure_size // 3 + 1
     horizontal_openings = get_openings(horizontal_walls, 0, 1)
-    build_openings(seed, structures_array, horizontal_openings, horizontal_walls, horizontal_opening_walls, number_of_openings,
+    build_openings(seed, structures_array, horizontal_openings, horizontal_walls, horizontal_opening_walls,
+                   number_of_openings,
                    WALL_LEFT_CORNER, WALL_RIGHT_CORNER, CHECKERED_PLAIN,
                    WALL_LEFT_CORNER_BROKEN, WALL_RIGHT_CORNER_BROKEN, WALL_BROKEN)
     vertical_openings = get_openings(vertical_walls, 1, 0)
-    build_openings(seed, structures_array, vertical_openings, vertical_walls, vertical_opening_walls, number_of_openings,
+    build_openings(seed, structures_array, vertical_openings, vertical_walls, vertical_opening_walls,
+                   number_of_openings,
                    WALL_TOP_CORNER, WALL_BOTTOM_CORNER, CHECKERED_PLAIN,
                    WALL_TOP_CORNER_BROKEN, WALL_BOTTOM_CORNER_BROKEN, WALL_BROKEN)
 
@@ -257,7 +259,7 @@ def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corne
                                          CHECKERED_SHADOW_TOP, GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
 
     for wall_pos in horizontal_opening_walls:
-        if is_what(structures_array[wall_pos], WALL_LEFT_CORNER)\
+        if is_what(structures_array[wall_pos], WALL_LEFT_CORNER) \
                 or is_what(structures_array[wall_pos], WALL_LEFT_CORNER_BROKEN):
             side_shadow_pos = (wall_pos[0], wall_pos[1] + 1)
             corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
@@ -270,7 +272,7 @@ def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corne
                                        CHECKERED_SHADOW_TOP_CORNER, GRASS_SHADOW_TOP_CORNER)
 
     for wall_pos in vertical_opening_walls:
-        if is_what(structures_array[wall_pos], WALL_TOP_CORNER)\
+        if is_what(structures_array[wall_pos], WALL_TOP_CORNER) \
                 or is_what(structures_array[wall_pos], WALL_TOP_CORNER_BROKEN):
             side_shadow_pos = (wall_pos[0] + 1, wall_pos[1])
             corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
@@ -312,10 +314,10 @@ def cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left
         structures_array[corner_shadow_pos] = terrain_corner_shadow_type
         if not is_what(structures_array[left_shadow_pos], GRASS_SHADOW):
             structures_array[left_shadow_pos] = randchoice(seed + left_shadow_pos[0] + left_shadow_pos[1],
-                                                       [terrain_left_shadow_type1, terrain_left_shadow_type2])
+                                                           [terrain_left_shadow_type1, terrain_left_shadow_type2])
         if not is_what(structures_array[top_shadow_pos], GRASS_SHADOW):
             structures_array[top_shadow_pos] = randchoice(seed + top_shadow_pos[0] + top_shadow_pos[1],
-                                                      [terrain_top_shadow_type1, terrain_top_shadow_type2])
+                                                          [terrain_top_shadow_type1, terrain_top_shadow_type2])
 
 
 def cast_opening_single_shadow(structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type):
@@ -341,3 +343,44 @@ def generate_items(seed, structures_array, structures_info, position, interior_f
     for item_pos in item_positions:
         item = ItemGenerator().generate_item()
         structures_array[tuple(item_pos)] = item.get_sprite()
+
+
+def decode(tilegrid, structuregrid, position):
+    if structuregrid is None or structuregrid[position] == 0:
+        terrain_noise = tilegrid[position]
+        if 0 <= terrain_noise - 0.1 < 0.15:
+            tilegrid[position] = compare(noise_value=terrain_noise, starting_value=0.1, interval_percentage=0.15,
+                                         slices=[GRASS_DARKLEAFS_1,
+                                                 GRASS_DARKLEAFS_2],
+                                         percentages=[0.6, 0.4])
+        elif 0 <= terrain_noise - 0.25 <= 0.45:
+            tilegrid[position] = GRASS_PLAIN
+        elif 0 <= terrain_noise - 0.7 < 0.3:
+            tilegrid[position] = compare(noise_value=terrain_noise, starting_value=0.7, interval_percentage=0.3,
+                                         slices=[GRASS_BRIGHTLEAFS_4,
+                                                 GRASS_BRIGHTLEAFS_3,
+                                                 GRASS_BRIGHTLEAFS_2,
+                                                 GRASS_BRIGHTLEAFS_1],
+                                         percentages=[0.05, 0.1, 0.15, 0.7])
+        else:
+            tilegrid[position] = ROCK
+    elif (is_what(structuregrid[position], FLOOR) or is_what(structuregrid[position], ITEM)) \
+            and not is_what(structuregrid[position], FLOOR_SHADOW):
+        floor_noise = tilegrid[position]
+        if 0 <= floor_noise - 0.1 < 0.2:
+            tilegrid[position] = compare(noise_value=floor_noise, starting_value=0.1, interval_percentage=0.2,
+                                         slices=[GRASS_BRIGHTLEAFS_1,
+                                                 GRASS_BRIGHTLEAFS_2,
+                                                 CHECKERED_GRASS_3,
+                                                 CHECKERED_GRASS_2,
+                                                 CHECKERED_GRASS_1],
+                                         percentages=[0.1, 0.2, 0.2, 0.25, 0.25])
+        elif 0 <= floor_noise - 0.6 < 0.4:
+            tilegrid[position] = compare(noise_value=floor_noise, starting_value=0.6, interval_percentage=0.4,
+                                         slices=[CHECKERED_BROKEN_2,
+                                                 CHECKERED_BROKEN_1],
+                                         percentages=[0.4, 0.6])
+        else:
+            tilegrid[position] = CHECKERED_PLAIN
+    else:
+        tilegrid[position] = structuregrid[position]

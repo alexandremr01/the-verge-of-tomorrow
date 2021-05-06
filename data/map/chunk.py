@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 from data.components.item import ItemGenerator
 from data.utils import compare
-from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, RENDER_STEPS, TILE_NUMBER
+from data.constants import CHUNK_SIZE, CHUNK_ARRAY, TILE_SIZE, DRAW_RENDER_STEPS, TERRAIN_BUILD_STEPS, TILE_NUMBER
 from data.map.tile import *
 from data.map.chunk_generator import *
 
@@ -23,11 +23,11 @@ class Chunk:
         self.surface_night = None
         self.is_rendering = True
         self.terrain_step = 0
-        self.terrain_steps = 8
+        self.terrain_steps = TERRAIN_BUILD_STEPS
         self.structures_step = -1
         self.structures_steps = 0
         self.draw_step = 0
-        self.draw_steps = RENDER_STEPS
+        self.draw_steps = DRAW_RENDER_STEPS
         self.item_generator = ItemGenerator()
 
     def is_unloaded(self):
@@ -43,24 +43,30 @@ class Chunk:
         self.surface_night = None
         self.structures = None
         self.structures_step = -1
-        self.terrain_step = self.draw_step = 0
 
-    def generate_structure_variables(self, number_of_structures):
-        self.structuregrid = np.zeros((TILE_NUMBER, TILE_NUMBER))
-        self.structures = gen_structure_info(self.seed, number_of_structures)
+    def initialize_chunk_variables(self):
+        self.surface = pygame.Surface(CHUNK_ARRAY)
+        self.surface_night = pygame.Surface(CHUNK_ARRAY)
+
+        number_of_structures = randchoice(self.seed, array=5, p=[0.6, 0.2, 0.1, 0.05, 0.05])
+        if number_of_structures > 0:
+            self.structuregrid = np.zeros((TILE_NUMBER, TILE_NUMBER))
+            self.structures = gen_structure_info(self.seed, number_of_structures)
+        self.structures_steps = number_of_structures
+        self.terrain_step = 0
+        self.draw_step = 0
 
     def generate_terrain(self, generator):
         load = gen_terrain_load(generator, self.topleft, self.terrain_step)
         if self.terrain_step == 0:
             self.tilegrid = load
-            self.surface = pygame.Surface(CHUNK_ARRAY)
-            self.surface_night = pygame.Surface(CHUNK_ARRAY)
         else:
             self.tilegrid = np.concatenate((self.tilegrid, load), axis=0)
 
     def generate_structure(self):
         position = [*self.structures][self.structures_step]  # Gets next structure position to generate
 
+        # Helpful lists
         interior_floor = []
         border_floor = []
         horizontal_walls = []
@@ -86,12 +92,7 @@ class Chunk:
     def render(self, generator, tiles):
         self.is_rendering = True
         if self.structures_step == -1:
-            np.random.seed(self.seed)
-            number_of_structures = int(np.random.choice([0, 1, 2, 3, 4], p=[0.6, 0.2, 0.1, 0.05, 0.05]))
-            number_of_structures = 4
-            if number_of_structures != 0:
-                self.generate_structure_variables(number_of_structures)
-            self.structures_steps = number_of_structures
+            self.initialize_chunk_variables()
             self.structures_step += 1
         else:
             if self.terrain_step is not self.terrain_steps:
@@ -115,50 +116,10 @@ class Chunk:
                                 np.array([j, i]) * TILE_SIZE)
 
     def draw(self, tiles):
-        row = TILE_NUMBER // self.draw_steps * self.draw_step
-        for i in range(TILE_NUMBER // self.draw_steps):
+        row = TILE_NUMBER // DRAW_RENDER_STEPS * self.draw_step
+        for i in range(TILE_NUMBER // DRAW_RENDER_STEPS):
             for j in range(TILE_NUMBER):
-                self.decode(row + i, j)
+                decode(self.tilegrid, self.structuregrid, (row + i, j))
                 self.blit(row + i, j, tiles, self.tilegrid)
                 if self.structuregrid is not None and is_what(self.structuregrid[row + i][j], ITEM):
                     self.blit(row + i, j, tiles, self.structuregrid)
-
-    def decode(self, i, j):
-        if self.structuregrid is None or self.structuregrid[i][j] == 0:
-            terrain_noise = self.tilegrid[i][j]
-            if 0 <= terrain_noise - 0.1 < 0.15:
-                self.tilegrid[i][j] = compare(noise_value=terrain_noise, starting_value=0.1, interval_percentage=0.15,
-                                              slices=[GRASS_DARKLEAFS_1,
-                                                      GRASS_DARKLEAFS_2],
-                                              percentages=[0.6, 0.4])
-            elif 0 <= terrain_noise - 0.25 <= 0.45:
-                self.tilegrid[i][j] = GRASS_PLAIN
-            elif 0 <= terrain_noise - 0.7 < 0.3:
-                self.tilegrid[i][j] = compare(noise_value=terrain_noise, starting_value=0.7, interval_percentage=0.3,
-                                              slices=[GRASS_BRIGHTLEAFS_4,
-                                                      GRASS_BRIGHTLEAFS_3,
-                                                      GRASS_BRIGHTLEAFS_2,
-                                                      GRASS_BRIGHTLEAFS_1],
-                                              percentages=[0.05, 0.1, 0.15, 0.7])
-            else:
-                self.tilegrid[i][j] = ROCK
-        elif (is_what(self.structuregrid[i][j], FLOOR) or is_what(self.structuregrid[i][j], ITEM)) \
-                and not is_what(self.structuregrid[i][j], FLOOR_SHADOW):
-            floor_noise = self.tilegrid[i][j]
-            if 0 <= floor_noise - 0.1 < 0.2:
-                self.tilegrid[i][j] = compare(noise_value=floor_noise, starting_value=0.1, interval_percentage=0.2,
-                                              slices=[GRASS_BRIGHTLEAFS_1,
-                                                      GRASS_BRIGHTLEAFS_2,
-                                                      CHECKERED_GRASS_3,
-                                                      CHECKERED_GRASS_2,
-                                                      CHECKERED_GRASS_1],
-                                              percentages=[0.1, 0.2, 0.2, 0.25, 0.25])
-            elif 0 <= floor_noise - 0.6 < 0.4:
-                self.tilegrid[i][j] = compare(noise_value=floor_noise, starting_value=0.6, interval_percentage=0.4,
-                                              slices=[CHECKERED_BROKEN_2,
-                                                      CHECKERED_BROKEN_1],
-                                              percentages=[0.4, 0.6])
-            else:
-                self.tilegrid[i][j] = CHECKERED_PLAIN
-        else:
-            self.tilegrid[i][j] = self.structuregrid[i][j]
