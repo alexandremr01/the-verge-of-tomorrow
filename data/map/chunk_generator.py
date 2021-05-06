@@ -141,15 +141,16 @@ def build_corner_wall(structures_array, corner_walls, corner_pos, adjacent_pos1,
             corner_walls.append(corner_pos)
 
 
-def create_openings(seed, structures_array, structures_info, position, horizontal_walls, vertical_walls, opening_walls):
+def create_openings(seed, structures_array, structures_info, position, horizontal_walls, vertical_walls,
+                    horizontal_opening_walls, vertical_opening_walls):
     structure_size = len(structures_info[position])
     number_of_openings = structure_size // 3 + 1
     horizontal_openings = get_openings(horizontal_walls, 0, 1)
-    build_openings(seed, structures_array, horizontal_openings, horizontal_walls, opening_walls, number_of_openings,
+    build_openings(seed, structures_array, horizontal_openings, horizontal_walls, horizontal_opening_walls, number_of_openings,
                    WALL_LEFT_CORNER, WALL_RIGHT_CORNER, CHECKERED_PLAIN,
                    WALL_LEFT_CORNER_BROKEN, WALL_RIGHT_CORNER_BROKEN, WALL_BROKEN)
     vertical_openings = get_openings(vertical_walls, 1, 0)
-    build_openings(seed, structures_array, vertical_openings, vertical_walls, opening_walls, number_of_openings,
+    build_openings(seed, structures_array, vertical_openings, vertical_walls, vertical_opening_walls, number_of_openings,
                    WALL_TOP_CORNER, WALL_BOTTOM_CORNER, CHECKERED_PLAIN,
                    WALL_TOP_CORNER_BROKEN, WALL_BOTTOM_CORNER_BROKEN, WALL_BROKEN)
 
@@ -221,7 +222,8 @@ def build_opening(structures_array, opening, walls_list, opening_walls, corner_t
         opening_walls.append(tuple(opening[3]))
 
 
-def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corner_walls, opening_walls):
+def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corner_walls,
+                 horizontal_opening_walls, vertical_opening_walls):
     for wall_pos in horizontal_walls:
         shadow_pos = (wall_pos[0] + 1, wall_pos[1])
         cast_side_shadow(seed, structures_array, shadow_pos, CHECKERED_SHADOW_TOP,
@@ -254,8 +256,31 @@ def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corne
                                          CHECKERED_SHADOW_LEFT, GRASS_SHADOW_LEFT_1, GRASS_SHADOW_LEFT_2,
                                          CHECKERED_SHADOW_TOP, GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
 
-    for wall_pos in opening_walls:
-        pass
+    for wall_pos in horizontal_opening_walls:
+        if is_what(structures_array[wall_pos], WALL_LEFT_CORNER)\
+                or is_what(structures_array[wall_pos], WALL_LEFT_CORNER_BROKEN):
+            side_shadow_pos = (wall_pos[0], wall_pos[1] + 1)
+            corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
+            cast_opening_double_shadow(structures_array, side_shadow_pos, corner_shadow_pos,
+                                       CHECKERED_SHADOW_LEFT_CORNER,
+                                       CHECKERED_SHADOW_TOP_LEFT, GRASS_SHADOW_TOP_LEFT)
+        else:
+            shadow_pos = (wall_pos[0] + 1, wall_pos[1])
+            cast_opening_single_shadow(structures_array, shadow_pos,
+                                       CHECKERED_SHADOW_TOP_CORNER, GRASS_SHADOW_TOP_CORNER)
+
+    for wall_pos in vertical_opening_walls:
+        if is_what(structures_array[wall_pos], WALL_TOP_CORNER)\
+                or is_what(structures_array[wall_pos], WALL_TOP_CORNER_BROKEN):
+            side_shadow_pos = (wall_pos[0] + 1, wall_pos[1])
+            corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
+            cast_opening_double_shadow(structures_array, side_shadow_pos, corner_shadow_pos,
+                                       CHECKERED_SHADOW_TOP_CORNER,
+                                       CHECKERED_SHADOW_TOP_LEFT, GRASS_SHADOW_TOP_LEFT)
+        else:
+            shadow_pos = (wall_pos[0], wall_pos[1] + 1)
+            cast_opening_single_shadow(structures_array, shadow_pos,
+                                       CHECKERED_SHADOW_LEFT_CORNER, GRASS_SHADOW_LEFT_CORNER)
 
 
 def cast_side_shadow(seed, structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type1, terrain_shadow_type2):
@@ -291,6 +316,23 @@ def cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left
         if not is_what(structures_array[top_shadow_pos], GRASS_SHADOW):
             structures_array[top_shadow_pos] = randchoice(seed + top_shadow_pos[0] + top_shadow_pos[1],
                                                       [terrain_top_shadow_type1, terrain_top_shadow_type2])
+
+
+def cast_opening_single_shadow(structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type):
+    if is_what(structures_array[shadow_pos], FLOOR):
+        structures_array[shadow_pos] = floor_shadow_type
+    else:
+        structures_array[shadow_pos] = terrain_shadow_type
+
+
+def cast_opening_double_shadow(structures_array, side_shadow_pos, corner_shadow_pos, side_shadow_type,
+                               floor_corner_shadow_type, terrain_corner_shadow_type):
+    if is_what(structures_array[corner_shadow_pos], FLOOR):
+        structures_array[corner_shadow_pos] = floor_corner_shadow_type
+    else:
+        structures_array[corner_shadow_pos] = terrain_corner_shadow_type
+    if not is_what(structures_array[side_shadow_pos], WALL_BROKEN):
+        structures_array[side_shadow_pos] = side_shadow_type
 
 
 def generate_items(seed, structures_array, structures_info, position, interior_floor):

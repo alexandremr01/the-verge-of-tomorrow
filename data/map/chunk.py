@@ -66,7 +66,8 @@ class Chunk:
         horizontal_walls = []
         vertical_walls = []
         corner_walls = []
-        opening_walls = []
+        horizontal_opening_walls = []
+        vertical_opening_walls = []
 
         build_floor(self.structuregrid, self.structures, position, interior_floor, border_floor)
         build_walls(self.structuregrid, border_floor, horizontal_walls, vertical_walls, corner_walls)
@@ -76,8 +77,9 @@ class Chunk:
         vertical_walls.sort(key=lambda element: (element[1], element[0]))
 
         create_openings(self.seed, self.structuregrid, self.structures, position,
-                        horizontal_walls, vertical_walls, opening_walls)
-        cast_shadows(self.seed, self.structuregrid, horizontal_walls, vertical_walls, corner_walls, opening_walls)
+                        horizontal_walls, vertical_walls, horizontal_opening_walls, vertical_opening_walls)
+        cast_shadows(self.seed, self.structuregrid, horizontal_walls, vertical_walls, corner_walls,
+                     horizontal_opening_walls, vertical_opening_walls)
 
         generate_items(self.seed, self.structuregrid, self.structures, position, interior_floor)
 
