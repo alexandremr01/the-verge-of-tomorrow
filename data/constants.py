@@ -2,7 +2,6 @@
 This module contains constant variables used throughout all
 code
 """
-import pygame
 import numpy as np
 
 # Screen

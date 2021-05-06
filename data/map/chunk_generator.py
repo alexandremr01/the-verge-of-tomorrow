@@ -25,13 +25,12 @@ def randint(seed, low, high=None, size=None, dtype=int):
     return np.random.randint(low=low, high=high, size=size, dtype=dtype)
 
 
+def randrowchoice(seed, array, size=None, replace=True, p=None):
+    return np.take(np.array(array, dtype=object), indices=randchoice(seed=seed, array=len(array), size=size, replace=replace, p=p), axis=0)
+
+
 def gen_structure_info(seed, structures_number):
-    structure_spawns = np.take(a=STRUCTURES,
-                               indices=randchoice(seed=seed,
-                                                  array=[0, 1, 2, 3],
-                                                  size=structures_number,
-                                                  replace=False),
-                               axis=0)
+    structure_spawns = randrowchoice(seed=seed, array=STRUCTURES, size=structures_number, replace=False)
     structures = {}
     for position in structure_spawns:
         structure_seed = seed + STRUCTURES_SEED[tuple(position)]
@@ -39,21 +38,16 @@ def gen_structure_info(seed, structures_number):
                                        array=[1, 2, 3, 4],
                                        p=[0.35, 0.35, 0.2, 0.1])
         directions_number = 4
-        build_directions = np.take(a=DIRECTIONS,
-                                   indices=randchoice(seed=structure_seed,
-                                                      array=[0, 1, 2, 3],
-                                                      size=directions_number,
-                                                      replace=False),
-                                   axis=0)
+        build_directions = randrowchoice(seed=structure_seed, array=DIRECTIONS, size=directions_number, replace=False)
         generation_variables = []
         for direction in build_directions:
             direction_seed = structure_seed + DIRECTIONS_SEED[tuple(direction)]
             width = randint(seed=direction_seed,
                             low=6,
-                            high=TILE_NUMBER / 4 - 1)
+                            high=TILE_NUMBER // 4 - 1)
             height = randint(seed=direction_seed + 5,
                              low=6,
-                             high=TILE_NUMBER / 4 - 1)
+                             high=TILE_NUMBER // 4 - 1)
             generation_variables.append((direction, (width, height)))
         structures[tuple(position)] = generation_variables
     return structures
@@ -147,85 +141,17 @@ def build_corner_wall(structures_array, corner_walls, corner_pos, adjacent_pos1,
             corner_walls.append(corner_pos)
 
 
-def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corner_walls):
-    for wall_pos in horizontal_walls:
-        shadow_pos = (wall_pos[0] + 1, wall_pos[1])
-        cast_side_shadow(seed, structures_array, shadow_pos, CHECKERED_SHADOW_TOP,
-                         GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
-
-    for wall_pos in vertical_walls:
-        shadow_pos = (wall_pos[0], wall_pos[1] + 1)
-        cast_side_shadow(seed, structures_array, shadow_pos, CHECKERED_SHADOW_LEFT,
-                         GRASS_SHADOW_LEFT_1, GRASS_SHADOW_LEFT_2)
-
-    for wall_pos in corner_walls:
-        if is_what(structures_array[wall_pos], WALL_TOP_LEFT):
-            shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
-            cast_normal_corner_shadow(structures_array, shadow_pos,
-                                      CHECKERED_SHADOW_TOP_LEFT_FULL, GRASS_SHADOW_TOP_LEFT_FULL)
-        elif is_what(structures_array[wall_pos], WALL_BOTTOM_LEFT):
-            shadow_pos = (wall_pos[0] + 1, wall_pos[1])
-            cast_normal_corner_shadow(structures_array, shadow_pos,
-                                      CHECKERED_SHADOW_TOP_CORNER, GRASS_SHADOW_TOP_CORNER)
-        elif is_what(structures_array[wall_pos], WALL_TOP_RIGHT):
-            shadow_pos = (wall_pos[0], wall_pos[1] + 1)
-            cast_normal_corner_shadow(structures_array, shadow_pos,
-                                      CHECKERED_SHADOW_LEFT_CORNER, GRASS_SHADOW_LEFT_CORNER)
-        elif is_what(structures_array[wall_pos], WALL_BOTTOM_RIGHT):
-            corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
-            left_shadow_pos = (wall_pos[0], wall_pos[1] + 1)
-            top_shadow_pos = (wall_pos[0] + 1, wall_pos[1])
-            cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left_shadow_pos, top_shadow_pos,
-                                         CHECKERED_SHADOW_TOP_LEFT, GRASS_SHADOW_TOP_LEFT,
-                                         CHECKERED_SHADOW_LEFT, GRASS_SHADOW_LEFT_1, GRASS_SHADOW_LEFT_2,
-                                         CHECKERED_SHADOW_TOP, GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
-
-
-def cast_side_shadow(seed, structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type1, terrain_shadow_type2):
-    if is_what(structures_array[shadow_pos], FLOOR):
-        structures_array[shadow_pos] = floor_shadow_type
-    else:
-        structures_array[shadow_pos] = randchoice(seed + shadow_pos[0] + shadow_pos[1],
-                                                  [terrain_shadow_type1, terrain_shadow_type2])
-
-
-def cast_normal_corner_shadow(structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type):
-    if is_what(structures_array[shadow_pos], FLOOR):
-        structures_array[shadow_pos] = floor_shadow_type
-    elif is_what(structures_array[shadow_pos], TERRAIN):
-        structures_array[shadow_pos] = terrain_shadow_type
-
-
-def cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left_shadow_pos, top_shadow_pos,
-                                 floor_corner_shadow_type, terrain_corner_shadow_type,
-                                 floor_left_shadow_type, terrain_left_shadow_type1, terrain_left_shadow_type2,
-                                 floor_top_shadow_type, terrain_top_shadow_type1, terrain_top_shadow_type2):
-    if is_what(structures_array[corner_shadow_pos], FLOOR):
-        structures_array[corner_shadow_pos] = floor_corner_shadow_type
-        if not is_what(structures_array[left_shadow_pos], FLOOR_SHADOW):
-            structures_array[left_shadow_pos] = floor_left_shadow_type
-        if not is_what(structures_array[top_shadow_pos], FLOOR_SHADOW):
-            structures_array[top_shadow_pos] = floor_top_shadow_type
-    elif is_what(structures_array[corner_shadow_pos], TERRAIN):
-        structures_array[corner_shadow_pos] = terrain_corner_shadow_type
-        if not is_what(structures_array[left_shadow_pos], GRASS_SHADOW):
-            structures_array[left_shadow_pos] = randchoice(seed + left_shadow_pos[0] + left_shadow_pos[1],
-                                                       [terrain_left_shadow_type1, terrain_left_shadow_type2])
-        if not is_what(structures_array[top_shadow_pos], GRASS_SHADOW):
-            structures_array[top_shadow_pos] = randchoice(seed + top_shadow_pos[0] + top_shadow_pos[1],
-                                                      [terrain_top_shadow_type1, terrain_top_shadow_type2])
-
-
-def create_openings(seed, structures_array, structures_info, position, horizontal_walls, vertical_walls):
+def create_openings(seed, structures_array, structures_info, position, horizontal_walls, vertical_walls, opening_walls):
     structure_size = len(structures_info[position])
     number_of_openings = structure_size // 3 + 1
     horizontal_openings = get_openings(horizontal_walls, 0, 1)
-    build_openings(seed, structures_array, horizontal_openings, number_of_openings,
-                   WALL_LEFT_CORNER, WALL_RIGHT_CORNER, WALL_BROKEN)
+    build_openings(seed, structures_array, horizontal_openings, horizontal_walls, opening_walls, number_of_openings,
+                   WALL_LEFT_CORNER, WALL_RIGHT_CORNER, CHECKERED_PLAIN,
+                   WALL_LEFT_CORNER_BROKEN, WALL_RIGHT_CORNER_BROKEN, WALL_BROKEN)
     vertical_openings = get_openings(vertical_walls, 1, 0)
-    build_openings(seed, structures_array, vertical_openings, number_of_openings,
-                   WALL_TOP_CORNER, WALL_BOTTOM_CORNER, WALL_BROKEN)
-    print("done")
+    build_openings(seed, structures_array, vertical_openings, vertical_walls, opening_walls, number_of_openings,
+                   WALL_TOP_CORNER, WALL_BOTTOM_CORNER, CHECKERED_PLAIN,
+                   WALL_TOP_CORNER_BROKEN, WALL_BOTTOM_CORNER_BROKEN, WALL_BROKEN)
 
 
 def get_groups(walls_list, defining_index, secondary_index):
@@ -265,24 +191,111 @@ def get_openings(walls_list, defining_index, secondary_index):
     return openings
 
 
-def build_openings(seed, structures_array, openings_list, number_of_openings, corner_type1, corner_type2, opening_type):
-    indices = randchoice(seed, list(range(len(openings_list))), size=number_of_openings, replace=False)
-    openings = np.take(openings_list, indices=indices, axis=0)
+def build_openings(seed, structures_array, openings_list, walls_list, opening_walls, number_of_openings,
+                   corner_type1, corner_type2, opening_type,
+                   corner_broken_type1, corner_broken_type2, opening_broken_type):
+    openings = randrowchoice(seed, openings_list, size=number_of_openings, replace=False)
     for opening in openings:
-        structures_array[opening[0][0], opening[0][1]] = corner_type1
-        structures_array[opening[1][0], opening[1][1]] = opening_type
-        structures_array[opening[2][0], opening[2][1]] = opening_type
-        if len(opening) == 5:
-            structures_array[opening[3][0], opening[3][1]] = opening_type
-            structures_array[opening[4][0], opening[4][1]] = corner_type2
+        if randchoice(seed + opening[0][0], [False, True]):
+            build_opening(structures_array, opening, walls_list, opening_walls,
+                          corner_type1, corner_type2, opening_type)
         else:
-            structures_array[opening[3][0], opening[3][1]] = corner_type2
+            build_opening(structures_array, opening, walls_list, opening_walls,
+                          corner_broken_type1, corner_broken_type2, opening_broken_type)
+
+
+def build_opening(structures_array, opening, walls_list, opening_walls, corner_type1, corner_type2, opening_type):
+    structures_array[tuple(opening[0])] = corner_type1
+    opening_walls.append(tuple(opening[0]))
+    structures_array[tuple(opening[1])] = opening_type
+    walls_list.remove(tuple(opening[1]))
+    structures_array[tuple(opening[2])] = opening_type
+    walls_list.remove(tuple(opening[2]))
+    if len(opening) == 5:
+        structures_array[tuple(opening[3])] = opening_type
+        walls_list.remove(tuple(opening[3]))
+        structures_array[tuple(opening[4])] = corner_type2
+        opening_walls.append(tuple(opening[4]))
+    else:
+        structures_array[tuple(opening[3])] = corner_type2
+        opening_walls.append(tuple(opening[3]))
+
+
+def cast_shadows(seed, structures_array, horizontal_walls, vertical_walls, corner_walls, opening_walls):
+    for wall_pos in horizontal_walls:
+        shadow_pos = (wall_pos[0] + 1, wall_pos[1])
+        cast_side_shadow(seed, structures_array, shadow_pos, CHECKERED_SHADOW_TOP,
+                         GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
+
+    for wall_pos in vertical_walls:
+        shadow_pos = (wall_pos[0], wall_pos[1] + 1)
+        cast_side_shadow(seed, structures_array, shadow_pos, CHECKERED_SHADOW_LEFT,
+                         GRASS_SHADOW_LEFT_1, GRASS_SHADOW_LEFT_2)
+
+    for wall_pos in corner_walls:
+        if is_what(structures_array[wall_pos], WALL_TOP_LEFT):
+            shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
+            cast_normal_corner_shadow(structures_array, shadow_pos,
+                                      CHECKERED_SHADOW_TOP_LEFT_FULL, GRASS_SHADOW_TOP_LEFT_FULL)
+        elif is_what(structures_array[wall_pos], WALL_BOTTOM_LEFT):
+            shadow_pos = (wall_pos[0] + 1, wall_pos[1])
+            cast_normal_corner_shadow(structures_array, shadow_pos,
+                                      CHECKERED_SHADOW_TOP_CORNER, GRASS_SHADOW_TOP_CORNER)
+        elif is_what(structures_array[wall_pos], WALL_TOP_RIGHT):
+            shadow_pos = (wall_pos[0], wall_pos[1] + 1)
+            cast_normal_corner_shadow(structures_array, shadow_pos,
+                                      CHECKERED_SHADOW_LEFT_CORNER, GRASS_SHADOW_LEFT_CORNER)
+        elif is_what(structures_array[wall_pos], WALL_BOTTOM_RIGHT):
+            corner_shadow_pos = (wall_pos[0] + 1, wall_pos[1] + 1)
+            left_shadow_pos = (wall_pos[0], wall_pos[1] + 1)
+            top_shadow_pos = (wall_pos[0] + 1, wall_pos[1])
+            cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left_shadow_pos, top_shadow_pos,
+                                         CHECKERED_SHADOW_TOP_LEFT, GRASS_SHADOW_TOP_LEFT,
+                                         CHECKERED_SHADOW_LEFT, GRASS_SHADOW_LEFT_1, GRASS_SHADOW_LEFT_2,
+                                         CHECKERED_SHADOW_TOP, GRASS_SHADOW_TOP_1, GRASS_SHADOW_TOP_2)
+
+    for wall_pos in opening_walls:
+        pass
+
+
+def cast_side_shadow(seed, structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type1, terrain_shadow_type2):
+    if is_what(structures_array[shadow_pos], FLOOR):
+        structures_array[shadow_pos] = floor_shadow_type
+    else:
+        structures_array[shadow_pos] = randchoice(seed + shadow_pos[0] + shadow_pos[1],
+                                                  [terrain_shadow_type1, terrain_shadow_type2])
+
+
+def cast_normal_corner_shadow(structures_array, shadow_pos, floor_shadow_type, terrain_shadow_type):
+    if is_what(structures_array[shadow_pos], FLOOR):
+        structures_array[shadow_pos] = floor_shadow_type
+    elif is_what(structures_array[shadow_pos], TERRAIN):
+        structures_array[shadow_pos] = terrain_shadow_type
+
+
+def cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left_shadow_pos, top_shadow_pos,
+                                 floor_corner_shadow_type, terrain_corner_shadow_type,
+                                 floor_left_shadow_type, terrain_left_shadow_type1, terrain_left_shadow_type2,
+                                 floor_top_shadow_type, terrain_top_shadow_type1, terrain_top_shadow_type2):
+    if is_what(structures_array[corner_shadow_pos], FLOOR):
+        structures_array[corner_shadow_pos] = floor_corner_shadow_type
+        if not is_what(structures_array[left_shadow_pos], FLOOR_SHADOW):
+            structures_array[left_shadow_pos] = floor_left_shadow_type
+        if not is_what(structures_array[top_shadow_pos], FLOOR_SHADOW):
+            structures_array[top_shadow_pos] = floor_top_shadow_type
+    elif is_what(structures_array[corner_shadow_pos], TERRAIN):
+        structures_array[corner_shadow_pos] = terrain_corner_shadow_type
+        if not is_what(structures_array[left_shadow_pos], GRASS_SHADOW):
+            structures_array[left_shadow_pos] = randchoice(seed + left_shadow_pos[0] + left_shadow_pos[1],
+                                                       [terrain_left_shadow_type1, terrain_left_shadow_type2])
+        if not is_what(structures_array[top_shadow_pos], GRASS_SHADOW):
+            structures_array[top_shadow_pos] = randchoice(seed + top_shadow_pos[0] + top_shadow_pos[1],
+                                                      [terrain_top_shadow_type1, terrain_top_shadow_type2])
 
 
 def generate_items(seed, structures_array, structures_info, position, interior_floor):
     number_of_items = len(structures_info[position])
-    indices = randchoice(seed, list(range(len(interior_floor))), size=number_of_items, replace=False)
-    item_positions = np.take(interior_floor, indices=indices, axis=0)
+    item_positions = randrowchoice(seed, interior_floor, size=number_of_items, replace=False)
     for item_pos in item_positions:
         item = ItemGenerator().generate_item()
         structures_array[tuple(item_pos)] = item.get_sprite()
