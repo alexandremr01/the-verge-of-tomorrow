@@ -216,16 +216,15 @@ def cast_exception_corner_shadow(seed, structures_array, corner_shadow_pos, left
                                                       [terrain_top_shadow_type1, terrain_top_shadow_type2])
 
 
-def create_openings(structures_array, structures_info, position, horizontal_walls, vertical_walls):
-    # number_of_openings = len(structures_info[position])
+def create_openings(seed, structures_array, structures_info, position, horizontal_walls, vertical_walls):
+    structure_size = len(structures_info[position])
+    number_of_openings = structure_size // 3 + 1
     horizontal_openings = get_openings(horizontal_walls, 0, 1)
-    for opening in horizontal_openings:
-        for pos in opening:
-            structures_array[pos] = CHECKERED_PLAIN
+    build_openings(seed, structures_array, horizontal_openings, number_of_openings,
+                   WALL_LEFT_CORNER, WALL_RIGHT_CORNER, WALL_BROKEN)
     vertical_openings = get_openings(vertical_walls, 1, 0)
-    for opening in vertical_openings:
-        for pos in opening:
-            structures_array[pos] = CHECKERED_PLAIN
+    build_openings(seed, structures_array, vertical_openings, number_of_openings,
+                   WALL_TOP_CORNER, WALL_BOTTOM_CORNER, WALL_BROKEN)
     print("done")
 
 
@@ -255,13 +254,29 @@ def get_openings(walls_list, defining_index, secondary_index):
         opening = []
         group_length = len(group)
         if group_length >= 4:
+            opening.append(group[group_length // 2 - 2])
             opening.append(group[group_length // 2 - 1])
             opening.append(group[group_length // 2])
+            opening.append(group[group_length // 2 + 1])
             if group_length % 2 != 0:
-                opening.append(group[group_length // 2 + 1])
+                opening.append(group[group_length // 2 + 2])
         if opening:
             openings.append(opening)
     return openings
+
+
+def build_openings(seed, structures_array, openings_list, number_of_openings, corner_type1, corner_type2, opening_type):
+    indices = randchoice(seed, list(range(len(openings_list))), size=number_of_openings, replace=False)
+    openings = np.take(openings_list, indices=indices, axis=0)
+    for opening in openings:
+        structures_array[opening[0][0], opening[0][1]] = corner_type1
+        structures_array[opening[1][0], opening[1][1]] = opening_type
+        structures_array[opening[2][0], opening[2][1]] = opening_type
+        if len(opening) == 5:
+            structures_array[opening[3][0], opening[3][1]] = opening_type
+            structures_array[opening[4][0], opening[4][1]] = corner_type2
+        else:
+            structures_array[opening[3][0], opening[3][1]] = corner_type2
 
 
 def generate_items(seed, structures_array, structures_info, position, interior_floor):

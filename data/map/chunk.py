@@ -74,7 +74,7 @@ class Chunk:
         horizontal_walls.sort(key=lambda element: (element[0], element[1]))
         vertical_walls.sort(key=lambda element: (element[1], element[0]))
 
-        create_openings(self.structuregrid, self.structuregrid, self.structures, horizontal_walls, vertical_walls)
+        create_openings(self.seed, self.structuregrid, self.structures, position, horizontal_walls, vertical_walls)
         generate_items(self.seed, self.structuregrid, self.structures, position, interior_floor)
 
     def render(self, generator, tiles):
